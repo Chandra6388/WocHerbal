@@ -1,0 +1,1518 @@
+{
+  "info": {
+    "name": "E-commerce Product Management System API",
+    "description": "Complete API collection for E-commerce Product Management System with Admin and User functionalities",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api",
+      "type": "string"
+    },
+    {
+      "key": "userToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "adminToken",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{userToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "User Registration",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"password\": \"password123\",\n  \"phone\": \"+1234567890\",\n  \"address\": {\n    \"street\": \"123 Main St\",\n    \"city\": \"New York\",\n    \"state\": \"NY\",\n    \"country\": \"USA\",\n    \"zipCode\": \"10001\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "User Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Admin Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"admin123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/admin/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "admin", "login"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get User Profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "me"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/logout",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "logout"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Forgot Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/password/forgot",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "password", "forgot"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Products",
+      "item": [
+        {
+          "name": "Get All Products",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/products?page=1&limit=10&keyword=phone&category=Electronics&price[gte]=100&price[lte]=1000",
+              "host": ["{{baseUrl}}"],
+              "path": ["products"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "keyword",
+                  "value": "phone"
+                },
+                {
+                  "key": "category",
+                  "value": "Electronics"
+                },
+                {
+                  "key": "price[gte]",
+                  "value": "100"
+                },
+                {
+                  "key": "price[lte]",
+                  "value": "1000"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Featured Products",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/products/featured",
+              "host": ["{{baseUrl}}"],
+              "path": ["products", "featured"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Products by Category",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/products/category/Electronics?page=1&limit=12&sort=price",
+              "host": ["{{baseUrl}}"],
+              "path": ["products", "category", "Electronics"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "12"
+                },
+                {
+                  "key": "sort",
+                  "value": "price"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Single Product",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/products/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["products", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "product_id_here"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Product",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"iPhone 13\",\n  \"description\": \"Latest iPhone model with advanced features\",\n  \"price\": 999,\n  \"category\": \"Electronics\",\n  \"seller\": \"Apple Store\",\n  \"stock\": 50,\n  \"tags\": [\"smartphone\", \"apple\", \"5G\"],\n  \"specifications\": {\n    \"color\": \"Black\",\n    \"storage\": \"128GB\",\n    \"screen\": \"6.1 inch\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/products/new",
+              "host": ["{{baseUrl}}"],
+              "path": ["products", "new"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Product",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"iPhone 13 Pro\",\n  \"price\": 1099,\n  \"stock\": 30,\n  \"status\": \"active\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/products/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["products", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "product_id_here"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Product",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/products/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["products", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "product_id_here"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Product Reviews",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/products/:id/reviews",
+              "host": ["{{baseUrl}}"],
+              "path": ["products", ":id", "reviews"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "product_id_here"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Product Review",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": \"product_id_here\",\n  \"rating\": 5,\n  \"title\": \"Excellent Product!\",\n  \"comment\": \"Great quality and fast delivery. Highly recommended!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/products/review",
+              "host": ["{{baseUrl}}"],
+              "path": ["products", "review"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Orders",
+      "item": [
+        {
+          "name": "Create Order",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderItems\": [\n    {\n      \"product\": \"product_id_here\",\n      \"quantity\": 2\n    }\n  ],\n  \"shippingInfo\": {\n    \"address\": \"123 Main St\",\n    \"city\": \"New York\",\n    \"phoneNo\": \"+1234567890\",\n    \"postalCode\": \"10001\",\n    \"country\": \"USA\"\n  },\n  \"itemsPrice\": 1998,\n  \"taxPrice\": 200,\n  \"shippingPrice\": 50,\n  \"totalPrice\": 2248,\n  \"paymentInfo\": {\n    \"id\": \"razorpay_payment_id\",\n    \"status\": \"succeeded\",\n    \"method\": \"card\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/orders/new",
+              "host": ["{{baseUrl}}"],
+              "path": ["orders", "new"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get User Orders",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/orders/me?page=1&limit=10&status=Delivered",
+              "host": ["{{baseUrl}}"],
+              "path": ["orders", "me"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "status",
+                  "value": "Delivered"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Single Order",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/orders/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["orders", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "order_id_here"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 2248,\n  \"currency\": \"INR\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/orders/create-payment",
+              "host": ["{{baseUrl}}"],
+              "path": ["orders", "create-payment"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Verify Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"razorpay_order_id\": \"order_id\",\n  \"razorpay_payment_id\": \"payment_id\",\n  \"razorpay_signature\": \"signature\",\n  \"orderData\": {\n    \"orderItems\": [],\n    \"shippingInfo\": {},\n    \"itemsPrice\": 0,\n    \"taxPrice\": 0,\n    \"shippingPrice\": 0,\n    \"totalPrice\": 0,\n    \"paymentInfo\": {}\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/orders/verify-payment",
+              "host": ["{{baseUrl}}"],
+              "path": ["orders", "verify-payment"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Cart",
+      "item": [
+        {
+          "name": "Get Cart",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart",
+              "host": ["{{baseUrl}}"],
+              "path": ["cart"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add to Cart",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": \"product_id_here\",\n  \"quantity\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/cart/add",
+              "host": ["{{baseUrl}}"],
+              "path": ["cart", "add"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Cart Item",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": \"product_id_here\",\n  \"quantity\": 3\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/cart/update",
+              "host": ["{{baseUrl}}"],
+              "path": ["cart", "update"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Remove from Cart",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart/remove/:productId",
+              "host": ["{{baseUrl}}"],
+              "path": ["cart", "remove", ":productId"],
+              "variable": [
+                {
+                  "key": "productId",
+                  "value": "product_id_here"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Clear Cart",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart/clear",
+              "host": ["{{baseUrl}}"],
+              "path": ["cart", "clear"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Apply Coupon",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"couponCode\": \"SAVE10\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/cart/coupon",
+              "host": ["{{baseUrl}}"],
+              "path": ["cart", "coupon"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Cart Summary",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart/summary",
+              "host": ["{{baseUrl}}"],
+              "path": ["cart", "summary"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Reviews",
+      "item": [
+        {
+          "name": "Get Product Reviews",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/reviews/product/:productId?page=1&limit=10&rating=5&sort=createdAt",
+              "host": ["{{baseUrl}}"],
+              "path": ["reviews", "product", ":productId"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "rating",
+                  "value": "5"
+                },
+                {
+                  "key": "sort",
+                  "value": "createdAt"
+                }
+              ],
+              "variable": [
+                {
+                  "key": "productId",
+                  "value": "product_id_here"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Review",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": \"product_id_here\",\n  \"orderId\": \"order_id_here\",\n  \"rating\": 5,\n  \"title\": \"Great Product!\",\n  \"comment\": \"Excellent quality and fast delivery.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/reviews",
+              "host": ["{{baseUrl}}"],
+              "path": ["reviews"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Review",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rating\": 4,\n  \"title\": \"Good Product\",\n  \"comment\": \"Good quality but could be better.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/reviews/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["reviews", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "review_id_here"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Review",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/reviews/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["reviews", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "review_id_here"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Mark Review Helpful",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"helpful\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/reviews/:id/helpful",
+              "host": ["{{baseUrl}}"],
+              "path": ["reviews", ":id", "helpful"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "review_id_here"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get My Reviews",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/reviews/user/me?page=1&limit=10&status=approved",
+              "host": ["{{baseUrl}}"],
+              "path": ["reviews", "user", "me"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "status",
+                  "value": "approved"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "User Management",
+      "item": [
+        {
+          "name": "Get User Profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/user/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["user", "profile"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"John Updated\",\n  \"phone\": \"+1234567891\",\n  \"address\": {\n    \"street\": \"456 New St\",\n    \"city\": \"Los Angeles\",\n    \"state\": \"CA\",\n    \"country\": \"USA\",\n    \"zipCode\": \"90210\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/user/profile/update",
+              "host": ["{{baseUrl}}"],
+              "path": ["user", "profile", "update"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get User Orders",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/user/orders?page=1&limit=10&status=Processing",
+              "host": ["{{baseUrl}}"],
+              "path": ["user", "orders"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "status",
+                  "value": "Processing"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get User Reviews",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/user/reviews?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["user", "reviews"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get User Products",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/user/products?page=1&limit=10&status=active&approvalStatus=approved",
+              "host": ["{{baseUrl}}"],
+              "path": ["user", "products"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "status",
+                  "value": "active"
+                },
+                {
+                  "key": "approvalStatus",
+                  "value": "approved"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Wishlist",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/user/wishlist",
+              "host": ["{{baseUrl}}"],
+              "path": ["user", "wishlist"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add to Wishlist",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": \"product_id_here\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/user/wishlist/add",
+              "host": ["{{baseUrl}}"],
+              "path": ["user", "wishlist", "add"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Remove from Wishlist",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/user/wishlist/remove/:productId",
+              "host": ["{{baseUrl}}"],
+              "path": ["user", "wishlist", "remove", ":productId"],
+              "variable": [
+                {
+                  "key": "productId",
+                  "value": "product_id_here"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Favorites",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/user/favorites",
+              "host": ["{{baseUrl}}"],
+              "path": ["user", "favorites"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add to Favorites",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": \"product_id_here\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/user/favorites/add",
+              "host": ["{{baseUrl}}"],
+              "path": ["user", "favorites", "add"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Notifications",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/user/notifications?page=1&limit=20&isRead=false",
+              "host": ["{{baseUrl}}"],
+              "path": ["user", "notifications"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "isRead",
+                  "value": "false"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Mark Notification as Read",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/user/notifications/:id/read",
+              "host": ["{{baseUrl}}"],
+              "path": ["user", "notifications", ":id", "read"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "notification_id_here"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get User Stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/user/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["user", "stats"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Admin Dashboard",
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "{{adminToken}}",
+            "type": "string"
+          }
+        ]
+      },
+      "item": [
+        {
+          "name": "Get Dashboard Stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/dashboard",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "dashboard"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users?page=1&limit=10&status=active&search=john",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "users"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "status",
+                  "value": "active"
+                },
+                {
+                  "key": "search",
+                  "value": "john"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update User Status",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"blocked\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/users/:id/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "users", ":id", "status"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "user_id_here"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get User Details",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "users", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "user_id_here"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Reviews",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/reviews?page=1&limit=10&status=pending&productId=product_id&userId=user_id",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "reviews"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "status",
+                  "value": "pending"
+                },
+                {
+                  "key": "productId",
+                  "value": "product_id"
+                },
+                {
+                  "key": "userId",
+                  "value": "user_id"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Approve Review",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"approved\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/reviews/:id/approve",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "reviews", ":id", "approve"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "review_id_here"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Send Notification",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"recipients\": \"all\",\n  \"type\": \"broadcast\",\n  \"title\": \"New Feature Available!\",\n  \"message\": \"Check out our latest features and improvements.\",\n  \"priority\": \"normal\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/notifications/send",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "notifications", "send"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Help Requests",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/help-requests?page=1&limit=10&status=open&priority=high&category=order_issue",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "help-requests"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "status",
+                  "value": "open"
+                },
+                {
+                  "key": "priority",
+                  "value": "high"
+                },
+                {
+                  "key": "category",
+                  "value": "order_issue"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Respond to Help Request",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"We have resolved your issue. Your order will be delivered tomorrow.\",\n  \"status\": \"resolved\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/help-requests/:id/respond",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "help-requests", ":id", "respond"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "help_request_id_here"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Sales Report",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/sales-report?startDate=2024-01-01&endDate=2024-12-31&groupBy=month",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "sales-report"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2024-01-01"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2024-12-31"
+                },
+                {
+                  "key": "groupBy",
+                  "value": "month"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Help & Support",
+      "item": [
+        {
+          "name": "Get Help Categories",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/help/categories",
+              "host": ["{{baseUrl}}"],
+              "path": ["help", "categories"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Help Request",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"subject\": \"Order Issue\",\n  \"message\": \"My order hasn't arrived yet. It's been 5 days since I placed the order.\",\n  \"category\": \"order_issue\",\n  \"order\": \"order_id_here\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/help",
+              "host": ["{{baseUrl}}"],
+              "path": ["help"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get My Help Requests",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/help/my-requests?page=1&limit=10&status=open",
+              "host": ["{{baseUrl}}"],
+              "path": ["help", "my-requests"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "status",
+                  "value": "open"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Help Request",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/help/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["help", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "help_request_id_here"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Help Request",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"subject\": \"Updated Order Issue\",\n  \"message\": \"I need more information about my order status.\",\n  \"category\": \"order_issue\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/help/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["help", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "help_request_id_here"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Respond to Help Request",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"Thank you for your patience. We are looking into this issue.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/help/:id/respond",
+              "host": ["{{baseUrl}}"],
+              "path": ["help", ":id", "respond"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "help_request_id_here"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Rate Help Request",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rating\": 5,\n  \"comment\": \"Excellent support service!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/help/:id/rate",
+              "host": ["{{baseUrl}}"],
+              "path": ["help", ":id", "rate"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "help_request_id_here"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Health Check",
+      "item": [
+        {
+          "name": "API Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+} 

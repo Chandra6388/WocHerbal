@@ -1,0 +1,46 @@
+const express = require('express');
+const router = express.Router();
+const { protect, adminOnly, optionalAuth } = require('../middleware/auth');
+const validate = require('../middleware/validate');
+
+const {
+  newProduct,
+  getProducts,
+  getSingleProduct,
+  updateProduct,
+  deleteProduct,
+  createProductReview,
+  getProductReviews,
+  deleteReview,
+  getAllProducts,
+  approveProduct,
+  getProductStats,
+  getFeaturedProducts,
+  getProductsByCategory
+} = require('../controllers/productController');
+
+// Public routes
+router.get('/', getProducts);
+router.get('/featured', getFeaturedProducts);
+router.get('/category/:category', getProductsByCategory);
+router.get('/:id', getSingleProduct);
+router.get('/:id/reviews', getProductReviews);
+
+// Protected routes
+router.use(protect);
+
+// Product CRUD
+router.post('/new', validate('createProduct'), newProduct);
+router.put('/:id', validate('updateProduct'), updateProduct);
+router.delete('/:id', deleteProduct);
+
+// Review routes
+router.post('/review', validate('createReview'), createProductReview);
+router.delete('/reviews', deleteReview);
+
+// Admin routes
+router.get('/admin/all', adminOnly, getAllProducts);
+router.put('/admin/approve/:id', adminOnly, approveProduct);
+router.get('/admin/stats', adminOnly, getProductStats);
+
+module.exports = router; 
