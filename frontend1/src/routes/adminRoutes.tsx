@@ -32,53 +32,29 @@ import Customers from "@/pages/admin/Customers";
 import Notifications from "@/pages/admin/Notifications";
 import BlogManagement from "@/pages/admin/BlogManagement";
 import { BlogPost, BlogList } from "@/pages/Blog";
-const queryClient = new QueryClient();
+import AdminSidebar from '@/components/admin/AdminSidebarNew';
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <BrowserRouter>
-        <AuthProvider>
-          <CartProvider>
-            <Toaster />
-            <Sonner />
-            <Routes>
-              <Route path="/" element={<Layout><Index /></Layout>} />
-              <Route path="/products" element={<Layout><Products /></Layout>} />
-              <Route path="/product/:id" element={<Layout><ProductDetail /></Layout>} />
-              <Route path="/cart" element={<Layout><Cart /></Layout>} />
-              <Route path="/checkout" element={<Layout><Checkout /></Layout>} />
-              <Route path="/order-success" element={<Layout><OrderSuccess /></Layout>} />
-              <Route path="/about" element={<Layout><About /></Layout>} />
-              <Route path="/testimonials" element={<Layout><Testimonials /></Layout>} />
-              <Route path="/contact" element={<Layout><Contact /></Layout>} />
-              <Route path="/track-order" element={<Layout><TrackOrder /></Layout>} />
-              <Route path="/auth" element={<Layout><Auth /></Layout>} />
-              <Route path="/profile" element={<Layout><Profile /></Layout>} />
-              <Route path="/blog" element={<Layout><BlogList /></Layout>} />
-              <Route path="/blog/:id" element={<Layout><BlogPost /></Layout>} />
 
-            
-              <Route path="/admin" element={<AdminLayoutNew />}>
-                <Route path="dashboard" element={<Dashboard />} />
-                <Route path="products" element={<AdminProducts />} />
-                <Route path="reviews" element={<Reviews />} />
-                <Route path="orders" element={<Orders />} />
-                <Route path="tracking" element={<OrderTracking />} />
-                <Route path="customers" element={<Customers />} />
-                <Route path="notifications" element={<Notifications />} />
-                <Route path="blog" element={<BlogManagement />} />
-                <Route path="reviews" element={<Reviews />} />
-                <Route path="settings" element={<div className="p-6">Settings - Coming Soon</div>} />
-              </Route>
+const AdminRoutes = () => (
+  <div className="min-h-screen bg-background flex">
+    <AdminSidebar />
+    <main className="flex-1 overflow-auto">
+      <Routes>
+        <Route path="dashboard" element={<Dashboard />} />
+        <Route path="products" element={<AdminProducts />} />
+        <Route path="reviews" element={<Reviews />} />
+        <Route path="orders" element={<Orders />} />
+        <Route path="tracking" element={<OrderTracking />} />
+        <Route path="customers" element={<Customers />} />
+        <Route path="notifications" element={<Notifications />} />
+        <Route path="blog" element={<BlogManagement />} />
+        <Route path="reviews" element={<Reviews />} />
+        <Route path="settings" element={<div className="p-6">Settings - Coming Soon</div>} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </main>
+  </div>
 
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </CartProvider>
-        </AuthProvider>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
 );
 
-export default App;
+export default AdminRoutes;
