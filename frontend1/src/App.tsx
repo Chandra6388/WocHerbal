@@ -32,7 +32,6 @@ import Customers from "./pages/admin/Customers";
 import Notifications from "./pages/admin/Notifications";
 import BlogManagement from "./pages/admin/BlogManagement";
 import { BlogPost, BlogList } from "./pages/Blog";
-
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -44,7 +43,6 @@ const App = () => (
             <Toaster />
             <Sonner />
             <Routes>
-              {/* Public Routes */}
               <Route path="/" element={<Layout><Index /></Layout>} />
               <Route path="/products" element={<Layout><Products /></Layout>} />
               <Route path="/product/:id" element={<Layout><ProductDetail /></Layout>} />

@@ -5,11 +5,11 @@ import { loginUser, registerUser, logoutUser } from '@/services/authSerives';
 import { getUserFromToken } from '@/Utils/TokenData';
 
 interface User {
-  id: string;
-  name: string;
-  email: string;
+  id?: string;
+  name?: string;
+  email?: string;
   phone?: string;
-  role: 'user' | 'admin';
+  role?: 'user' | 'admin';
   address?: {
     street: string;
     city: string;
@@ -42,47 +42,56 @@ export const useAuth = () => {
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const { toast } = useToast();
-  const token = getUserFromToken()
+  const token = getUserFromToken();
+
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
+    if (token) {
+      setUser(token as User);
+    } else {
+      setUser(null);
     }
   }, []);
 
-  const login = async (email: string, password: string): Promise<boolean> => {
-    console.log("SSSSS", email, password);
-    try {
-      const req = { email, password };
-      const res = await loginUser(req);
-      if (res?.status == "success") {
-        toast({
-          title: "Login Successful",
-          description: "Welcome back!",
-          variant: "success",
-          duration: 3000,
-        });
-        return true;
-      } else {
-        toast({
-          title: "Login Failed",
-          description: res?.message || "Invalid email or password",
-          variant: "destructive",
-          duration: 3000,
-        });
-        return false;
+
+const login = async (email: string, password: string): Promise<boolean> => {
+  try {
+    const req = { email, password };
+    const res = await loginUser(req);
+
+    if (res?.status == "success") {
+      // 🍪 Assume the token is already stored in the cookie by loginUser service
+      const tokenUser = getUserFromToken();
+      if (tokenUser) {
+        setUser(tokenUser as User); // ✅ Set the user immediately after login
       }
-    } catch (error: any) {
+
+      toast({
+        title: "Login Successful",
+        description: "Welcome back!",
+        variant: "success",
+        duration: 3000,
+      });
+      return true;
+    } else {
       toast({
         title: "Login Failed",
-        description: error?.message || "An error occurred during login",
+        description: res?.message || "Invalid email or password",
         variant: "destructive",
         duration: 3000,
       });
-      console.error("Login error:", error);
-      return false
+      return false;
     }
-  };
+  } catch (error: any) {
+    toast({
+      title: "Login Failed",
+      description: error?.message || "An error occurred during login",
+      variant: "destructive",
+      duration: 3000,
+    });
+    console.error("Login error:", error);
+    return false;
+  }
+};
 
   const register = async (name: string, email: string, password: string, phone?: string): Promise<boolean> => {
     const req = { name, email, password, phone };
