@@ -8,9 +8,27 @@ import {
   Globe, Smartphone, Monitor, Activity, Bell
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import {getDashboardStats} from '@/services/admin/dashbaord';
 
 const Dashboard = () => {
   const [timeRange, setTimeRange] = useState('7d');
+  const [dashboardData, setDashboardData] = useState(null);
+
+  useEffect(() => {
+    const fetchDashboardStats = async () => {
+      try {
+        const data = await getDashboardStats();
+        setDashboardData(data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchDashboardStats();
+  }, []);
+
+
+  console.log('Dashboard Data:', dashboardData?.stats?.revenue?.total);
 
   // Enhanced dummy data with more comprehensive metrics
   const salesData = [
@@ -54,16 +72,16 @@ const Dashboard = () => {
   const stats = [
     { 
       title: 'Total Revenue Today', 
-      value: '₹12,450', 
+      value: dashboardData?.stats?.revenue?.total, 
       change: '+12.5%', 
       changeType: 'positive',
       icon: DollarSign, 
       color: 'text-green-600',
       bgColor: 'bg-green-50'
     },
-    { 
-      title: 'Orders Today', 
-      value: '48', 
+    {
+      title: 'Orders Today',
+      value: dashboardData?.stats?.orders?.total || '0',
       change: '+8.2%',
       changeType: 'positive',
       icon: ShoppingCart, 
@@ -72,7 +90,7 @@ const Dashboard = () => {
     },
     { 
       title: 'Active Users', 
-      value: '1,247', 
+      value: dashboardData?.stats?.users?.total || '0',
       change: '+24.1%',
       changeType: 'positive',
       icon: Users, 

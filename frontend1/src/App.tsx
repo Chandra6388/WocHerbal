@@ -1,34 +1,36 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "./contexts/AuthContext";
+import { BrowserRouter, Routes, Route, useNavigate, Navigate } from "react-router-dom";
+import { useEffect } from "react";
+
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { CartProvider } from "./contexts/CartContext";
+
 import Login from "@/pages/login";
 import Register from "@/pages/register";
 import ForgotPassword from "@/pages/forgotPassword";
 import NotFound from "./pages/NotFound";
 import AdminRoute from "@/routes/adminRoutes";
 import UserRoute from "@/routes/userRoutes";
-import { useAuth } from '@/contexts/AuthContext';
-import { useEffect } from "react";
-import { useNavigate } from 'react-router-dom';
-
-
 
 const queryClient = new QueryClient();
-
 
 const AppRoutes = () => {
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuth();
+
   useEffect(() => {
-    if (!isAuthenticated) {
-      navigate('/login');
+    // Redirect only when user lands at root "/"
+    if (isAuthenticated && window.location.pathname === "/") {
+      if (user?.role === "admin") {
+        navigate("/admin/dashboard");
+      } else {
+        navigate("/user/home");
+      }
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, user, navigate]);
 
   return (
     <>
@@ -45,6 +47,7 @@ const AppRoutes = () => {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/" element={<Navigate to="/login" />} />
           </>
         )}
         <Route path="*" element={<NotFound />} />
@@ -56,13 +59,15 @@ const AppRoutes = () => {
 const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <CartProvider>
-        <TooltipProvider>
-          <BrowserRouter>
-            <AppRoutes />
-          </BrowserRouter>
-        </TooltipProvider>
-      </CartProvider>
+      <AuthProvider>
+        <CartProvider>
+          <TooltipProvider>
+            <BrowserRouter>
+              <AppRoutes />
+            </BrowserRouter>
+          </TooltipProvider>
+        </CartProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 };

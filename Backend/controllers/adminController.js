@@ -6,7 +6,6 @@ const Notification = require('../models/Notification');
 const HelpRequest = require('../models/HelpRequest');
 const ErrorHandler = require('../utils/errorHandler');
 
-// Get admin dashboard analytics => /api/admin/dashboard
 exports.getDashboardStats = async (req, res, next) => {
   try {
     // User statistics
