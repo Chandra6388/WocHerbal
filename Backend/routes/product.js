@@ -31,7 +31,7 @@ router.use(protect);
 
 // Product CRUD
 router.post('/new', validate('createProduct'), newProduct);
-router.put('/:id', validate('updateProduct'), updateProduct);
+router.put('/:id',  updateProduct);
 router.delete('/:id', deleteProduct);
 
 // Review routes

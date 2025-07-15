@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,6 +12,7 @@ import {
   Mail, Phone, MapPin, Calendar, ShoppingBag, Star
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { getAllUser } from '@/services/admin/User';
 
 interface Customer {
   id: string;
@@ -28,60 +29,9 @@ interface Customer {
 }
 
 const Customers = () => {
-  const [customers, setCustomers] = useState<Customer[]>([
-    {
-      id: '1',
-      name: 'Priya Sharma',
-      email: 'priya.sharma@gmail.com',
-      phone: '+91 98765 43210',
-      address: 'Mumbai, Maharashtra',
-      joinDate: '2024-01-15',
-      totalOrders: 12,
-      totalSpent: 25600,
-      status: 'active',
-      lastOrder: '2024-01-10',
-      rating: 4.8
-    },
-    {
-      id: '2',
-      name: 'Raj Kumar',
-      email: 'raj.kumar@yahoo.com',
-      phone: '+91 87654 32109',
-      address: 'Delhi, Delhi',
-      joinDate: '2023-12-20',
-      totalOrders: 8,
-      totalSpent: 18400,
-      status: 'active',
-      lastOrder: '2024-01-08',
-      rating: 4.2
-    },
-    {
-      id: '3',
-      name: 'Anita Patel',
-      email: 'anita.patel@hotmail.com',
-      phone: '+91 76543 21098',
-      address: 'Ahmedabad, Gujarat',
-      joinDate: '2023-11-10',
-      totalOrders: 15,
-      totalSpent: 32100,
-      status: 'active',
-      lastOrder: '2024-01-12',
-      rating: 4.9
-    },
-    {
-      id: '4',
-      name: 'Suresh Reddy',
-      email: 'suresh.reddy@gmail.com',
-      phone: '+91 65432 10987',
-      address: 'Hyderabad, Telangana',
-      joinDate: '2023-10-25',
-      totalOrders: 3,
-      totalSpent: 4800,
-      status: 'inactive',
-      lastOrder: '2023-12-15',
-      rating: 3.5
-    }
-  ]);
+  const [customers, setCustomers] = useState<Customer[]>([]);
+
+  console.log("customers",customers)
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -95,6 +45,29 @@ const Customers = () => {
     const matchesStatus = statusFilter === 'all' || customer.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
+
+
+  useEffect(()=>{
+    allUsers()
+  },[])
+
+  const allUsers = () => {
+      getAllUser()
+        .then(data => {
+          if(data?.status=="success") {
+            setCustomers(data.data);
+           
+          }
+          else{
+            setCustomers([]);
+          }
+        })
+        .catch(error => {
+          toast.error('Failed to fetch products');
+          console.error(error);
+        });
+    }
+  
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -267,7 +240,7 @@ const Customers = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredCustomers.map((customer) => (
+              {customers?.map((customer) => (
                 <TableRow key={customer.id}>
                   <TableCell>
                     <div>
@@ -284,12 +257,12 @@ const Customers = () => {
                   <TableCell>
                     <div>
                       <p className="font-semibold">{customer.totalOrders}</p>
-                      <p className="text-sm text-muted-foreground">orders</p>
+                      <p className="text-sm text-muted-foreground">N/A</p>
                     </div>
                   </TableCell>
-                  <TableCell>₹{customer.totalSpent.toLocaleString()}</TableCell>
+                  <TableCell>₹{customer.totalSpent?.toLocaleString()}</TableCell>
                   <TableCell>{getStatusBadge(customer.status)}</TableCell>
-                  <TableCell>{new Date(customer.lastOrder).toLocaleDateString()}</TableCell>
+                  <TableCell>{new Date(customer.lastOrder)?.toLocaleDateString()}</TableCell>
                   <TableCell>
                     <div className="flex gap-2">
                       <Button variant="outline" size="sm" onClick={() => handleViewCustomer(customer)}>

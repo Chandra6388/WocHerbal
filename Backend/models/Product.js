@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-
 const productSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -11,6 +10,10 @@ const productSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Please enter product description']
   },
+  benefits: {
+    type: String,
+    required: [true, 'Please enter product benefits']
+  },
   price: {
     type: Number,
     required: [true, 'Please enter product price'],
@@ -20,18 +23,10 @@ const productSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
-  images: [
-    {
-      public_id: {
-        type: String,
-        required: true
-      },
-      url: {
-        type: String,
-        required: true
-      }
-    }
-  ],
+  images:{
+    type: String,
+    required: [true, 'Please enter product images']
+  },
   category: {
     type: String,
     required: [true, 'Please enter product category'],
@@ -48,14 +43,18 @@ const productSchema = new mongoose.Schema({
         'Beauty/Health',
         'Sports',
         'Outdoor',
-        'Home'
+        'Home',
+        'Oil',
+        'Furniture',
       ],
       message: 'Please select correct category'
     }
   },
-  seller: {
+  weight: {
     type: String,
-    required: [true, 'Please enter product seller']
+    required: [true, 'Please enter product weight'],
+    maxLength: [5, 'Weight cannot exceed 5 characters'],
+    default: 0
   },
   stock: {
     type: Number,
@@ -88,11 +87,6 @@ const productSchema = new mongoose.Schema({
       }
     }
   ],
-  user: {
-    type: mongoose.Schema.ObjectId,
-    ref: 'User',
-    required: true
-  },
   status: {
     type: String,
     default: 'active',
@@ -140,7 +134,7 @@ const productSchema = new mongoose.Schema({
 });
 
 // Calculate discounted price
-productSchema.methods.getDiscountedPrice = function() {
+productSchema.methods.getDiscountedPrice = function () {
   if (this.discount > 0) {
     return this.price - (this.price * this.discount / 100);
   }
@@ -148,7 +142,7 @@ productSchema.methods.getDiscountedPrice = function() {
 };
 
 // Update product status based on stock
-productSchema.methods.updateStatus = function() {
+productSchema.methods.updateStatus = function () {
   if (this.stock <= 0) {
     this.status = 'out_of_stock';
   } else if (this.status === 'out_of_stock' && this.stock > 0) {
