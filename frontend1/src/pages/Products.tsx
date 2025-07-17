@@ -1,36 +1,59 @@
-
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Star, ShoppingCart } from 'lucide-react';
-import { products } from '../data/products';
-import { useCart } from '../contexts/CartContext';
-import { Button } from '../components/ui/button';
-import { Card, CardContent, CardFooter, CardHeader } from '../components/ui/card';
-import { Badge } from '../components/ui/badge';
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { Star, ShoppingCart } from "lucide-react";
+import { products } from "../data/products";
+import { useCart } from "../contexts/CartContext";
+import { Button } from "../components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "../components/ui/card";
+import { Badge } from "../components/ui/badge";
+import { getAllProducts } from "../services/productsServices";
 
 const Products = () => {
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const { addToCart } = useCart();
+  const [products, setProducts] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await getAllProducts({});
+        // Assuming response.data contains the products array
+        // You can set the products state here if needed
+        setProducts(response.data);
+      } catch (error) {
+        console.error("Failed to fetch products:", error);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   const categories = [
-    { id: 'all', name: 'All Products' },
-    { id: 'men', name: 'For Men' },
-    { id: 'women', name: 'For Women' },
-    { id: 'growth', name: 'Hair Growth' }
+    { id: "all", name: "All Products" },
+    { id: "men", name: "For Men" },
+    { id: "women", name: "For Women" },
+    { id: "growth", name: "Hair Growth" },
   ];
 
-  const filteredProducts = selectedCategory === 'all' 
-    ? products 
-    : products.filter(product => product.category === selectedCategory);
+  const filteredProducts =
+    selectedCategory === "all"
+      ? products
+      : products.filter((product) => product.category === selectedCategory);
 
   const handleAddToCart = (product: any) => {
     addToCart({
       id: product.id,
       name: product.name,
       price: product.price,
-      image: product.image
+      image: product.image,
     });
   };
+  console.log("Filtered Products:", products);
 
   return (
     <div className="min-h-screen pt-20 bg-background">
@@ -41,7 +64,8 @@ const Products = () => {
             Our Products
           </h1>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Discover our range of premium Ayurvedic hair care products made with traditional Panchgavya and natural herbs
+            Discover our range of premium Ayurvedic hair care products made with
+            traditional Panchgavya and natural herbs
           </p>
         </div>
 
@@ -50,7 +74,7 @@ const Products = () => {
           {categories.map((category) => (
             <Button
               key={category.id}
-              variant={selectedCategory === category.id ? 'default' : 'outline'}
+              variant={selectedCategory === category.id ? "default" : "outline"}
               onClick={() => setSelectedCategory(category.id)}
               className="rounded-full"
             >
@@ -62,7 +86,10 @@ const Products = () => {
         {/* Products Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
           {filteredProducts.map((product) => (
-            <Card key={product.id} className="group hover:shadow-lg transition-shadow duration-300">
+            <Card
+              key={product.id}
+              className="group hover:shadow-lg transition-shadow duration-300"
+            >
               <CardHeader className="p-0">
                 <Link to={`/product/${product.id}`}>
                   <div className="aspect-square overflow-hidden rounded-t-lg">
@@ -74,14 +101,14 @@ const Products = () => {
                   </div>
                 </Link>
               </CardHeader>
-              
+
               <CardContent className="p-4">
                 <Link to={`/product/${product.id}`}>
                   <h3 className="font-semibold text-lg mb-2 hover:text-primary transition-colors">
                     {product.name}
                   </h3>
                 </Link>
-                
+
                 <div className="flex items-center gap-2 mb-2">
                   <div className="flex items-center">
                     <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
@@ -95,7 +122,7 @@ const Products = () => {
                     </Badge>
                   )}
                 </div>
-                
+
                 <div className="flex items-center gap-2 mb-3">
                   <span className="text-xl font-bold text-primary">
                     ₹{product.price}
@@ -107,7 +134,7 @@ const Products = () => {
                   )}
                 </div>
               </CardContent>
-              
+
               <CardFooter className="p-4 pt-0">
                 <Button
                   onClick={() => handleAddToCart(product)}
