@@ -40,7 +40,7 @@ exports.loginUser = async (req, res, next) => {
       });
     }
 
-    const userData = await User.findOne({ email }).select('password');
+    const userData = await User.findOne({ email }).select('password status');
     if (!userData) {
       return res.status(401).json({
         status: 'error',
@@ -54,6 +54,7 @@ exports.loginUser = async (req, res, next) => {
         message: 'Invalid Email or Password'
       });
     }
+    console.log("userData.status", userData.status);
     if (userData.status !== 'active') {
       return res.status(401).json({
         status: 'error',
