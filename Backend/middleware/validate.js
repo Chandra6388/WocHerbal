@@ -127,9 +127,6 @@ const schemas = {
   // }),
 
 
-
-
-
   createOrder: Joi.object({
     shippingInfo: Joi.object({
       address: Joi.string().required(),
