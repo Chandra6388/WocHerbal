@@ -35,7 +35,7 @@ const AppRoutes = () => {
       if (user?.role === "admin") {
         navigate("/admin/dashboard");
       } else {
-        navigate("/user/home");
+        navigate("/");
       }
     }
   }, [isAuthenticated, user, navigate]);
