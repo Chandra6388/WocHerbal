@@ -47,7 +47,7 @@ const Index = () => {
       textColor: "text-orange-700",
       features: ["10k+ customers", "5-star reviews", "Natural transformation"]
     }
-  ];
+  ];  
 
   const whyChooseUs = [
     { icon: <Globe className="w-6 h-6" />, text: "Global Quality Standards", color: "text-blue-600" },

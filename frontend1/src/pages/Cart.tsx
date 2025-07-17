@@ -5,6 +5,7 @@ import { useCart } from '../contexts/CartContext';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 
+
 const Cart = () => {
   const { items, updateQuantity, removeFromCart, totalPrice, totalItems } = useCart();
   const navigate = useNavigate();
@@ -16,7 +17,7 @@ const Cart = () => {
           <ShoppingBag className="w-24 h-24 text-muted-foreground mx-auto mb-4" />
           <h2 className="text-2xl font-bold mb-4">Your cart is empty</h2>
           <p className="text-muted-foreground mb-6">Add some products to get started</p>
-          <Link to="/products">
+          <Link to="/user/products">
             <Button size="lg">Shop Now</Button>
           </Link>
         </div>
@@ -113,7 +114,7 @@ const Cart = () => {
                 <Button
                   size="lg"
                   className="w-full"
-                  onClick={() => navigate('/checkout')}
+                  onClick={() => navigate('/user/checkout')}
                 >
                   Proceed to Checkout
                 </Button>

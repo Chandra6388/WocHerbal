@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,91 +10,33 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Plus, Edit, Trash2, Image, Upload, X, Eye, Search, Filter, Package, TrendingUp, DollarSign, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
-
+import { getAllProducts, addNewProduct, updateNewProduct, deleteProduct } from '@/services/admin/productService';
 interface Product {
-  id: string;
+  _id?: string
+  id?: string;
   name: string;
   price: number;
   originalPrice?: number;
   description: string;
   benefits: string;
-  image: string;
+  images: string;
   category: string;
   stock: number;
-  sku: string;
+  soldCount?: number;
   status: 'active' | 'inactive' | 'out-of-stock';
   tags: string[];
   weight: string;
-  dimensions: string;
-  createdAt: string;
-  sales: number;
   rating: number;
-  reviews: number;
+  reviews: {
+    user: string;
+    name: string;
+    rating: number;
+    comment: string;
+  }[];
 }
 
 const Products = () => {
-  const [products, setProducts] = useState<Product[]>([
-    {
-      id: '1',
-      name: 'WOC Panchgavya Ayurvedic Herbal Hair Oil',
-      price: 999,
-      originalPrice: 1299,
-      description: 'Premium Ayurvedic herbal hair oil with traditional Panchgavya for healthy, beautiful hair.',
-      benefits: 'Reduces scalp odor, fights lice, treats scalp infections, revives damaged hair',
-      image: '/lovable-uploads/4654272e-82ea-4eff-8386-6d9f4a2fcced.png',
-      category: 'Hair Care',
-      stock: 25,
-      sku: 'WOC-PHO-001',
-      status: 'active',
-      tags: ['ayurvedic', 'herbal', 'hair-oil', 'organic'],
-      weight: '100ml',
-      dimensions: '5x5x12 cm',
-      createdAt: '2024-01-01',
-      sales: 156,
-      rating: 4.9,
-      reviews: 89
-    },
-    {
-      id: '2',
-      name: 'Organic Tea Tree Oil',
-      price: 749,
-      originalPrice: 999,
-      description: 'Pure tea tree oil with natural antimicrobial properties for skin and hair care.',
-      benefits: 'Antibacterial, antifungal, treats acne, soothes scalp irritation',
-      image: '/placeholder.svg',
-      category: 'Essential Oils',
-      stock: 8,
-      sku: 'WOC-TTO-002',
-      status: 'active',
-      tags: ['tea-tree', 'essential-oil', 'antibacterial'],
-      weight: '50ml',
-      dimensions: '4x4x10 cm',
-      createdAt: '2024-01-02',
-      sales: 89,
-      rating: 4.6,
-      reviews: 45
-    },
-    {
-      id: '3',
-      name: 'Natural Lavender Oil',
-      price: 599,
-      description: 'Calming lavender essential oil for relaxation and aromatherapy.',
-      benefits: 'Promotes sleep, reduces stress, natural antiseptic',
-      image: '/placeholder.svg',
-      category: 'Essential Oils',
-      stock: 0,
-      sku: 'WOC-LVO-003',
-      status: 'out-of-stock',
-      tags: ['lavender', 'essential-oil', 'aromatherapy'],
-      weight: '30ml',
-      dimensions: '3x3x8 cm',
-      createdAt: '2024-01-03',
-      sales: 67,
-      rating: 4.8,
-      reviews: 32
-    }
-  ]);
-
+  const [products, setProducts] = useState<Product[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -102,7 +44,31 @@ const Products = () => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
+
+
+  const getProducts = () => {
+    getAllProducts()
+      .then(data => {
+        if (data?.status == "success") {
+          setProducts(data.products);
+
+        }
+        else {
+          setProducts([]);
+        }
+      })
+      .catch(error => {
+        toast.error('Failed to fetch products');
+        console.error(error);
+      });
+  }
+
+  useEffect(() => {
+    getProducts();
+  }, []);
+
   const [formData, setFormData] = useState({
+    _id: "",
     name: '',
     price: '',
     originalPrice: '',
@@ -110,16 +76,14 @@ const Products = () => {
     benefits: '',
     category: '',
     stock: '',
-    sku: '',
     status: 'active' as 'active' | 'inactive' | 'out-of-stock',
     tags: '',
     weight: '',
-    dimensions: ''
   });
 
+
   const filteredProducts = products.filter(product => {
-    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         product.sku.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesStatus = statusFilter === 'all' || product.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
@@ -139,9 +103,10 @@ const Products = () => {
 
   const handleAddProduct = () => {
     setEditingProduct(null);
-    setFormData({ 
-      name: '', price: '', originalPrice: '', description: '', benefits: '', 
-      category: '', stock: '', sku: '', status: 'active', tags: '', weight: '', dimensions: ''
+    setFormData({
+      _id: "",
+      name: '', price: '', originalPrice: '', description: '', benefits: '',
+      category: '', stock: '', status: 'active', tags: '', weight: '',
     });
     setImagePreview(null);
     setSelectedImage(null);
@@ -151,6 +116,7 @@ const Products = () => {
   const handleEditProduct = (product: Product) => {
     setEditingProduct(product);
     setFormData({
+      _id: product._id,
       name: product.name,
       price: product.price.toString(),
       originalPrice: product.originalPrice?.toString() || '',
@@ -158,55 +124,83 @@ const Products = () => {
       benefits: product.benefits,
       category: product.category,
       stock: product.stock.toString(),
-      sku: product.sku,
       status: product.status,
       tags: product.tags.join(', '),
-      weight: product.weight,
-      dimensions: product.dimensions
+      weight: product.weight
     });
-    setImagePreview(product.image);
-    setSelectedImage(product.image);
+    setImagePreview(product.images);
+    setSelectedImage(product.images);
     setIsDialogOpen(true);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     const productData = {
       ...formData,
       price: parseFloat(formData.price),
       originalPrice: formData.originalPrice ? parseFloat(formData.originalPrice) : undefined,
       stock: parseInt(formData.stock),
       tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0),
-      image: selectedImage || '/placeholder.svg'
+      images: selectedImage || '/placeholder.svg'
     };
 
+
+
     if (editingProduct) {
-      setProducts(products.map(p => 
-        p.id === editingProduct.id 
-          ? { ...p, ...productData }
-          : p
-      ));
-      toast.success('Product updated successfully!');
+      const req = {
+        id: formData._id,
+        productData: productData
+      }
+      await updateNewProduct(req)
+        .then(() => {
+          toast.success('Product Updated successfully!');
+          setIsDialogOpen(false);
+        })
+        .catch((error) => {
+          toast.error('Failed to add product');
+          console.error(error);
+        });
+
     } else {
       const newProduct: Product = {
-        id: Date.now().toString(),
         ...productData,
-        createdAt: new Date().toISOString().split('T')[0],
-        sales: 0,
+        soldCount: 0,
         rating: 0,
-        reviews: 0
+        reviews: []
       };
-      setProducts([...products, newProduct]);
-      toast.success('Product added successfully!');
+
+      const { _id, ...productWithoutId } = newProduct;
+      await addNewProduct(productWithoutId)
+        .then(() => {
+          setProducts([...products, newProduct]);
+          toast.success('Product added successfully!');
+          setIsDialogOpen(false);
+        })
+        .catch((error) => {
+          toast.error('Failed to add product');
+          console.error(error);
+        });
     }
-    
-    setIsDialogOpen(false);
+
+
   };
 
-  const handleDeleteProduct = (id: string) => {
-    setProducts(products.filter(p => p.id !== id));
-    toast.success('Product deleted successfully!');
+  const handleDeleteProduct = async (id: string) => {
+   
+    await deleteProduct(id)
+      .then((res) => {
+        if (res?.status == "success") {
+          toast.success('Product deleted successfully!');
+        }
+        else{
+          toast.error(res?.message);
+        }
+      })
+      .catch((error)=>{
+          toast.error("some error in delete product");
+      })
+
   };
 
   const getStatusBadge = (status: string) => {
@@ -226,8 +220,8 @@ const Products = () => {
   const activeProducts = products.filter(p => p.status === 'active').length;
   const lowStockProducts = products.filter(p => p.stock <= 10 && p.stock > 0).length;
   const outOfStockProducts = products.filter(p => p.stock === 0).length;
-  const totalSales = products.reduce((sum, p) => sum + p.sales, 0);
-  const totalRevenue = products.reduce((sum, p) => sum + (p.sales * p.price), 0);
+  const totalSales = products.reduce((sum, p) => sum + p.soldCount, 0);
+  const totalRevenue = products.reduce((sum, p) => sum + (p.soldCount * p.price), 0);
 
   return (
     <div className="p-6 space-y-6">
@@ -260,11 +254,11 @@ const Products = () => {
                     <Input
                       id="name"
                       value={formData.name}
-                      onChange={(e) => setFormData({...formData, name: e.target.value})}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       required
                     />
                   </div>
-                  
+
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="price">Price (₹)</Label>
@@ -272,7 +266,7 @@ const Products = () => {
                         id="price"
                         type="number"
                         value={formData.price}
-                        onChange={(e) => setFormData({...formData, price: e.target.value})}
+                        onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                         required
                       />
                     </div>
@@ -282,7 +276,7 @@ const Products = () => {
                         id="originalPrice"
                         type="number"
                         value={formData.originalPrice}
-                        onChange={(e) => setFormData({...formData, originalPrice: e.target.value})}
+                        onChange={(e) => setFormData({ ...formData, originalPrice: e.target.value })}
                       />
                     </div>
                   </div>
@@ -292,7 +286,7 @@ const Products = () => {
                     <Textarea
                       id="description"
                       value={formData.description}
-                      onChange={(e) => setFormData({...formData, description: e.target.value})}
+                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                       rows={3}
                       required
                     />
@@ -303,7 +297,7 @@ const Products = () => {
                     <Textarea
                       id="benefits"
                       value={formData.benefits}
-                      onChange={(e) => setFormData({...formData, benefits: e.target.value})}
+                      onChange={(e) => setFormData({ ...formData, benefits: e.target.value })}
                       rows={3}
                       required
                     />
@@ -315,16 +309,7 @@ const Products = () => {
                       <Input
                         id="category"
                         value={formData.category}
-                        onChange={(e) => setFormData({...formData, category: e.target.value})}
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="sku">SKU</Label>
-                      <Input
-                        id="sku"
-                        value={formData.sku}
-                        onChange={(e) => setFormData({...formData, sku: e.target.value})}
+                        onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                         required
                       />
                     </div>
@@ -379,7 +364,7 @@ const Products = () => {
                         id="stock"
                         type="number"
                         value={formData.stock}
-                        onChange={(e) => setFormData({...formData, stock: e.target.value})}
+                        onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
                         required
                       />
                     </div>
@@ -388,7 +373,7 @@ const Products = () => {
                       <select
                         id="status"
                         value={formData.status}
-                        onChange={(e) => setFormData({...formData, status: e.target.value as 'active' | 'inactive' | 'out-of-stock'})}
+                        onChange={(e) => setFormData({ ...formData, status: e.target.value as 'active' | 'inactive' | 'out-of-stock' })}
                         className="w-full px-3 py-2 border border-input rounded-md"
                       >
                         <option value="active">Active</option>
@@ -403,7 +388,7 @@ const Products = () => {
                     <Input
                       id="tags"
                       value={formData.tags}
-                      onChange={(e) => setFormData({...formData, tags: e.target.value})}
+                      onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
                       placeholder="e.g. ayurvedic, herbal, organic"
                     />
                   </div>
@@ -414,23 +399,14 @@ const Products = () => {
                       <Input
                         id="weight"
                         value={formData.weight}
-                        onChange={(e) => setFormData({...formData, weight: e.target.value})}
+                        onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
                         placeholder="e.g. 100ml"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="dimensions">Dimensions</Label>
-                      <Input
-                        id="dimensions"
-                        value={formData.dimensions}
-                        onChange={(e) => setFormData({...formData, dimensions: e.target.value})}
-                        placeholder="e.g. 5x5x12 cm"
                       />
                     </div>
                   </div>
                 </div>
               </div>
-              
+
               <div className="flex gap-2 pt-4">
                 <Button type="submit" className="flex-1">
                   {editingProduct ? 'Update Product' : 'Add Product'}
@@ -549,7 +525,7 @@ const Products = () => {
             <TableHeader>
               <TableRow>
                 <TableHead>Product</TableHead>
-                <TableHead>SKU</TableHead>
+                {/* <TableHead>SKU</TableHead> */}
                 <TableHead>Category</TableHead>
                 <TableHead>Price</TableHead>
                 <TableHead>Stock</TableHead>
@@ -564,8 +540,8 @@ const Products = () => {
                   <TableCell>
                     <div className="flex items-center space-x-3">
                       <div className="w-12 h-12 bg-muted rounded-lg flex items-center justify-center overflow-hidden">
-                        {product.image ? (
-                          <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+                        {product.images ? (
+                          <img src={product.images} alt={product.name} className="w-full h-full object-cover" />
                         ) : (
                           <Image className="h-6 w-6 text-muted-foreground" />
                         )}
@@ -576,9 +552,9 @@ const Products = () => {
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell>
+                  {/* <TableCell>
                     <span className="font-mono text-sm">{product.sku}</span>
-                  </TableCell>
+                  </TableCell> */}
                   <TableCell>{product.category}</TableCell>
                   <TableCell>
                     <div>
@@ -591,24 +567,23 @@ const Products = () => {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <span className={`font-semibold ${
-                      product.stock === 0 ? 'text-red-600' : 
-                      product.stock <= 10 ? 'text-yellow-600' : 'text-green-600'
-                    }`}>
+                    <span className={`font-semibold ${product.stock === 0 ? 'text-red-600' :
+                        product.stock <= 10 ? 'text-yellow-600' : 'text-green-600'
+                      }`}>
                       {product.stock}
                     </span>
                   </TableCell>
-                  <TableCell>{product.sales}</TableCell>
+                  <TableCell>{product.soldCount}</TableCell>
                   <TableCell>{getStatusBadge(product.status)}</TableCell>
                   <TableCell>
                     <div className="flex gap-2">
-                      <Button variant="outline" size="sm">
+                      {/* <Button variant="outline" size="sm">
                         <Eye className="h-4 w-4" />
-                      </Button>
+                      </Button> */}
                       <Button variant="outline" size="sm" onClick={() => handleEditProduct(product)}>
                         <Edit className="h-4 w-4" />
                       </Button>
-                      <Button variant="destructive" size="sm" onClick={() => handleDeleteProduct(product.id)}>
+                      <Button variant="destructive" size="sm" onClick={() => handleDeleteProduct(product._id)}>
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>

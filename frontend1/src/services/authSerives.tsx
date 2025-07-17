@@ -36,3 +36,14 @@ export const logoutUser = async () => {
     throw error.response.data;
   }
 };
+
+
+
+export const updateProfile = async (data) => {
+  try {
+    const response = await axios.put(`${API_URL}/user/profile/update`, data);
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};

@@ -41,7 +41,7 @@ const Header = () => {
 
           <nav className="hidden md:flex items-center space-x-8">
             <Link to="/" className="text-forest-700 hover:text-forest-500 transition-colors">Home</Link>
-            <Link to="/products" className="text-forest-700 hover:text-forest-500 transition-colors">Products</Link>
+            <Link to="/user/products" className="text-forest-700 hover:text-forest-500 transition-colors">Products</Link>
             <Link to="/blog" className="text-forest-700 hover:text-forest-500 transition-colors">Blogs</Link>
             <Link to="/about" className="text-forest-700 hover:text-forest-500 transition-colors">About</Link>
             <Link to="/testimonials" className="text-forest-700 hover:text-forest-500 transition-colors">Testimonials</Link>
@@ -59,7 +59,7 @@ const Header = () => {
               </button>
             )}
             
-            <Link to="/cart" className="relative p-2 text-forest-700 hover:text-forest-500 transition-colors">
+            <Link to="/user/cart" className="relative p-2 text-forest-700 hover:text-forest-500 transition-colors">
               <ShoppingCart className="w-5 h-5" />
               {itemCount > 0 && (
                 <span className="absolute -top-1 -right-1 bg-earth-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
@@ -82,7 +82,7 @@ const Header = () => {
                     Admin
                   </Button>
                 )}
-                <Link to="/profile" className="p-2 text-forest-700 hover:text-forest-500 transition-colors">
+                <Link to="/user/profile" className="p-2 text-forest-700 hover:text-forest-500 transition-colors">
                   <User className="w-5 h-5" />
                 </Link>
                 <button

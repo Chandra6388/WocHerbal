@@ -6,7 +6,6 @@ const Notification = require('../models/Notification');
 const HelpRequest = require('../models/HelpRequest');
 const ErrorHandler = require('../utils/errorHandler');
 
-// Get admin dashboard analytics => /api/admin/dashboard
 exports.getDashboardStats = async (req, res, next) => {
   try {
     // User statistics
@@ -106,34 +105,62 @@ exports.getDashboardStats = async (req, res, next) => {
   }
 };
 
-// Get all users (admin) => /api/admin/users
+// Get all users (POST, data from req.body if needed)
 exports.getAllUsers = async (req, res, next) => {
   try {
-    const { page = 1, limit = 10, status, search } = req.query;
+    // Optionally, you can filter users based on req.body if needed
+    const users = await User.find({role:"user"});
+    res.json({
+      status: 'success',
+      data : users
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
-    const query = { role: 'user' };
-    if (status) query.status = status;
-    if (search) {
-      query.$or = [
-        { name: { $regex: search, $options: 'i' } },
-        { email: { $regex: search, $options: 'i' } }
-      ];
-    }
+// Add a new user (POST, data from req.body)
+exports.addUser = async (req, res, next) => {
+  try {
+    const { name, email, password, phone, address, status } = req.body;
+    const user = await User.create({ name, email, password, phone, address, status });
+    res.status(201).json({
+      status: 'success',
+      user
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
-    const users = await User.find(query)
-      .select('-password')
-      .limit(limit * 1)
-      .skip((page - 1) * limit)
-      .sort('-createdAt');
-
-    const count = await User.countDocuments(query);
-
+// Update a user (POST, user id and data from req.body)
+exports.updateUser = async (req, res, next) => {
+  try {
+    const { id, name, email, phone, address, status } = req.body;
+    const user = await User.findByIdAndUpdate(
+      id,
+      { name, email, phone, address, status },
+      { new: true, runValidators: true }
+    );
+    if (!user) return next(new ErrorHandler('User not found', 404));
     res.status(200).json({
       status: 'success',
-      users,
-      totalPages: Math.ceil(count / limit),
-      currentPage: page,
-      totalUsers: count
+      user
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Delete a user (POST, user id from req.body)
+exports.deleteUser = async (req, res, next) => {
+  try {
+    const { id } = req.body;
+    const user = await User.findByIdAndDelete(id);
+    if (!user) return next(new ErrorHandler('User not found', 404));
+    res.status(200).json({
+      status: 'success',
+      message: 'User deleted successfully'
     });
   } catch (error) {
     next(error);

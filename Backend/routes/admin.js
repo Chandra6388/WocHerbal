@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { protect, adminOnly } = require('../middleware/auth');
+const { protect, adminOnly, isAuthenticatedUser, authorizeRoles } = require('../middleware/auth');
 
 const {
   getDashboardStats,
@@ -12,7 +12,7 @@ const {
   sendNotification,
   getHelpRequests,
   respondToHelpRequest,
-  getSalesReport
+  getSalesReport,
 } = require('../controllers/adminController');
 
 // All routes require admin authentication
@@ -26,6 +26,15 @@ router.get('/dashboard', getDashboardStats);
 router.get('/users', getAllUsers);
 router.put('/users/:id/status', updateUserStatus);
 router.get('/users/:id', getUserDetails);
+
+// Add user (POST)
+// router.post('/users/add', isAuthenticatedUser, authorizeRoles('admin'), addUser);
+
+// Update user (POST)
+// router.post('/users/update', isAuthenticatedUser, authorizeRoles('admin'), adminController.updateUser);
+
+// Delete user (POST)
+// router.post('/users/delete', isAuthenticatedUser, authorizeRoles('admin'), adminController.deleteUser);
 
 // Review management routes
 router.get('/reviews', getAllReviews);

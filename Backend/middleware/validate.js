@@ -2,7 +2,6 @@ const Joi = require('joi');
 
 // Validation schemas
 const schemas = {
-  // User validation
   register: Joi.object({
     name: Joi.string().min(2).max(50).required(),
     email: Joi.string().email().required(),
@@ -38,37 +37,63 @@ const schemas = {
   createProduct: Joi.object({
     name: Joi.string().min(2).max(100).required(),
     description: Joi.string().min(10).required(),
+    benefits: Joi.string().min(10).required(),
     price: Joi.number().positive().required(),
+    soldCount: Joi.number().min(0).optional(),
+    weight: Joi.string().optional(),
     category: Joi.string().valid(
       'Electronics', 'Cameras', 'Laptops', 'Accessories', 'Headphones',
       'Food', 'Books', 'Clothes/Shoes', 'Beauty/Health', 'Sports',
-      'Outdoor', 'Home'
+      'Outdoor', 'Home', 'Oil', 'Furniture'
     ).required(),
-    seller: Joi.string().required(),
+
     stock: Joi.number().integer().min(0).required(),
     tags: Joi.array().items(Joi.string()).optional(),
     specifications: Joi.object().optional(),
+    status: Joi.string().valid('active', 'inactive', 'out_of_stock').optional(),
     discount: Joi.number().min(0).max(100).optional(),
-    originalPrice: Joi.number().positive().optional()
+    originalPrice: Joi.number().positive().optional(),
+    images: Joi.string().optional(),
+    rating: Joi.number().min(0).max(5).optional(),
+    reviews: Joi.array().items(
+    Joi.object({
+      user: Joi.string().required(),       // should be a valid ObjectId format if needed
+      name: Joi.string().required(),
+      rating: Joi.number().min(0).max(5).required(),
+      comment: Joi.string().required()
+    })
+  ).optional()
   }),
 
   updateProduct: Joi.object({
     name: Joi.string().min(2).max(100).optional(),
     description: Joi.string().min(10).optional(),
+    benefits: Joi.string().min(10).optional(),
     price: Joi.number().positive().optional(),
+    soldCount: Joi.number().min(0).optional(),
+    weight: Joi.string().optional(),
+    images: Joi.string().optional(),
     category: Joi.string().valid(
       'Electronics', 'Cameras', 'Laptops', 'Accessories', 'Headphones',
       'Food', 'Books', 'Clothes/Shoes', 'Beauty/Health', 'Sports',
-      'Outdoor', 'Home'
+      'Outdoor', 'Home', 'Oil', 'Furniture'
     ).optional(),
-    seller: Joi.string().optional(),
     stock: Joi.number().integer().min(0).optional(),
     status: Joi.string().valid('active', 'inactive', 'out_of_stock').optional(),
     tags: Joi.array().items(Joi.string()).optional(),
     specifications: Joi.object().optional(),
     discount: Joi.number().min(0).max(100).optional(),
     originalPrice: Joi.number().positive().optional(),
-    featured: Joi.boolean().optional()
+    featured: Joi.boolean().optional(),
+    rating: Joi.number().min(0).max(5).optional(),
+    reviews: Joi.array().items(
+    Joi.object({
+      user: Joi.string().required(),       // should be a valid ObjectId format if needed
+      name: Joi.string().required(),
+      rating: Joi.number().min(0).max(5).required(),
+      comment: Joi.string().required()
+    })
+  ).optional()
   }),
 
   // Review validation
