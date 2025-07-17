@@ -27,7 +27,7 @@ router.get('/:id', getSingleProduct);
 router.get('/:id/reviews', getProductReviews);
 
 // Protected routes
-router.use(protect);
+// router.use(protect);
 
 // Product CRUD
 router.post('/new', validate('createProduct'), newProduct);
