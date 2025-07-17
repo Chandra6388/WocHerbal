@@ -32,6 +32,8 @@ import About from "./pages/About";
 import Blog from "./pages/Blog";
 import Testimonials from "./pages/Testimonials";
 import Cart from "./pages/Cart";
+import Checkout from "./pages/Checkout";
+import Orders from "./pages/OrderSuccess";
 
 // Route Components
 import AdminRoute from "@/routes/adminRoutes";
@@ -128,6 +130,22 @@ const AppRoutes: React.FC = () => {
         element={
           <Layout>
             <Cart />
+          </Layout>
+        }
+      />
+      <Route
+        path="/checkout"
+        element={
+          <Layout>
+            <Checkout />
+          </Layout>
+        }
+      />
+      <Route
+        path="/orders"
+        element={
+          <Layout>
+            <Orders />
           </Layout>
         }
       />
