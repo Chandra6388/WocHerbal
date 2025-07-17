@@ -56,13 +56,13 @@ const schemas = {
     images: Joi.string().optional(),
     rating: Joi.number().min(0).max(5).optional(),
     reviews: Joi.array().items(
-    Joi.object({
-      user: Joi.string().required(),       // should be a valid ObjectId format if needed
-      name: Joi.string().required(),
-      rating: Joi.number().min(0).max(5).required(),
-      comment: Joi.string().required()
-    })
-  ).optional()
+      Joi.object({
+        user: Joi.string().required(),       // should be a valid ObjectId format if needed
+        name: Joi.string().required(),
+        rating: Joi.number().min(0).max(5).required(),
+        comment: Joi.string().required()
+      })
+    ).optional()
   }),
 
   updateProduct: Joi.object({
@@ -87,13 +87,13 @@ const schemas = {
     featured: Joi.boolean().optional(),
     rating: Joi.number().min(0).max(5).optional(),
     reviews: Joi.array().items(
-    Joi.object({
-      user: Joi.string().required(),       // should be a valid ObjectId format if needed
-      name: Joi.string().required(),
-      rating: Joi.number().min(0).max(5).required(),
-      comment: Joi.string().required()
-    })
-  ).optional()
+      Joi.object({
+        user: Joi.string().required(),       // should be a valid ObjectId format if needed
+        name: Joi.string().required(),
+        rating: Joi.number().min(0).max(5).required(),
+        comment: Joi.string().required()
+      })
+    ).optional()
   }),
 
   // Review validation
@@ -110,20 +110,57 @@ const schemas = {
   }),
 
   // Order validation
+  // createOrder: Joi.object({
+  //   shippingInfo: Joi.object({
+  //     address: Joi.string().required(),
+  //     city: Joi.string().required(),
+  //     phoneNo: Joi.string().required(),
+  //     postalCode: Joi.string().required(),
+  //     country: Joi.string().required(),
+  //   }).required(),
+  //   orderItems: Joi.array().items(
+  //     Joi.object({
+  //       product: Joi.string().required(),
+  //       quantity: Joi.number().integer().min(1).required()
+  //     })
+  //   ).min(1).required()
+  // }),
+
+
+
+
+
   createOrder: Joi.object({
     shippingInfo: Joi.object({
       address: Joi.string().required(),
       city: Joi.string().required(),
       phoneNo: Joi.string().required(),
       postalCode: Joi.string().required(),
-      country: Joi.string().required()
+      country: Joi.string().required(),
     }).required(),
+
     orderItems: Joi.array().items(
       Joi.object({
-        product: Joi.string().required(),
-        quantity: Joi.number().integer().min(1).required()
+        product: Joi.string().required(),         // Product ID
+        name: Joi.string().required(),            // Product Name
+        price: Joi.number().min(0).required(),    // Price
+        quantity: Joi.number().integer().min(1).required(),
+        image: Joi.string().required(),           // Image URL/Base64
       })
-    ).min(1).required()
+    ).min(1).required(),
+
+    user: Joi.string().required(),
+
+    paymentInfo: Joi.object({
+      id: Joi.string().required(),
+      status: Joi.string().valid('Paid', 'Pending').required(),
+      method: Joi.string().valid('Razorpay', 'Cash on Delivery').required(),
+    }).required(),
+
+    itemsPrice: Joi.number().min(0).required(),
+    taxPrice: Joi.number().min(0).required(),
+    shippingPrice: Joi.number().min(0).required(),
+    totalPrice: Joi.number().min(0).required(),
   }),
 
   // Help request validation
