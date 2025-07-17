@@ -127,7 +127,7 @@ const Checkout = () => {
       const { order } = await createOrderByrazorpay({ amount: finalAmount });
 
       const options: RazorpayOptions = {
-        key: 'rzp_test_Yg6vhSeAq4hucc', // Replace with your live/test key
+        key: 'rzp_test_Yg6vhSeAq4hucc', 
         amount: finalAmount,
         currency: 'INR',
         order_id: order._id,
