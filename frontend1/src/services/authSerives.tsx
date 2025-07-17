@@ -1,5 +1,5 @@
-import axios from 'axios';
-import { API_URL } from '../Utils/config';
+import axios from "axios";
+import { API_URL } from "../Utils/config";
 axios.defaults.withCredentials = true; // Enable sending cookies with requests
 
 export const registerUser = async (userData) => {
@@ -17,7 +17,7 @@ export const loginUser = async (data) => {
   } catch (error) {
     throw error.response.data;
   }
-};  
+};
 
 export const getUserProfile = async (data) => {
   try {
@@ -36,8 +36,6 @@ export const logoutUser = async () => {
     throw error.response.data;
   }
 };
-
-
 
 export const updateProfile = async (data) => {
   try {

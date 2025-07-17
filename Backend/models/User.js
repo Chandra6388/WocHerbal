@@ -76,7 +76,7 @@ const userSchema = new mongoose.Schema({
 });
 
 // Encrypt password before saving
-userSchema.pre('save', async function(next) {
+userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) {
     next();
   }
@@ -84,22 +84,25 @@ userSchema.pre('save', async function(next) {
 });
 
 // Compare user password
-userSchema.methods.comparePassword = async function(enteredPassword) {
+userSchema.methods.comparePassword = async function (enteredPassword) {
+  console.log(enteredPassword, this.password);
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
 // Return JWT token
-userSchema.methods.getJwtToken = function() {
-  return jwt.sign({ id: this._id,name: this.name,
-      email: this.email,
-      role: this.role,
-      avatar: this.avatar }, process.env.JWT_SECRET, {
+userSchema.methods.getJwtToken = function () {
+  return jwt.sign({
+    id: this._id, name: this.name,
+    email: this.email,
+    role: this.role,
+    avatar: this.avatar
+  }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRE
   });
 };
 
 // Generate password reset token
-userSchema.methods.getResetPasswordToken = function() {
+userSchema.methods.getResetPasswordToken = function () {
   // Generate token
   const resetToken = crypto.randomBytes(20).toString('hex');
 

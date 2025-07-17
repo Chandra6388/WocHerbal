@@ -1,36 +1,39 @@
-
-import { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { Eye, EyeOff, Info } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
-import { Button } from '../components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { Input } from '../components/ui/input';
-import { Label } from '../components/ui/label';
-import { useToast } from '../hooks/use-toast';
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { Eye, EyeOff } from "lucide-react";
+import { useAuth } from "../contexts/AuthContext";
+import { Button } from "../components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
+import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
+import { useToast } from "../hooks/use-toast";
 
 const Auth = () => {
-  const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
-  const [formData, setFormData] = useState({ email: '',  password: '',});
+  const [formData, setFormData] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
   const { login, register } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
 
-  const from = location.state?.from || '/';
+  // Determine mode based on route
+  const isLogin = location.pathname === "/login";
+  const from = location.state?.from || "/";
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
- const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+
     try {
       if (isLogin) {
         const success = await login(formData.email, formData.password);
@@ -50,14 +53,36 @@ const Auth = () => {
             duration: 3000,
           });
         }
-      } 
-      
+      } else {
+        // Provide a placeholder or actual value for the required third argument (e.g., username)
+        const success = await register(
+          formData.email,
+          formData.password,
+          formData.email
+        );
+        if (success) {
+          toast({
+            title: "Account Created",
+            description: "You can now log in",
+            variant: "success",
+            duration: 3000,
+          });
+          navigate("/login");
+        } else {
+          toast({
+            title: "Registration Failed",
+            description: "Email may already be used",
+            variant: "destructive",
+            duration: 3000,
+          });
+        }
+      }
     } catch (error) {
       toast({
         title: "Error",
         description: "Something went wrong. Please try again.",
         variant: "destructive",
-        duration: 3000, 
+        duration: 3000,
       });
     } finally {
       setLoading(false);
@@ -70,12 +95,10 @@ const Auth = () => {
         <div className="max-w-md mx-auto space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className="text-2xl text-center">
-                Login
-              </CardTitle>
+              <CardTitle className="text-2xl text-center">Login~</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <Label htmlFor="email">Email</Label>
                   <Input
@@ -94,7 +117,7 @@ const Auth = () => {
                     <Input
                       id="password"
                       name="password"
-                      type={showPassword ? 'text' : 'password'}
+                      type={showPassword ? "text" : "password"}
                       value={formData.password}
                       onChange={handleInputChange}
                       required
@@ -105,22 +128,35 @@ const Auth = () => {
                       className="absolute right-3 top-1/2 transform -translate-y-1/2"
                       onClick={() => setShowPassword(!showPassword)}
                     >
-                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      {showPassword ? (
+                        <EyeOff className="w-4 h-4" />
+                      ) : (
+                        <Eye className="w-4 h-4" />
+                      )}
                     </button>
                   </div>
                 </div>
-                <Button onClick={handleSubmit} className="w-full" disabled={loading}>
-                  {loading ? 'Please wait...' : 'Login'}
+                <Button type="submit" className="w-full" disabled={loading}>
+                  {loading
+                    ? isLogin
+                      ? "Logging in..."
+                      : "Creating account..."
+                    : isLogin
+                    ? "Login"
+                    : "Register"}
                 </Button>
-              </div>
-              <div className="mt-4 text-center" >
+              </form>
+
+              <div className="mt-4 text-center">
                 <button
                   type="button"
-                  onClick={() => setIsLogin(!isLogin)}
+                  onClick={() => navigate(isLogin ? "/register" : "/login")}
                   className="text-primary hover:underline"
                   disabled={loading}
                 >
-                  {isLogin ? "Don't have an account? Sign up" : "Already have an account? Login"}
+                  {isLogin
+                    ? "Don't have an account? Sign up"
+                    : "Already have an account? Login"}
                 </button>
               </div>
             </CardContent>
