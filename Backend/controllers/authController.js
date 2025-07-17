@@ -40,34 +40,31 @@ exports.loginUser = async (req, res, next) => {
       });
     }
 
-    const user = await User.findOne({ email }).select('+password');
-
-    if (!user) {
-      return res.json({
+    const userData = await User.findOne({ email }).select('password');
+    if (!userData) {
+      return res.status(401).json({
         status: 'error',
         message: 'Invalid Email or Password'
       });
     }
-
-    const isPasswordMatched = await user.comparePassword(password);
-
+    const isPasswordMatched = await userData.comparePassword(password);
     if (!isPasswordMatched) {
-      return res.json({
+      return res.status(401).json({
         status: 'error',
         message: 'Invalid Email or Password'
       });
     }
-
-    if (user.status !== 'active') {
-      return res.json({
+    if (userData.status !== 'active') {
+      return res.status(401).json({
         status: 'error',
         message: 'Your account has been blocked. Please contact support.'
       });
     }
-    user.lastLogin = Date.now();
-    await user.save();
+    userData.lastLogin = Date.now();
+    await userData.save();
+    sendToken(userData, 200, res);
 
-    sendToken(user, 200, res);
+
   } catch (error) {
     next(error);
   }

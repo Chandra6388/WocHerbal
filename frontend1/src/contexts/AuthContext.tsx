@@ -1,16 +1,15 @@
-
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useToast } from '@/hooks/use-toast';
-import { loginUser, registerUser, logoutUser } from '@/services/authSerives';
-import { getUserFromToken } from '@/Utils/TokenData';
+import React, { createContext, useContext, useState, useEffect } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { loginUser, registerUser, logoutUser } from "@/services/authSerives";
+import { getUserFromToken } from "@/Utils/TokenData";
 
 interface User {
-  _id:string;
+  _id: string;
   id?: string;
   name?: string;
   email?: string;
   phone?: string;
-  role?: 'user' | 'admin';
+  role?: "user" | "admin";
   address?: {
     street: string;
     city: string;
@@ -23,7 +22,12 @@ interface User {
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<boolean>;
-  register: (name: string, email: string, password: string, phone?: string) => Promise<boolean>;
+  register: (
+    name: string,
+    email: string,
+    password: string,
+    phone?: string
+  ) => Promise<boolean>;
   updateProfile: (userData: Partial<User>) => Promise<boolean>;
   logout: () => void;
   isAuthenticated: boolean;
@@ -35,12 +39,14 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [user, setUser] = useState<User | null>(null);
   const { toast } = useToast();
   const token = getUserFromToken();
@@ -53,48 +59,52 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
+  const login = async (email: string, password: string): Promise<boolean> => {
+    try {
+      const req = { email, password };
+      const res = await loginUser(req);
 
-const login = async (email: string, password: string): Promise<boolean> => {
-  try {
-    const req = { email, password };
-    const res = await loginUser(req);
+      if (res?.status == "success") {
+        // 🍪 Assume the token is already stored in the cookie by loginUser service
+        const tokenUser = getUserFromToken();
+        if (tokenUser) {
+          setUser(tokenUser as User); // ✅ Set the user immediately after login
+        }
 
-    if (res?.status == "success") {
-      // 🍪 Assume the token is already stored in the cookie by loginUser service
-      const tokenUser = getUserFromToken();
-      if (tokenUser) {
-        setUser(tokenUser as User); // ✅ Set the user immediately after login
+        toast({
+          title: "Login Successful",
+          description: "Welcome back!",
+          variant: "success",
+          duration: 3000,
+        });
+        return true;
+      } else {
+        toast({
+          title: "Login Failed",
+          description: res?.message || "Invalid email or password",
+          variant: "destructive",
+          duration: 3000,
+        });
+        return false;
       }
-
-      toast({
-        title: "Login Successful",
-        description: "Welcome back!",
-        variant: "success",
-        duration: 3000,
-      });
-      return true;
-    } else {
+    } catch (error: any) {
       toast({
         title: "Login Failed",
-        description: res?.message || "Invalid email or password",
+        description: error?.message || "An error occurred during login",
         variant: "destructive",
         duration: 3000,
       });
+      console.error("Login error:", error);
       return false;
     }
-  } catch (error: any) {
-    toast({
-      title: "Login Failed",
-      description: error?.message || "An error occurred during login",
-      variant: "destructive",
-      duration: 3000,
-    });
-    console.error("Login error:", error);
-    return false;
-  }
-};
+  };
 
-  const register = async (name: string, email: string, password: string, phone?: string): Promise<boolean> => {
+  const register = async (
+    name: string,
+    email: string,
+    password: string,
+    phone?: string
+  ): Promise<boolean> => {
     const req = { name, email, password, phone };
     try {
       const res = await registerUser(req);
@@ -132,26 +142,45 @@ const login = async (email: string, password: string): Promise<boolean> => {
 
     const updatedUser = { ...user, ...userData };
     setUser(updatedUser);
-    localStorage.setItem('user', JSON.stringify(updatedUser));
+    localStorage.setItem("user", JSON.stringify(updatedUser));
     return true;
   };
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('user');
-    localStorage.removeItem('adminToken');
+    localStorage.removeItem("user");
+    localStorage.removeItem("adminToken");
+    logoutUser()
+      .then(() => {
+        toast({
+          title: "Logout Successful",
+          description: "You have been logged out.",
+          variant: "success",
+          duration: 3000,
+        });
+      })
+      .catch((error) => {
+        toast({
+          title: "Logout Failed",
+          description: error?.message || "An error occurred during logout",
+          variant: "destructive",
+          duration: 3000,
+        });
+      });
   };
 
   return (
-    <AuthContext.Provider value={{
-      user,
-      login,
-      register,
-      updateProfile,
-      logout,
-      isAuthenticated: token ? true : false,
-      isAdmin: user?.role === 'admin'
-    }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        login,
+        register,
+        updateProfile,
+        logout,
+        isAuthenticated: token ? true : false,
+        isAdmin: user?.role === "admin",
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
