@@ -127,41 +127,38 @@ const schemas = {
   // }),
 
 
+createOrder: Joi.object({
+  shippingInfo: Joi.object({
+    address: Joi.string().required(),
+    city: Joi.string().required(),
+    phoneNo: Joi.string().required(),
+    postalCode: Joi.string().required(),
+    country: Joi.string().required(),
+  }).required(),
 
+  orderItems: Joi.array().items(
+    Joi.object({
+      product: Joi.string().required(),         // Product ID
+      name: Joi.string().optional(),            // Optional - will be added server-side
+      price: Joi.number().min(0).optional(),    // Optional - will be added server-side
+      quantity: Joi.number().integer().min(1).required(),
+      image: Joi.string().optional(),           // Optional - will be added server-side
+    })
+  ).min(1).required(),
 
+  paymentInfo: Joi.object({
+    id: Joi.string().required(),
+    status: Joi.string().valid('Paid', 'Pending').required(),
+    method: Joi.string().valid('Razorpay', 'Cash on Delivery').required(),
+  }).required(),
 
-  createOrder: Joi.object({
-    shippingInfo: Joi.object({
-      address: Joi.string().required(),
-      city: Joi.string().required(),
-      phoneNo: Joi.string().required(),
-      postalCode: Joi.string().required(),
-      country: Joi.string().required(),
-    }).required(),
+  itemsPrice: Joi.number().min(0).optional(),
+  taxPrice: Joi.number().min(0).optional(),
+  shippingPrice: Joi.number().min(0).optional(),
+  totalPrice: Joi.number().min(0).optional(),
+  user: Joi.string().optional()
+}),
 
-    orderItems: Joi.array().items(
-      Joi.object({
-        product: Joi.string().required(),         // Product ID
-        name: Joi.string().required(),            // Product Name
-        price: Joi.number().min(0).required(),    // Price
-        quantity: Joi.number().integer().min(1).required(),
-        image: Joi.string().required(),           // Image URL/Base64
-      })
-    ).min(1).required(),
-
-    user: Joi.string().required(),
-
-    paymentInfo: Joi.object({
-      id: Joi.string().required(),
-      status: Joi.string().valid('Paid', 'Pending').required(),
-      method: Joi.string().valid('Razorpay', 'Cash on Delivery').required(),
-    }).required(),
-
-    itemsPrice: Joi.number().min(0).required(),
-    taxPrice: Joi.number().min(0).required(),
-    shippingPrice: Joi.number().min(0).required(),
-    totalPrice: Joi.number().min(0).required(),
-  }),
 
   // Help request validation
   createHelpRequest: Joi.object({

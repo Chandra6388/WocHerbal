@@ -72,9 +72,11 @@ const Checkout = () => {
 
 
   const formattedItems = items.map((item) => ({
-  product: item.id, // 👈 convert 'id' to 'product'
+  product: item.id,
   quantity: item.quantity,
-
+  name: item?.name,
+  image:item?.image,
+  price:item?.price
 }));
 
 
@@ -127,7 +129,7 @@ const Checkout = () => {
       const { order } = await createOrderByrazorpay({ amount: finalAmount });
 
       const options: RazorpayOptions = {
-        key: 'rzp_test_Yg6vhSeAq4hucc', // Replace with your live/test key
+        key: 'rzp_test_Yg6vhSeAq4hucc', 
         amount: finalAmount,
         currency: 'INR',
         order_id: order._id,
