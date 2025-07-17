@@ -31,6 +31,7 @@ import Contact from "./pages/Contact";
 import About from "./pages/About";
 import Blog from "./pages/Blog";
 import Testimonials from "./pages/Testimonials";
+import Cart from "./pages/Cart";
 
 // Route Components
 import AdminRoute from "@/routes/adminRoutes";
@@ -121,6 +122,15 @@ const AppRoutes: React.FC = () => {
           </Layout>
         }
       />
+      <Route
+        path="/cart"
+        element={
+          <Layout>
+            <Cart />
+          </Layout>
+        }
+      />
+
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
