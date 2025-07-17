@@ -125,15 +125,16 @@ exports.deleteProduct = async (req, res, next) => {
       });
     }
 
-    // Check if user is admin or product owner
-    if (req.user.role !== 'admin' && product.user.toString() !== req.user.id) {
+    // Authorization check
+    if (req.user.role !== 'admin' && product.user?.toString() !== req.user.id) {
       return res.status(403).json({
         status: 'error',
         message: 'You are not authorized to delete this product'
       });
     }
 
-    await product.remove();
+    // Delete the product
+    await product.deleteOne(); // modern method in Mongoose 7+
 
     res.status(200).json({
       status: 'success',
@@ -143,6 +144,7 @@ exports.deleteProduct = async (req, res, next) => {
     next(error);
   }
 };
+
 
 // Create/Update product review => /api/products/review
 exports.createProductReview = async (req, res, next) => {

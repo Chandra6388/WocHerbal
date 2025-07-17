@@ -6,22 +6,26 @@ const razorpay = new Razorpay({
   key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
 
+
+
 // Create order
 const createOrder = async (amount, currency = 'INR', receipt) => {
   try {
+
     const options = {
-      amount: amount * 100, // Razorpay expects amount in paise
+      amount: amount * 100, 
       currency: currency,
       receipt: receipt,
       payment_capture: 1
     };
-
     const order = await razorpay.orders.create(options);
     return order;
   } catch (error) {
     throw new Error(`Error creating Razorpay order: ${error.message}`);
   }
 };
+
+
 
 // Verify payment signature
 const verifyPayment = (razorpay_order_id, razorpay_payment_id, razorpay_signature) => {
@@ -34,6 +38,8 @@ const verifyPayment = (razorpay_order_id, razorpay_payment_id, razorpay_signatur
   const isAuthentic = expectedSignature === razorpay_signature;
   return isAuthentic;
 };
+
+
 
 // Get payment details
 const getPaymentDetails = async (paymentId) => {

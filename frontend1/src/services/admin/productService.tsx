@@ -29,3 +29,15 @@ export const updateNewProduct = async (productData) => {
     throw error.response.data;
   }
 };
+
+export const deleteProduct = async (productData) => {
+  try {
+    const response = await axios.delete(`${API_URL}/products/${productData}`, {
+      data: productData.productData 
+    });
+    return response.data;
+  } catch (error) {
+    throw error?.response?.data || error;
+  }
+};
+

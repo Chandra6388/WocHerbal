@@ -1,5 +1,5 @@
 
-import React, { useState , useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,9 +10,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Plus, Edit, Trash2, Image, Upload, X, Eye, Search, Filter, Package, TrendingUp, DollarSign, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
-import {getAllProducts , addNewProduct, updateNewProduct} from '@/services/admin/productService';
+import { getAllProducts, addNewProduct, updateNewProduct, deleteProduct } from '@/services/admin/productService';
 interface Product {
-  _id?:string
+  _id?: string
   id?: string;
   name: string;
   price: number;
@@ -49,11 +49,11 @@ const Products = () => {
   const getProducts = () => {
     getAllProducts()
       .then(data => {
-        if(data?.status=="success") {
+        if (data?.status == "success") {
           setProducts(data.products);
-         
+
         }
-        else{
+        else {
           setProducts([]);
         }
       })
@@ -68,7 +68,7 @@ const Products = () => {
   }, []);
 
   const [formData, setFormData] = useState({
-    _id:"",
+    _id: "",
     name: '',
     price: '',
     originalPrice: '',
@@ -78,7 +78,7 @@ const Products = () => {
     stock: '',
     status: 'active' as 'active' | 'inactive' | 'out-of-stock',
     tags: '',
-    weight: '', 
+    weight: '',
   });
 
 
@@ -103,9 +103,9 @@ const Products = () => {
 
   const handleAddProduct = () => {
     setEditingProduct(null);
-    setFormData({ 
-      _id:"",
-      name: '', price: '', originalPrice: '', description: '', benefits: '', 
+    setFormData({
+      _id: "",
+      name: '', price: '', originalPrice: '', description: '', benefits: '',
       category: '', stock: '', status: 'active', tags: '', weight: '',
     });
     setImagePreview(null);
@@ -116,7 +116,7 @@ const Products = () => {
   const handleEditProduct = (product: Product) => {
     setEditingProduct(product);
     setFormData({
-      _id:product._id,
+      _id: product._id,
       name: product.name,
       price: product.price.toString(),
       originalPrice: product.originalPrice?.toString() || '',
@@ -133,9 +133,9 @@ const Products = () => {
     setIsDialogOpen(true);
   };
 
-  const handleSubmit = async(e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     const productData = {
       ...formData,
       price: parseFloat(formData.price),
@@ -145,23 +145,23 @@ const Products = () => {
       images: selectedImage || '/placeholder.svg'
     };
 
-    
+
 
     if (editingProduct) {
       const req = {
-        id : formData._id,
+        id: formData._id,
         productData: productData
       }
       await updateNewProduct(req)
-      .then(() => {
-        toast.success('Product Updated successfully!');
-         setIsDialogOpen(false);
-      })
-      .catch((error) => {
-        toast.error('Failed to add product');
-        console.error(error);
-      });
-      
+        .then(() => {
+          toast.success('Product Updated successfully!');
+          setIsDialogOpen(false);
+        })
+        .catch((error) => {
+          toast.error('Failed to add product');
+          console.error(error);
+        });
+
     } else {
       const newProduct: Product = {
         ...productData,
@@ -169,24 +169,38 @@ const Products = () => {
         rating: 0,
         reviews: []
       };
-      await addNewProduct(newProduct)
-      .then(() => {
-        setProducts([...products, newProduct]);
-        toast.success('Product added successfully!');
-         setIsDialogOpen(false);
-      })
-      .catch((error) => {
-        toast.error('Failed to add product');
-        console.error(error);
-      });
+
+      const { _id, ...productWithoutId } = newProduct;
+      await addNewProduct(productWithoutId)
+        .then(() => {
+          setProducts([...products, newProduct]);
+          toast.success('Product added successfully!');
+          setIsDialogOpen(false);
+        })
+        .catch((error) => {
+          toast.error('Failed to add product');
+          console.error(error);
+        });
     }
-    
-   
+
+
   };
 
-  const handleDeleteProduct = (id: string) => {
-    setProducts(products.filter(p => p.id !== id));
-    toast.success('Product deleted successfully!');
+  const handleDeleteProduct = async (id: string) => {
+   
+    await deleteProduct(id)
+      .then((res) => {
+        if (res?.status == "success") {
+          toast.success('Product deleted successfully!');
+        }
+        else{
+          toast.error(res?.message);
+        }
+      })
+      .catch((error)=>{
+          toast.error("some error in delete product");
+      })
+
   };
 
   const getStatusBadge = (status: string) => {
@@ -240,11 +254,11 @@ const Products = () => {
                     <Input
                       id="name"
                       value={formData.name}
-                      onChange={(e) => setFormData({...formData, name: e.target.value})}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       required
                     />
                   </div>
-                  
+
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="price">Price (₹)</Label>
@@ -252,7 +266,7 @@ const Products = () => {
                         id="price"
                         type="number"
                         value={formData.price}
-                        onChange={(e) => setFormData({...formData, price: e.target.value})}
+                        onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                         required
                       />
                     </div>
@@ -262,7 +276,7 @@ const Products = () => {
                         id="originalPrice"
                         type="number"
                         value={formData.originalPrice}
-                        onChange={(e) => setFormData({...formData, originalPrice: e.target.value})}
+                        onChange={(e) => setFormData({ ...formData, originalPrice: e.target.value })}
                       />
                     </div>
                   </div>
@@ -272,7 +286,7 @@ const Products = () => {
                     <Textarea
                       id="description"
                       value={formData.description}
-                      onChange={(e) => setFormData({...formData, description: e.target.value})}
+                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                       rows={3}
                       required
                     />
@@ -283,7 +297,7 @@ const Products = () => {
                     <Textarea
                       id="benefits"
                       value={formData.benefits}
-                      onChange={(e) => setFormData({...formData, benefits: e.target.value})}
+                      onChange={(e) => setFormData({ ...formData, benefits: e.target.value })}
                       rows={3}
                       required
                     />
@@ -295,7 +309,7 @@ const Products = () => {
                       <Input
                         id="category"
                         value={formData.category}
-                        onChange={(e) => setFormData({...formData, category: e.target.value})}
+                        onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                         required
                       />
                     </div>
@@ -350,7 +364,7 @@ const Products = () => {
                         id="stock"
                         type="number"
                         value={formData.stock}
-                        onChange={(e) => setFormData({...formData, stock: e.target.value})}
+                        onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
                         required
                       />
                     </div>
@@ -359,7 +373,7 @@ const Products = () => {
                       <select
                         id="status"
                         value={formData.status}
-                        onChange={(e) => setFormData({...formData, status: e.target.value as 'active' | 'inactive' | 'out-of-stock'})}
+                        onChange={(e) => setFormData({ ...formData, status: e.target.value as 'active' | 'inactive' | 'out-of-stock' })}
                         className="w-full px-3 py-2 border border-input rounded-md"
                       >
                         <option value="active">Active</option>
@@ -374,7 +388,7 @@ const Products = () => {
                     <Input
                       id="tags"
                       value={formData.tags}
-                      onChange={(e) => setFormData({...formData, tags: e.target.value})}
+                      onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
                       placeholder="e.g. ayurvedic, herbal, organic"
                     />
                   </div>
@@ -385,14 +399,14 @@ const Products = () => {
                       <Input
                         id="weight"
                         value={formData.weight}
-                        onChange={(e) => setFormData({...formData, weight: e.target.value})}
+                        onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
                         placeholder="e.g. 100ml"
                       />
                     </div>
                   </div>
                 </div>
               </div>
-              
+
               <div className="flex gap-2 pt-4">
                 <Button type="submit" className="flex-1">
                   {editingProduct ? 'Update Product' : 'Add Product'}
@@ -553,10 +567,9 @@ const Products = () => {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <span className={`font-semibold ${
-                      product.stock === 0 ? 'text-red-600' : 
-                      product.stock <= 10 ? 'text-yellow-600' : 'text-green-600'
-                    }`}>
+                    <span className={`font-semibold ${product.stock === 0 ? 'text-red-600' :
+                        product.stock <= 10 ? 'text-yellow-600' : 'text-green-600'
+                      }`}>
                       {product.stock}
                     </span>
                   </TableCell>
@@ -570,7 +583,7 @@ const Products = () => {
                       <Button variant="outline" size="sm" onClick={() => handleEditProduct(product)}>
                         <Edit className="h-4 w-4" />
                       </Button>
-                      <Button variant="destructive" size="sm" onClick={() => handleDeleteProduct(product.id)}>
+                      <Button variant="destructive" size="sm" onClick={() => handleDeleteProduct(product._id)}>
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>

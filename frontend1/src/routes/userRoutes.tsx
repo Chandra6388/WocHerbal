@@ -28,6 +28,10 @@ const queryClient = new QueryClient();
 const UserRoutes = () => (
     <Routes>
         <Route path="/home" element={<Layout><Index /></Layout>} />
+        <Route path="/products" element={<Layout><Products/></Layout>} />
+        <Route path="/cart" element={<Layout><Cart/></Layout>} />
+        <Route path="/profile" element={<Layout><Profile/></Layout>} />
+        <Route path="/checkout" element={<Layout><Checkout/></Layout>} />
     </Routes>
 );
 

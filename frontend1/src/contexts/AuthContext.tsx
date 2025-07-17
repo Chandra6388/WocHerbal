@@ -5,6 +5,7 @@ import { loginUser, registerUser, logoutUser } from '@/services/authSerives';
 import { getUserFromToken } from '@/Utils/TokenData';
 
 interface User {
+  _id:string;
   id?: string;
   name?: string;
   email?: string;
