@@ -45,19 +45,18 @@ const AppRoutes = () => {
       <Toaster />
       <Sonner />
       <Routes>
-        {isAuthenticated ? (
-          <>
-            <Route path="/user/*" element={<UserRoute />} />
-            <Route path="/admin/*" element={<AdminRoute />} />
-          </>
-        ) : (
-          <>
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/" element={<Navigate to="/login" />} />
-          </>
-        )}
+        {/* {isAuthenticated ? ( */}
+        <>
+          <Route path="/*" element={<UserRoute />} />
+          <Route path="/admin/*" element={<AdminRoute />} />
+        </>
+        {/* ) : ( */}
+        <>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+        </>
+        {/* )} */}
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>

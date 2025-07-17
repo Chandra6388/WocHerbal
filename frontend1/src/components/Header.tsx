@@ -1,11 +1,19 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
-import { useCart } from '../contexts/CartContext';
-import { Menu, X, ShoppingCart, User, LogOut, Settings, MessageCircle } from 'lucide-react';
-import { Button } from './ui/button';
-import ReviewUpload from './ReviewUpload';
-import { useIsMobile } from '../hooks/use-mobile';
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import { useCart } from "../contexts/CartContext";
+import {
+  Menu,
+  X,
+  ShoppingCart,
+  User,
+  LogOut,
+  Settings,
+  MessageCircle,
+} from "lucide-react";
+import { Button } from "./ui/button";
+import ReviewUpload from "./ReviewUpload";
+import { useIsMobile } from "../hooks/use-mobile";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -17,12 +25,12 @@ const Header = () => {
 
   const handleLogout = () => {
     logout();
-    navigate('/');
+    navigate("/");
   };
 
   const handleAdminAccess = () => {
     if (isAdmin) {
-      navigate('/admin/dashboard');
+      navigate("/admin/dashboard");
     }
   };
 
@@ -36,16 +44,48 @@ const Header = () => {
             <div className="w-8 h-8 bg-gradient-to-r from-forest-500 to-earth-500 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm">W</span>
             </div>
-            <span className="text-xl font-playfair font-bold text-forest-800">WocHerbal</span>
+            <span className="text-xl font-playfair font-bold text-forest-800">
+              WocHerbal
+            </span>
           </Link>
 
           <nav className="hidden md:flex items-center space-x-8">
-            <Link to="/" className="text-forest-700 hover:text-forest-500 transition-colors">Home</Link>
-            <Link to="/user/products" className="text-forest-700 hover:text-forest-500 transition-colors">Products</Link>
-            <Link to="/blog" className="text-forest-700 hover:text-forest-500 transition-colors">Blogs</Link>
-            <Link to="/about" className="text-forest-700 hover:text-forest-500 transition-colors">About</Link>
-            <Link to="/testimonials" className="text-forest-700 hover:text-forest-500 transition-colors">Testimonials</Link>
-            <Link to="/contact" className="text-forest-700 hover:text-forest-500 transition-colors">Contact</Link>
+            <Link
+              to="/"
+              className="text-forest-700 hover:text-forest-500 transition-colors"
+            >
+              Home
+            </Link>
+            <Link
+              to="/products"
+              className="text-forest-700 hover:text-forest-500 transition-colors"
+            >
+              Products
+            </Link>
+            <Link
+              to="/blog"
+              className="text-forest-700 hover:text-forest-500 transition-colors"
+            >
+              Blogs
+            </Link>
+            <Link
+              to="/about"
+              className="text-forest-700 hover:text-forest-500 transition-colors"
+            >
+              About
+            </Link>
+            <Link
+              to="/testimonials"
+              className="text-forest-700 hover:text-forest-500 transition-colors"
+            >
+              Testimonials
+            </Link>
+            <Link
+              to="/contact"
+              className="text-forest-700 hover:text-forest-500 transition-colors"
+            >
+              Contact
+            </Link>
           </nav>
 
           <div className="flex items-center space-x-4">
@@ -58,8 +98,11 @@ const Header = () => {
                 <MessageCircle className="w-5 h-5" />
               </button>
             )}
-            
-            <Link to="/user/cart" className="relative p-2 text-forest-700 hover:text-forest-500 transition-colors">
+
+            <Link
+              to="/cart"
+              className="relative p-2 text-forest-700 hover:text-forest-500 transition-colors"
+            >
               <ShoppingCart className="w-5 h-5" />
               {itemCount > 0 && (
                 <span className="absolute -top-1 -right-1 bg-earth-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
@@ -82,7 +125,10 @@ const Header = () => {
                     Admin
                   </Button>
                 )}
-                <Link to="/user/profile" className="p-2 text-forest-700 hover:text-forest-500 transition-colors">
+                <Link
+                  to="/profile"
+                  className="p-2 text-forest-700 hover:text-forest-500 transition-colors"
+                >
                   <User className="w-5 h-5" />
                 </Link>
                 <button
@@ -93,7 +139,7 @@ const Header = () => {
                 </button>
               </div>
             ) : (
-              <Link to="/auth">
+              <Link to="/login">
                 <Button variant="outline" size="sm">
                   Login
                 </Button>
@@ -104,7 +150,11 @@ const Header = () => {
               className="md:hidden p-2 text-forest-700"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
-              {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              {isMenuOpen ? (
+                <X className="w-5 h-5" />
+              ) : (
+                <Menu className="w-5 h-5" />
+              )}
             </button>
           </div>
         </div>

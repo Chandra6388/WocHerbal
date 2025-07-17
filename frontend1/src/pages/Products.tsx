@@ -1,12 +1,17 @@
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Star, ShoppingCart } from 'lucide-react';
-import { useCart } from '../contexts/CartContext';
-import { Button } from '../components/ui/button';
-import { Card, CardContent, CardFooter, CardHeader } from '../components/ui/card';
-import { Badge } from '../components/ui/badge';
-import { getAllProducts } from '@/services/admin/productService';
-import { toast } from 'sonner';
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { Star, ShoppingCart } from "lucide-react";
+import { useCart } from "../contexts/CartContext";
+import { Button } from "../components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "../components/ui/card";
+import { Badge } from "../components/ui/badge";
+import { getAllProducts } from "@/services/admin/productService";
+import { toast } from "sonner";
 
 interface Product {
   _id: string;
@@ -15,11 +20,11 @@ interface Product {
   originalPrice?: number;
   description: string;
   benefits: string;
-  images: string; 
+  images: string;
   category: string;
   stock: number;
   soldCount?: number;
-  status: 'active' | 'inactive' | 'out-of-stock';
+  status: "active" | "inactive" | "out-of-stock";
   tags: string[];
   weight: string;
   ratings: number;
@@ -32,10 +37,9 @@ interface Product {
 }
 
 const Products = () => {
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [products, setProducts] = useState<Product[]>([]);
   const { addToCart } = useCart();
-  
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -59,19 +63,19 @@ const Products = () => {
     { id: "growth", name: "Hair Growth" },
   ];
 
-  const filteredProducts = selectedCategory === 'all'
-    ? products
-    : products.filter(product => product.category === selectedCategory);
+  const filteredProducts =
+    selectedCategory === "all"
+      ? products
+      : products.filter((product) => product.category === selectedCategory);
 
   const handleAddToCart = (product: Product) => {
     addToCart({
       id: product._id,
       name: product.name,
       price: product.price,
-      image: product.images
+      image: product.images,
     });
   };
- 
 
   useEffect(() => {
     getProducts();
@@ -79,16 +83,16 @@ const Products = () => {
 
   const getProducts = () => {
     getAllProducts()
-      .then(data => {
-        if (data?.status === 'success') {
+      .then((data) => {
+        if (data?.status === "success") {
           setProducts(data.products);
           console.log("data", data.products);
         } else {
           setProducts([]);
         }
       })
-      .catch(error => {
-        toast.error('Failed to fetch products');
+      .catch((error) => {
+        toast.error("Failed to fetch products");
         console.error(error);
       });
   };
@@ -118,8 +122,11 @@ const Products = () => {
           ))}
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-          {filteredProducts.map((product) => (
-            <Card key={product._id} className="group hover:shadow-lg transition-shadow duration-300">
+          {filteredProducts?.map((product) => (
+            <Card
+              key={product._id}
+              className="group hover:shadow-lg transition-shadow duration-300"
+            >
               <CardHeader className="p-0">
                 <Link to={`/product/${product._id}`}>
                   <div className="aspect-square overflow-hidden rounded-t-lg">
