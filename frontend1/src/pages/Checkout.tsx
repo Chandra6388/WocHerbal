@@ -72,9 +72,11 @@ const Checkout = () => {
 
 
   const formattedItems = items.map((item) => ({
-  product: item.id, // 👈 convert 'id' to 'product'
+  product: item.id,
   quantity: item.quantity,
-
+  name: item?.name,
+  image:item?.image,
+  price:item?.price
 }));
 
 

@@ -17,7 +17,7 @@ const Cart = () => {
           <ShoppingBag className="w-24 h-24 text-muted-foreground mx-auto mb-4" />
           <h2 className="text-2xl font-bold mb-4">Your cart is empty</h2>
           <p className="text-muted-foreground mb-6">Add some products to get started</p>
-          <Link to="/user/products">
+          <Link to="/products">
             <Button size="lg">Shop Now</Button>
           </Link>
         </div>
@@ -114,7 +114,7 @@ const Cart = () => {
                 <Button
                   size="lg"
                   className="w-full"
-                  onClick={() => navigate('/user/checkout')}
+                  onClick={() => navigate('/checkout')}
                 >
                   Proceed to Checkout
                 </Button>
