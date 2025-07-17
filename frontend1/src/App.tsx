@@ -53,6 +53,7 @@ const AppRoutes: React.FC = () => {
   useEffect(() => {
     // Redirect when logged in user hits root "/"
     if (isAuthenticated && window.location.pathname === "/") {
+      console.log("User ", user);
       if (user?.role === "admin") {
         navigate("/admin/dashboard");
       } else {
