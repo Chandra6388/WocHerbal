@@ -10,7 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Plus, Edit, Trash2, Image, Upload, X, Eye, Search, Filter, Package, TrendingUp, DollarSign, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
-import { getAllProducts, addNewProduct, updateNewProduct, deleteProduct } from '@/services/admin/productService';
+import { getAllProducts, addNewProduct, updateNewProduct, deleteProduct, getCategory } from '@/services/admin/productService';
 interface Product {
   _id?: string
   id?: string;
@@ -35,7 +35,14 @@ interface Product {
   }[];
 }
 
+interface Category {
+  _id?: string
+  name: string;
+  status: 'active' | 'inactive' | 'out-of-stock';
+}
 const Products = () => {
+  const [category, setCategory] = useState<Category[]>([]);
+
   const [products, setProducts] = useState<Product[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -44,6 +51,30 @@ const Products = () => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
+
+  console.log("category", category)
+
+  const getAllCategory = () => {
+    getCategory()
+      .then(data => {
+        if (data?.status == "success") {
+          setFormData({...formData, category:data?.allCategory[0 ]?._id})
+          setCategory(data.allCategory);
+
+        }
+        else {
+          setCategory([]);
+        }
+      })
+      .catch(error => {
+        toast.error('Failed to fetch products');
+        console.error(error);
+      });
+  }
+
+  useEffect(() => {
+    getAllCategory();
+  }, []);
 
 
   const getProducts = () => {
@@ -187,18 +218,18 @@ const Products = () => {
   };
 
   const handleDeleteProduct = async (id: string) => {
-   
+
     await deleteProduct(id)
       .then((res) => {
         if (res?.status == "success") {
           toast.success('Product deleted successfully!');
         }
-        else{
+        else {
           toast.error(res?.message);
         }
       })
-      .catch((error)=>{
-          toast.error("some error in delete product");
+      .catch((error) => {
+        toast.error("some error in delete product");
       })
 
   };
@@ -232,26 +263,12 @@ const Products = () => {
           <p className="text-muted-foreground">Manage your herbal oil products and inventory</p>
         </div>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-         <div className=''>
-          <DialogTrigger asChild className='mx-3'>
-            <Button onClick={handleAddProduct}>
-              <Plus className="h-4 w-4 mr-2" />
-              View Category
-            </Button>
-          </DialogTrigger>
-          <DialogTrigger asChild className='mx-3'>
-            <Button onClick={handleAddProduct}>
-              <Plus className="h-4 w-4 mr-2" />
-              Add Category
-            </Button>
-          </DialogTrigger>
-           <DialogTrigger asChild>
+          <DialogTrigger asChild>
             <Button onClick={handleAddProduct}>
               <Plus className="h-4 w-4 mr-2" />
               Add Product
             </Button>
           </DialogTrigger>
-         </div>
           <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>{editingProduct ? 'Edit Product' : 'Add New Product'}</DialogTitle>
@@ -318,16 +335,25 @@ const Products = () => {
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="category">Category</Label>
-                      <Input
-                        id="category"
-                        value={formData.category}
-                        onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                        required
-                      />
+                   <div className="space-y-2">
+                      <Label htmlFor="status">Category</Label>
+                      <select
+                        id="status"
+                       value={formData.category}
+                        onChange={(e) => setFormData({...formData, category: e.target.value})}
+                        className="w-full px-3 py-2 border border-input rounded-md"
+                      >
+                       {
+                        category?.map((item)=>{
+                          return  <option value={item?._id}>{item?.name}</option>
+                        })
+                      }
+
+                       
+                      </select>
                     </div>
                   </div>
+
                 </div>
 
                 {/* Right Column */}
@@ -580,7 +606,7 @@ const Products = () => {
                   </TableCell>
                   <TableCell>
                     <span className={`font-semibold ${product.stock === 0 ? 'text-red-600' :
-                        product.stock <= 10 ? 'text-yellow-600' : 'text-green-600'
+                      product.stock <= 10 ? 'text-yellow-600' : 'text-green-600'
                       }`}>
                       {product.stock}
                     </span>
