@@ -62,3 +62,14 @@ export const updateStockAndSoldCount = async (data) => {
     throw error.response.data;
   }
 };
+
+export const getoverallRevenue = async () => {
+  try {
+    const response = await axios.get(
+      `${API_URL}/orders/order/getOverallRevenue`
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};

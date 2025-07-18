@@ -43,6 +43,7 @@ import {
   updateNewProduct,
   deleteProduct,
   updateProductStatus,
+  getoverallRevenue,
 } from "@/services/admin/productService";
 interface Product {
   _id?: string;
@@ -76,6 +77,7 @@ const Products = () => {
   const [statusFilter, setStatusFilter] = useState("all");
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [totalRevenueState, setTotalRevenueState] = useState<number>(0);
 
   const getProducts = () => {
     getAllProducts()
@@ -94,6 +96,7 @@ const Products = () => {
 
   useEffect(() => {
     getProducts();
+    handleGetOverallRevenue();
   }, []);
 
   const [formData, setFormData] = useState({
@@ -265,6 +268,8 @@ const Products = () => {
     (sum, p) => sum + p.soldCount * p.price,
     0
   );
+  // If you want to use the state variable, update it here:
+  // useEffect(() => { setTotalRevenueState(totalRevenue); }, [products]);
 
   const handleStatusChange = async (
     productId: string,
@@ -280,6 +285,20 @@ const Products = () => {
       }
     } catch (error) {
       toast.error("Error updating product status");
+      console.error(error);
+    }
+  };
+
+  const handleGetOverallRevenue = async () => {
+    try {
+      const res = await getoverallRevenue();
+      if (res?.status === "success") {
+        setTotalRevenueState(res.overallRevenue);
+      } else {
+        toast.error(res?.message || "Failed to fetch revenue");
+      }
+    } catch (error) {
+      toast.error("Error fetching overall revenue");
       console.error(error);
     }
   };
@@ -589,9 +608,7 @@ const Products = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Revenue</p>
-                <p className="text-2xl font-bold">
-                  ₹{totalRevenue.toLocaleString()}
-                </p>
+                <p className="text-2xl font-bold">₹{totalRevenueState}</p>
               </div>
               <DollarSign className="h-8 w-8 text-green-600" />
             </div>
