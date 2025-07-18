@@ -41,11 +41,7 @@ const schemas = {
     price: Joi.number().positive().required(),
     soldCount: Joi.number().min(0).optional(),
     weight: Joi.string().optional(),
-    category: Joi.string().valid(
-      'Electronics', 'Cameras', 'Laptops', 'Accessories', 'Headphones',
-      'Food', 'Books', 'Clothes/Shoes', 'Beauty/Health', 'Sports',
-      'Outdoor', 'Home', 'Oil', 'Furniture'
-    ).required(),
+    category: Joi.string().valid('men','women','hairgrowth',).required(),
 
     stock: Joi.number().integer().min(0).required(),
     tags: Joi.array().items(Joi.string()).optional(),
@@ -73,11 +69,7 @@ const schemas = {
     soldCount: Joi.number().min(0).optional(),
     weight: Joi.string().optional(),
     images: Joi.string().optional(),
-    category: Joi.string().valid(
-      'Electronics', 'Cameras', 'Laptops', 'Accessories', 'Headphones',
-      'Food', 'Books', 'Clothes/Shoes', 'Beauty/Health', 'Sports',
-      'Outdoor', 'Home', 'Oil', 'Furniture'
-    ).optional(),
+    category: Joi.string().valid('men','women','hairgrowth').optional(),
     stock: Joi.number().integer().min(0).optional(),
     status: Joi.string().valid('active', 'inactive', 'out_of_stock').optional(),
     tags: Joi.array().items(Joi.string()).optional(),
@@ -109,23 +101,7 @@ const schemas = {
     comment: Joi.string().min(10).max(500).optional()
   }),
 
-  // Order validation
-  // createOrder: Joi.object({
-  //   shippingInfo: Joi.object({
-  //     address: Joi.string().required(),
-  //     city: Joi.string().required(),
-  //     phoneNo: Joi.string().required(),
-  //     postalCode: Joi.string().required(),
-  //     country: Joi.string().required(),
-  //   }).required(),
-  //   orderItems: Joi.array().items(
-  //     Joi.object({
-  //       product: Joi.string().required(),
-  //       quantity: Joi.number().integer().min(1).required()
-  //     })
-  //   ).min(1).required()
-  // }),
-
+ 
 
 createOrder: Joi.object({
   shippingInfo: Joi.object({
