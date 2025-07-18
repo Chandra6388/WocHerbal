@@ -16,7 +16,9 @@ const {
   approveProduct,
   getProductStats,
   getFeaturedProducts,
-  getProductsByCategory
+  getProductsByCategory,
+  updateProductStatus,
+  updateStockAndSoldCount
 } = require('../controllers/productController');
 
 // Public routes
@@ -31,12 +33,18 @@ router.get('/:id/reviews', getProductReviews);
 
 // Product CRUD
 router.post('/new', validate('createProduct'), newProduct);
-router.put('/:id',  updateProduct);
+router.put('/:id', updateProduct);
 router.delete('/:id', deleteProduct);
+router.put('/:id/status', updateProductStatus);
+router.post('/stock-sold', updateStockAndSoldCount);
+
+
 
 // Review routes
 router.post('/review', validate('createReview'), createProductReview);
 router.delete('/reviews', deleteReview);
+
+
 
 // Admin routes
 router.get('/admin/all', adminOnly, getAllProducts);

@@ -373,21 +373,21 @@ exports.markAllNotificationsAsRead = async (req, res, next) => {
 exports.getUserStats = async (req, res, next) => {
   try {
     const totalOrders = await Order.countDocuments({ user: req.user.id });
-    const completedOrders = await Order.countDocuments({ 
-      user: req.user.id, 
-      orderStatus: 'Delivered' 
+    const completedOrders = await Order.countDocuments({
+      user: req.user.id,
+      orderStatus: 'Delivered'
     });
 
     const totalReviews = await Review.countDocuments({ user: req.user.id });
-    const approvedReviews = await Review.countDocuments({ 
-      user: req.user.id, 
-      status: 'approved' 
+    const approvedReviews = await Review.countDocuments({
+      user: req.user.id,
+      status: 'approved'
     });
 
     const totalProducts = await Product.countDocuments({ user: req.user.id });
-    const activeProducts = await Product.countDocuments({ 
-      user: req.user.id, 
-      status: 'active' 
+    const activeProducts = await Product.countDocuments({
+      user: req.user.id,
+      status: 'active'
     });
 
     const unreadNotifications = await Notification.countDocuments({

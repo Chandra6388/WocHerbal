@@ -1,6 +1,5 @@
-import axios from 'axios';
-import { API_URL } from '@/Utils/config';
-
+import axios from "axios";
+import { API_URL } from "@/Utils/config";
 
 export const getAllProducts = async () => {
   try {
@@ -20,10 +19,12 @@ export const addNewProduct = async (productData) => {
   }
 };
 
-
 export const updateNewProduct = async (productData) => {
   try {
-    const response = await axios.put(`${API_URL}/products/${productData.id}`,productData.productData);
+    const response = await axios.put(
+      `${API_URL}/products/${productData.id}`,
+      productData.productData
+    );
     return response.data;
   } catch (error) {
     throw error.response.data;
@@ -33,7 +34,7 @@ export const updateNewProduct = async (productData) => {
 export const deleteProduct = async (productData) => {
   try {
     const response = await axios.delete(`${API_URL}/products/${productData}`, {
-      data: productData.productData 
+      data: productData.productData,
     });
     return response.data;
   } catch (error) {
@@ -41,3 +42,23 @@ export const deleteProduct = async (productData) => {
   }
 };
 
+export const updateProductStatus = async (productId, status) => {
+  try {
+    const response = await axios.put(
+      `${API_URL}/products/${productId}/status`,
+      { status }
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+export const updateStockAndSoldCount = async (data) => {
+  try {
+    const response = await axios.post(`${API_URL}/products/stock-sold`, data);
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Star, ShoppingCart } from "lucide-react";
+import { Star, ShoppingCart, Heart } from "lucide-react";
 import { useCart } from "../contexts/CartContext";
 import { Button } from "../components/ui/button";
 import {
@@ -12,6 +12,12 @@ import {
 import { Badge } from "../components/ui/badge";
 import { getAllProducts } from "@/services/admin/productService";
 import { toast } from "sonner";
+import {
+  Addfavorlist,
+  getfavorlist,
+  removeFavorlist,
+  
+} from "@/services/productsServices";
 
 interface Product {
   _id: string;
@@ -40,13 +46,12 @@ const Products = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [products, setProducts] = useState<Product[]>([]);
   const { addToCart } = useCart();
+  const [favorList, setFavorList] = useState<Product[]>([]);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const response = await getAllProducts();
-        // Assuming response.data contains the products array
-        // You can set the products state here if needed
         setProducts(response.data);
       } catch (error) {
         console.error("Failed to fetch products:", error);
@@ -79,6 +84,7 @@ const Products = () => {
 
   useEffect(() => {
     getProducts();
+    handleGetFavorites();
   }, []);
 
   const getProducts = () => {
@@ -86,7 +92,6 @@ const Products = () => {
       .then((data) => {
         if (data?.status === "success") {
           setProducts(data.products);
-          console.log("data", data.products);
         } else {
           setProducts([]);
         }
@@ -96,6 +101,60 @@ const Products = () => {
         console.error(error);
       });
   };
+
+  const handleAddToFavorites = (product: Product) => {
+    Addfavorlist({ productId: product._id })
+      .then((data) => {
+        if (data?.status === "success") {
+          toast.success("Product added to favorites");
+          handleGetFavorites();
+        } else {
+          toast.error("Failed to add product to favorites");
+        }
+      })
+      .catch((error) => {
+        toast.error("Error adding product to favorites");
+        console.error(error);
+      });
+  };
+
+  const handleGetFavorites = () => {
+    getfavorlist({})
+      .then((data) => {
+        if (data?.status === "success") {
+          setFavorList(data.favorites);
+          console.log("Favorites:", data.favorites);
+        } else {
+          toast.error("Failed to fetch favorites");
+        }
+      })
+      .catch((error) => {
+        toast.error("Error fetching favorites");
+        console.error(error);
+      });
+  };
+
+  const handleRemoveFromFavorites = (productId: string) => {
+    removeFavorlist({ productId })
+      .then((data) => {
+        if (data?.status === "success") {
+          toast.success("Product removed from favorites");
+          handleGetFavorites(); // Refresh favorites list
+        } else {
+          toast.error("Failed to remove product from favorites");
+        }
+      })
+      .catch((error) => {
+        toast.error("Error removing product from favorites");
+        console.error(error);
+      });
+  };
+
+
+
+
+
+
 
   return (
     <div className="min-h-screen pt-20 bg-background">
@@ -109,6 +168,7 @@ const Products = () => {
             traditional Panchgavya and natural herbs
           </p>
         </div>
+
         <div className="flex flex-wrap justify-center gap-4 mb-12">
           {categories.map((category) => (
             <Button
@@ -121,6 +181,7 @@ const Products = () => {
             </Button>
           ))}
         </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
           {filteredProducts?.map((product) => (
             <Card
@@ -128,15 +189,37 @@ const Products = () => {
               className="group hover:shadow-lg transition-shadow duration-300"
             >
               <CardHeader className="p-0">
-                <Link to={`/product/${product._id}`}>
-                  <div className="aspect-square overflow-hidden rounded-t-lg">
+                <div className="relative aspect-square overflow-hidden rounded-t-lg">
+                  <div className="absolute top-2 right-2 z-10 bg-white p-1 rounded-full shadow-md cursor-pointer hover:text-red-500 transition-colors">
+                    {favorList.some((fav) => fav._id === product._id) ? (
+                      <Heart
+                        className="w-5 h-5"
+                        style={{ color: "red" }}
+                        fill="red"
+                        stroke="red"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleRemoveFromFavorites(product._id);
+                        }}
+                      />
+                    ) : (
+                      <Heart
+                        className="w-5 h-5 text-gray-500 hover:text-red-500 transition-colors"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleAddToFavorites(product);
+                        }}
+                      />
+                    )}
+                  </div>
+                  <Link to={`/product/${product._id}`}>
                     <img
                       src={product.images}
                       alt={product.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
-                  </div>
-                </Link>
+                  </Link>
+                </div>
               </CardHeader>
 
               <CardContent className="p-4">

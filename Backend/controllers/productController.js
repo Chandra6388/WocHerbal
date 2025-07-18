@@ -80,7 +80,7 @@ exports.getSingleProduct = async (req, res, next) => {
 // Update Product => /api/products/:id
 exports.updateProduct = async (req, res, next) => {
   try {
-    console.log("req.params.id",req.params.id )
+    console.log("req.params.id", req.params.id)
     let product = await Product.findById(req.params.id);
     if (!product) {
       return res.status(404).json({
@@ -102,7 +102,7 @@ exports.updateProduct = async (req, res, next) => {
       runValidators: true,
       useFindAndModify: false
     });
- 
+
 
     res.status(200).json({
       status: 'success',
@@ -367,8 +367,8 @@ exports.getProductStats = async (req, res, next) => {
 // Get featured products => /api/products/featured
 exports.getFeaturedProducts = async (req, res, next) => {
   try {
-    const products = await Product.find({ 
-      featured: true, 
+    const products = await Product.find({
+      featured: true,
       status: 'active',
       approvalStatus: 'approved'
     }).limit(8);
@@ -388,17 +388,17 @@ exports.getProductsByCategory = async (req, res, next) => {
     const { category } = req.params;
     const { page = 1, limit = 12, sort = 'createdAt' } = req.query;
 
-    const products = await Product.find({ 
-      category, 
+    const products = await Product.find({
+      category,
       status: 'active',
       approvalStatus: 'approved'
     })
-    .sort(sort)
-    .limit(limit * 1)
-    .skip((page - 1) * limit);
+      .sort(sort)
+      .limit(limit * 1)
+      .skip((page - 1) * limit);
 
-    const count = await Product.countDocuments({ 
-      category, 
+    const count = await Product.countDocuments({
+      category,
       status: 'active',
       approvalStatus: 'approved'
     });
@@ -413,4 +413,70 @@ exports.getProductsByCategory = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-}; 
+};
+
+
+exports.updateProductStatus = async (req, res, next) => {
+  try {
+    const { status } = req.body;
+
+    const product = await Product.findById(req.params.id);
+
+    if (!product) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'Product not found'
+      });
+    }
+
+
+    product.status = status;
+    await product.save();
+
+    res.status(200).json({
+      status: 'success',
+      message: `Product status updated to ${status}`,
+      product
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+
+
+exports.updateStockAndSoldCount = async (req, res, next) => {
+  try {
+    const { ids } = req.body;
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return res.status(400).json({ status: 'error', message: 'No product ids provided' });
+    }
+
+
+    const products = await Product.find({ _id: { $in: ids } });
+    if (!products.length) {
+      return res.status(404).json({ status: 'error', message: 'No products found for provided ids' });
+    }
+
+
+    const updatePromises = products.map(async (product) => {
+
+      if (product.stock > 0) {
+        product.stock -= 1;
+        product.soldCount = (product.soldCount || 0) + 1;
+        await product.save();
+      }
+      return product;
+    });
+    const updatedProducts = await Promise.all(updatePromises);
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Stock and soldCount updated for products',
+      products: updatedProducts
+    });
+  } catch (error) {
+    next(error);
+  }
+};
