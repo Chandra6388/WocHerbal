@@ -232,12 +232,26 @@ const Products = () => {
           <p className="text-muted-foreground">Manage your herbal oil products and inventory</p>
         </div>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
+         <div className=''>
+          <DialogTrigger asChild className='mx-3'>
+            <Button onClick={handleAddProduct}>
+              <Plus className="h-4 w-4 mr-2" />
+              View Category
+            </Button>
+          </DialogTrigger>
+          <DialogTrigger asChild className='mx-3'>
+            <Button onClick={handleAddProduct}>
+              <Plus className="h-4 w-4 mr-2" />
+              Add Category
+            </Button>
+          </DialogTrigger>
+           <DialogTrigger asChild>
             <Button onClick={handleAddProduct}>
               <Plus className="h-4 w-4 mr-2" />
               Add Product
             </Button>
           </DialogTrigger>
+         </div>
           <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>{editingProduct ? 'Edit Product' : 'Add New Product'}</DialogTitle>
@@ -419,8 +433,6 @@ const Products = () => {
           </DialogContent>
         </Dialog>
       </div>
-
-      {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
         <Card>
           <CardContent className="p-4">
