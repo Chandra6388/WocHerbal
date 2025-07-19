@@ -23,14 +23,14 @@ const productSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
-  images:{
+  images: {
     type: String,
     required: [true, 'Please enter product images']
   },
   category: {
-    type: String,
-    required: [true, 'Please enter product category'],
-    enum: {values: ['men','women','hairgrowth',],  message: 'Please select correct category' }
+    type: mongoose.Schema.ObjectId,
+    ref: 'category',
+    required: true
   },
   weight: {
     type: String,

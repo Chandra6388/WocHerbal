@@ -170,7 +170,7 @@ exports.createPayment = async (req, res, next) => {
   try {
     const { amount, currency = 'INR' } = req.body;
 
-    
+
 
     const razorpayOrder = await createRazorpayOrder(amount, currency, `order_${Date.now()}`);
 
@@ -343,4 +343,18 @@ exports.refundOrder = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-}; 
+};
+
+
+
+// Get overall revenue
+exports.getOverallRevenue = async (req, res) => {
+  try {
+
+    const orders = await Order.find({ orderStatus: { $in: ['Delivered', 'Processing', 'Shipped'] } });
+    const overallRevenue = orders.reduce((sum, order) => sum + (order.totalPrice || 0), 0);
+    res.status(200).json({ success: true, overallRevenue });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Failed to fetch overall revenue', error: error.message });
+  }
+};

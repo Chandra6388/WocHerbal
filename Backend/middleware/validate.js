@@ -41,7 +41,7 @@ const schemas = {
     price: Joi.number().positive().required(),
     soldCount: Joi.number().min(0).optional(),
     weight: Joi.string().optional(),
-    category: Joi.string().valid('men','women','hairgrowth',).required(),
+    category: Joi.string().required(),
 
     stock: Joi.number().integer().min(0).required(),
     tags: Joi.array().items(Joi.string()).optional(),
@@ -69,7 +69,7 @@ const schemas = {
     soldCount: Joi.number().min(0).optional(),
     weight: Joi.string().optional(),
     images: Joi.string().optional(),
-    category: Joi.string().valid('men','women','hairgrowth').optional(),
+    category: Joi.string().optional(),
     stock: Joi.number().integer().min(0).optional(),
     status: Joi.string().valid('active', 'inactive', 'out_of_stock').optional(),
     tags: Joi.array().items(Joi.string()).optional(),
@@ -101,39 +101,39 @@ const schemas = {
     comment: Joi.string().min(10).max(500).optional()
   }),
 
- 
 
-createOrder: Joi.object({
-  shippingInfo: Joi.object({
-    address: Joi.string().required(),
-    city: Joi.string().required(),
-    phoneNo: Joi.string().required(),
-    postalCode: Joi.string().required(),
-    country: Joi.string().required(),
-  }).required(),
 
-  orderItems: Joi.array().items(
-    Joi.object({
-      product: Joi.string().required(),         // Product ID
-      name: Joi.string().optional(),            // Optional - will be added server-side
-      price: Joi.number().min(0).optional(),    // Optional - will be added server-side
-      quantity: Joi.number().integer().min(1).required(),
-      image: Joi.string().optional(),           // Optional - will be added server-side
-    })
-  ).min(1).required(),
+  createOrder: Joi.object({
+    shippingInfo: Joi.object({
+      address: Joi.string().required(),
+      city: Joi.string().required(),
+      phoneNo: Joi.string().required(),
+      postalCode: Joi.string().required(),
+      country: Joi.string().required(),
+    }).required(),
 
-  paymentInfo: Joi.object({
-    id: Joi.string().required(),
-    status: Joi.string().valid('Paid', 'Pending').required(),
-    method: Joi.string().valid('Razorpay', 'Cash on Delivery').required(),
-  }).required(),
+    orderItems: Joi.array().items(
+      Joi.object({
+        product: Joi.string().required(),         // Product ID
+        name: Joi.string().optional(),            // Optional - will be added server-side
+        price: Joi.number().min(0).optional(),    // Optional - will be added server-side
+        quantity: Joi.number().integer().min(1).required(),
+        image: Joi.string().optional(),           // Optional - will be added server-side
+      })
+    ).min(1).required(),
 
-  itemsPrice: Joi.number().min(0).optional(),
-  taxPrice: Joi.number().min(0).optional(),
-  shippingPrice: Joi.number().min(0).optional(),
-  totalPrice: Joi.number().min(0).optional(),
-  user: Joi.string().optional()
-}),
+    paymentInfo: Joi.object({
+      id: Joi.string().required(),
+      status: Joi.string().valid('Paid', 'Pending').required(),
+      method: Joi.string().valid('Razorpay', 'Cash on Delivery').required(),
+    }).required(),
+
+    itemsPrice: Joi.number().min(0).optional(),
+    taxPrice: Joi.number().min(0).optional(),
+    shippingPrice: Joi.number().min(0).optional(),
+    totalPrice: Joi.number().min(0).optional(),
+    user: Joi.string().optional()
+  }),
 
 
   // Help request validation
