@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -9,51 +9,55 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Eye, Download, Edit } from 'lucide-react';
 import { toast } from 'sonner';
+import { getAllOrder } from '@/services/admin/order'
 
 interface Order {
-  id: string;
+  _id: string;
   customerName: string;
   product: string;
   amount: number;
-  paymentStatus: 'paid' | 'failed' | 'pending';
-  deliveryStatus: 'pending' | 'shipped' | 'delivered';
+  user: {
+    _id: string;
+    name: string;
+    email: string
+  },
+  orderItems: orderItems[];
+  shippingInfo: {
+    address: string,
+    city: string,
+    phoneNo: string
+    postalCode: string,
+    country: string
+  }
+  paymentInfo: {
+    id: string
+    status: string
+    method: string
+  };
+  paidAt: string
+  itemsPrice: string,
+  taxPrice: string,
+  shippingPrice: string,
+  totalPrice: string,
+  orderStatus: string,
+  createdAt: string,
+  paymentStatus: string;
+  deliveryStatus?: string;
   date: string;
   trackingId?: string;
 }
 
-const Orders = () => {
-  const [orders, setOrders] = useState<Order[]>([
-    {
-      id: 'ORD-001',
-      customerName: 'Priya Sharma',
-      product: 'Organic Lavender Oil',
-      amount: 299,
-      paymentStatus: 'paid',
-      deliveryStatus: 'delivered',
-      date: '2024-01-15',
-      trackingId: 'TRK123456'
-    },
-    {
-      id: 'ORD-002',
-      customerName: 'Raj Kumar',
-      product: 'Tea Tree Oil',
-      amount: 249,
-      paymentStatus: 'paid',
-      deliveryStatus: 'shipped',
-      date: '2024-01-14',
-      trackingId: 'TRK123457'
-    },
-    {
-      id: 'ORD-003',
-      customerName: 'Anita Patel',
-      product: 'Organic Lavender Oil',
-      amount: 299,
-      paymentStatus: 'pending',
-      deliveryStatus: 'pending',
-      date: '2024-01-13'
-    }
-  ]);
+interface orderItems {
+  name: string;
+  quantity: number;
+  image: string;
+  price: number;
+  product: string;
+  _id: string
+}
 
+const Orders = () => {
+  const [orders, setOrders] = useState<Order[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
   const [updateData, setUpdateData] = useState<{
@@ -63,6 +67,26 @@ const Orders = () => {
     deliveryStatus: 'pending',
     trackingId: ''
   });
+
+
+  const allOrder = async () => {
+    await getAllOrder()
+      .then((res) => {
+        if (res?.status == "success") {
+          setOrders(res?.orders)
+        }
+        else {
+          setOrders([])
+        }
+      })
+      .catch((error) => {
+        console.log("Error in fetching the order")
+      })
+  }
+
+  useEffect(() => {
+    allOrder()
+  }, [])
 
   const getPaymentStatusBadge = (status: string) => {
     switch (status) {
@@ -103,7 +127,7 @@ const Orders = () => {
     e.preventDefault();
     if (selectedOrder) {
       setOrders(orders.map(order =>
-        order.id === selectedOrder.id
+        order._id === selectedOrder._id
           ? { ...order, ...updateData }
           : order
       ));
@@ -117,7 +141,7 @@ const Orders = () => {
     const csvContent = [
       ['Order ID', 'Customer', 'Product', 'Amount', 'Payment Status', 'Delivery Status', 'Date'].join(','),
       ...orders.map(order => [
-        order.id,
+        order._id,
         order.customerName,
         order.product,
         order.amount,
@@ -137,6 +161,10 @@ const Orders = () => {
     toast.success('Orders exported successfully!');
   };
 
+
+
+
+  console.log("orders", orders)
   return (
     <div className="p-6 space-y-6">
       <div className="flex justify-between items-center">
@@ -170,14 +198,14 @@ const Orders = () => {
             </TableHeader>
             <TableBody>
               {orders.map((order) => (
-                <TableRow key={order.id}>
-                  <TableCell className="font-medium">{order.id}</TableCell>
-                  <TableCell>{order.customerName}</TableCell>
-                  <TableCell>{order.product}</TableCell>
-                  <TableCell>₹{order.amount}</TableCell>
-                  <TableCell>{getPaymentStatusBadge(order.paymentStatus)}</TableCell>
-                  <TableCell>{getDeliveryStatusBadge(order.deliveryStatus)}</TableCell>
-                  <TableCell>{new Date(order.date).toLocaleDateString()}</TableCell>
+                <TableRow key={order._id}>
+                  <TableCell className="font-medium">{order._id}</TableCell>
+                  <TableCell>{order?.user?.name}</TableCell>
+                  <TableCell>{order.orderItems[0]?.name}</TableCell>
+                  <TableCell>₹ {order?.itemsPrice}</TableCell>
+                  <TableCell>{getPaymentStatusBadge(order.orderStatus)}</TableCell>
+                  <TableCell>{getDeliveryStatusBadge("pending")}</TableCell>
+                  <TableCell>{new Date(order.createdAt).toLocaleDateString()}</TableCell>
                   <TableCell>
                     <div className="flex gap-2">
                       <Button variant="outline" size="sm">
@@ -200,7 +228,7 @@ const Orders = () => {
           <DialogHeader>
             <DialogTitle>Update Order Status</DialogTitle>
             <DialogDescription>
-              Update delivery status and tracking information for order {selectedOrder?.id}
+              Update delivery status and tracking information for order {selectedOrder?._id}
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSubmitUpdate} className="space-y-4">
@@ -209,7 +237,7 @@ const Orders = () => {
               <select
                 id="deliveryStatus"
                 value={updateData.deliveryStatus}
-                onChange={(e) => setUpdateData({...updateData, deliveryStatus: e.target.value as 'pending' | 'shipped' | 'delivered'})}
+                onChange={(e) => setUpdateData({ ...updateData, deliveryStatus: e.target.value as 'pending' | 'shipped' | 'delivered' })}
                 className="w-full px-3 py-2 border border-input rounded-md"
               >
                 <option value="pending">Pending</option>
@@ -222,7 +250,7 @@ const Orders = () => {
               <Input
                 id="trackingId"
                 value={updateData.trackingId}
-                onChange={(e) => setUpdateData({...updateData, trackingId: e.target.value})}
+                onChange={(e) => setUpdateData({ ...updateData, trackingId: e.target.value })}
                 placeholder="Enter tracking ID"
               />
             </div>

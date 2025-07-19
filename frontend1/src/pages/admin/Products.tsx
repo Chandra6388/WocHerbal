@@ -69,7 +69,14 @@ interface Product {
   }[];
 }
 
+interface Category {
+  _id?: string
+  name: string;
+  status: 'active' | 'inactive' | 'out-of-stock';
+}
 const Products = () => {
+  const [category, setCategory] = useState<Category[]>([]);
+
   const [products, setProducts] = useState<Product[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -418,6 +425,7 @@ const Products = () => {
                       />
                     </div>
                   </div>
+
                 </div>
 
                 {/* Right Column */}
@@ -545,8 +553,6 @@ const Products = () => {
           </DialogContent>
         </Dialog>
       </div>
-
-      {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
         <Card>
           <CardContent className="p-4">

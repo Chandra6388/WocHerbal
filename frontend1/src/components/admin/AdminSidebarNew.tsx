@@ -13,12 +13,14 @@ import {
   Bell,
   Settings,
   LogOut,
-  Leaf
+  Leaf,
+  Layers3
 } from 'lucide-react';
 
 const sidebarItems = [
   { icon: BarChart3, label: 'Dashboard', path: '/admin/dashboard' },
   { icon: Package, label: 'Products', path: '/admin/products' },
+  { icon: Layers3, label: 'Category', path: '/admin/category' },
   { icon: MessageCircle, label: 'Reviews', path: '/admin/reviews' },
   { icon: ShoppingCart, label: 'Orders', path: '/admin/orders' },
   { icon: Truck, label: 'Order Tracking', path: '/admin/tracking' },

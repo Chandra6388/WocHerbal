@@ -18,6 +18,8 @@ const cartRoutes = require('./routes/cart');
 const adminRoutes = require('./routes/admin');
 const notificationRoutes = require('./routes/notification');
 const helpRoutes = require('./routes/help');
+const category = require('./routes/category');
+
 
 // Middleware
 app.use(helmet());
@@ -41,13 +43,7 @@ app.use(
   })
 );
 
-// Rate limiting
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
-  message: 'Too many requests from this IP, please try again later.',
-});
-app.use('/api/', limiter);
+
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
@@ -65,6 +61,7 @@ app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/cart', cartRoutes);
+app.use('/api/category', category);
 app.use('/api/admin', adminRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/help', helpRoutes);

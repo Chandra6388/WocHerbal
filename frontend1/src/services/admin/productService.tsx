@@ -73,3 +73,41 @@ export const getoverallRevenue = async () => {
     throw error.response.data;
   }
 };
+
+export const addNewCategory = async (productData) => {
+  try {
+    const response = await axios.post(`${API_URL}/category/add`, productData);
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+export const getCategory = async () => {
+  try {
+    const response = await axios.post(`${API_URL}/category/get`);
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+export const updateCategory = async (data) => {
+  try {
+    const response = await axios.post(`${API_URL}/category/update`, data);
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+export const deleteCategory = async (productData) => {
+  try {
+    const response = await axios.post(
+      `${API_URL}/category/delete`,
+      productData
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};

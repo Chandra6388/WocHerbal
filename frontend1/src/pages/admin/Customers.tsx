@@ -19,8 +19,12 @@ interface Customer {
   name: string;
   email: string;
   phone: string;
-  address: string;
-  joinDate: string;
+  address: {
+    city:string,
+    country:string,
+    street:string
+  };
+  createdAt: string;
   totalOrders: number;
   totalSpent: number;
   status: 'active' | 'inactive' | 'blocked';
@@ -30,15 +34,11 @@ interface Customer {
 
 const Customers = () => {
   const [customers, setCustomers] = useState<Customer[]>([]);
-
-  console.log("customers",customers)
-
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-
   const filteredCustomers = customers.filter(customer => {
     const matchesSearch = customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          customer.email.toLowerCase().includes(searchTerm.toLowerCase());
@@ -56,7 +56,6 @@ const Customers = () => {
         .then(data => {
           if(data?.status=="success") {
             setCustomers(data.data);
-           
           }
           else{
             setCustomers([]);
@@ -108,13 +107,13 @@ const Customers = () => {
     const csvContent = [
       ['Name', 'Email', 'Phone', 'Total Orders', 'Total Spent', 'Status', 'Join Date'].join(','),
       ...filteredCustomers.map(customer => [
-        customer.name,
-        customer.email,
-        customer.phone,
-        customer.totalOrders,
-        customer.totalSpent,
-        customer.status,
-        customer.joinDate
+        customer?.name,
+        customer?.email,
+        customer?.phone,
+        customer?.totalOrders,
+        customer?.totalSpent,
+        customer?.status,
+        customer?.createdAt
       ].join(','))
     ].join('\n');
 
@@ -128,9 +127,10 @@ const Customers = () => {
     toast.success('Customer data exported successfully!');
   };
 
+  console.log("selectedCustomer", selectedCustomer)
+
   return (
     <div className="p-6 space-y-6">
-      {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
         <div>
           <h1 className="text-3xl font-bold">Customer Management</h1>
@@ -155,7 +155,7 @@ const Customers = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Total Customers</p>
-                <p className="text-2xl font-bold">{customers.length}</p>
+                <p className="text-2xl font-bold">{customers?.length}</p>
               </div>
               <UserPlus className="h-8 w-8 text-blue-600" />
             </div>
@@ -166,7 +166,7 @@ const Customers = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Active Customers</p>
-                <p className="text-2xl font-bold">{customers.filter(c => c.status === 'active').length}</p>
+                <p className="text-2xl font-bold">{customers?.filter(c => c.status === 'active').length}</p>
               </div>
               <Badge className="bg-green-100 text-green-800">Active</Badge>
             </div>
@@ -177,7 +177,7 @@ const Customers = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Total Revenue</p>
-                <p className="text-2xl font-bold">₹{customers.reduce((sum, c) => sum + c.totalSpent, 0).toLocaleString()}</p>
+                <p className="text-2xl font-bold">₹{customers?.reduce((sum, c) => sum + c.totalSpent, 0).toLocaleString()}</p>
               </div>
               <ShoppingBag className="h-8 w-8 text-green-600" />
             </div>
@@ -188,7 +188,7 @@ const Customers = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Avg. Order Value</p>
-                <p className="text-2xl font-bold">₹{Math.round(customers.reduce((sum, c) => sum + c.totalSpent, 0) / customers.reduce((sum, c) => sum + c.totalOrders, 0))}</p>
+                <p className="text-2xl font-bold">₹{Math.round(customers?.reduce((sum, c) => sum + c.totalSpent, 0) / customers.reduce((sum, c) => sum + c.totalOrders, 0))}</p>
               </div>
               <Star className="h-8 w-8 text-yellow-600" />
             </div>
@@ -240,38 +240,39 @@ const Customers = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {customers?.map((customer) => (
-                <TableRow key={customer.id}>
+              {filteredCustomers?.map((item) => (
+                <TableRow key={item.id}>
                   <TableCell>
                     <div>
-                      <p className="font-medium">{customer.name}</p>
-                      <p className="text-sm text-muted-foreground">{customer.email}</p>
+                      <p className="font-medium">{item?.name}</p>
+                      <p className="text-sm text-muted-foreground">{item?.email}</p>
                     </div>
                   </TableCell>
                   <TableCell>
                     <div>
-                      <p className="text-sm">{customer.phone}</p>
-                      <p className="text-sm text-muted-foreground">{customer.address}</p>
+                      <p className="text-sm">{item?.phone}</p>
+                      <p className="text-sm text-muted-foreground">{`${item?.address?.street || ""}, ${item?.address?.city || ""}, ${item?.address?.country || ""}`}</p>
                     </div>
                   </TableCell>
                   <TableCell>
                     <div>
-                      <p className="font-semibold">{customer.totalOrders}</p>
+                      <p className="font-semibold">{item?.totalOrders}</p>
                       <p className="text-sm text-muted-foreground">N/A</p>
                     </div>
                   </TableCell>
-                  <TableCell>₹{customer.totalSpent?.toLocaleString()}</TableCell>
-                  <TableCell>{getStatusBadge(customer.status)}</TableCell>
-                  <TableCell>{new Date(customer.lastOrder)?.toLocaleDateString()}</TableCell>
+                  <TableCell>₹ {item?.totalSpent?.toLocaleString() || 0}</TableCell>
+                  <TableCell>{getStatusBadge(item?.status)}</TableCell>
+                  {/* <TableCell>{new Date(item?.lastOrder)?.toLocaleDateString()}</TableCell> */}
+                  <TableCell>{ "N/A"}</TableCell>
                   <TableCell>
                     <div className="flex gap-2">
-                      <Button variant="outline" size="sm" onClick={() => handleViewCustomer(customer)}>
+                      <Button variant="outline" size="sm" onClick={() => handleViewCustomer(item)}>
                         <Eye className="h-4 w-4" />
                       </Button>
-                      <Button variant="outline" size="sm" onClick={() => handleEditCustomer(customer)}>
+                      <Button variant="outline" size="sm" onClick={() => handleEditCustomer(item)}>
                         <Edit className="h-4 w-4" />
                       </Button>
-                      <Button variant="destructive" size="sm" onClick={() => handleDeleteCustomer(customer.id)}>
+                      <Button variant="destructive" size="sm" onClick={() => handleDeleteCustomer(item.id)}>
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
@@ -297,28 +298,28 @@ const Customers = () => {
                   <Mail className="h-5 w-5 text-blue-600" />
                   <div>
                     <p className="text-sm text-muted-foreground">Email</p>
-                    <p className="font-medium">{selectedCustomer.email}</p>
+                    <p className="font-medium">{selectedCustomer?.email}</p>
                   </div>
                 </div>
                 <div className="flex items-center space-x-3">
                   <Phone className="h-5 w-5 text-green-600" />
                   <div>
                     <p className="text-sm text-muted-foreground">Phone</p>
-                    <p className="font-medium">{selectedCustomer.phone}</p>
+                    <p className="font-medium">{selectedCustomer?.phone}</p>
                   </div>
                 </div>
                 <div className="flex items-center space-x-3">
                   <MapPin className="h-5 w-5 text-red-600" />
                   <div>
                     <p className="text-sm text-muted-foreground">Address</p>
-                    <p className="font-medium">{selectedCustomer.address}</p>
+                    <p className="font-medium">{`${selectedCustomer?.address?.street || ""}, ${selectedCustomer?.address?.city || ""}, ${selectedCustomer?.address?.country || ""}`}</p>
                   </div>
                 </div>
                 <div className="flex items-center space-x-3">
                   <Calendar className="h-5 w-5 text-purple-600" />
                   <div>
                     <p className="text-sm text-muted-foreground">Join Date</p>
-                    <p className="font-medium">{new Date(selectedCustomer.joinDate).toLocaleDateString()}</p>
+                    <p className="font-medium">{new Date(selectedCustomer?.createdAt).toLocaleDateString()}</p>
                   </div>
                 </div>
               </div>
@@ -329,7 +330,7 @@ const Customers = () => {
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Total Spent</p>
-                  <p className="text-2xl font-bold text-green-600">₹{selectedCustomer.totalSpent.toLocaleString()}</p>
+                  <p className="text-2xl font-bold text-green-600">₹{selectedCustomer?.totalSpent?.toLocaleString()}</p>
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Customer Rating</p>

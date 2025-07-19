@@ -95,7 +95,7 @@ const Auth = () => {
         <div className="max-w-md mx-auto space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className="text-2xl text-center">Login~</CardTitle>
+              <CardTitle className="text-2xl text-center">Login</CardTitle>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-4">
