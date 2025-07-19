@@ -10,6 +10,8 @@ const Cart = () => {
   const { items, updateQuantity, removeFromCart, totalPrice, totalItems } = useCart();
   const navigate = useNavigate();
 
+
+  console.log("CPPP", items)
   if (items.length === 0) {
     return (
       <div className="min-h-screen pt-20 flex items-center justify-center">

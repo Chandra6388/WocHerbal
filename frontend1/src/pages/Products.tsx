@@ -74,6 +74,8 @@ const Products = () => {
       : products.filter((product) => product.category === selectedCategory);
 
   const handleAddToCart = (product: Product) => {
+
+    console.log("sss", product)
     addToCart({
       id: product._id,
       name: product.name,
@@ -152,7 +154,7 @@ const Products = () => {
 
 
 
-
+console.log("filteredProducts", filteredProducts) 
 
 
 

@@ -70,6 +70,7 @@ const Checkout = () => {
     if (!isAuthenticated) navigate("/auth", { state: { from: "/checkout" } });
   }, [items.length, isAuthenticated, navigate]);
 
+  console.log("items", items)
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
