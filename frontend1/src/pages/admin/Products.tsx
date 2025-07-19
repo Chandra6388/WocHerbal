@@ -44,6 +44,7 @@ import {
   deleteProduct,
   updateProductStatus,
   getoverallRevenue,
+  getCategory,
 } from "@/services/admin/productService";
 interface Product {
   _id?: string;
@@ -70,9 +71,9 @@ interface Product {
 }
 
 interface Category {
-  _id?: string
+  _id?: string;
   name: string;
-  status: 'active' | 'inactive' | 'out-of-stock';
+  status: "active" | "inactive" | "out-of-stock";
 }
 const Products = () => {
   const [category, setCategory] = useState<Category[]>([]);
@@ -104,6 +105,26 @@ const Products = () => {
   useEffect(() => {
     getProducts();
     handleGetOverallRevenue();
+  }, []);
+
+  const getAllCategory = () => {
+    getCategory()
+      .then((data) => {
+        if (data?.status == "success") {
+          setFormData({ ...formData, category: data?.allCategory[0]?._id });
+          setCategory(data.allCategory);
+        } else {
+          setCategory([]);
+        }
+      })
+      .catch((error) => {
+        toast.error("Failed to fetch products");
+        console.error(error);
+      });
+  };
+
+  useEffect(() => {
+    getAllCategory();
   }, []);
 
   const [formData, setFormData] = useState({
@@ -411,21 +432,25 @@ const Products = () => {
                       required
                     />
                   </div>
-
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="category">Category</Label>
-                      <Input
-                        id="category"
+                      <Label htmlFor="status">Category</Label>
+                      <select
+                        id="status"
                         value={formData.category}
                         onChange={(e) =>
                           setFormData({ ...formData, category: e.target.value })
                         }
-                        required
-                      />
+                        className="w-full px-3 py-2 border border-input rounded-md"
+                      >
+                        {category?.map((item) => {
+                          return (
+                            <option value={item?._id}>{item?.name}</option>
+                          );
+                        })}
+                      </select>
                     </div>
                   </div>
-
                 </div>
 
                 {/* Right Column */}
