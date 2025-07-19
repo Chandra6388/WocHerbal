@@ -42,7 +42,6 @@ interface Category {
 }
 const Products = () => {
   const [category, setCategory] = useState<Category[]>([]);
-
   const [products, setProducts] = useState<Product[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -348,8 +347,6 @@ const Products = () => {
                           return  <option value={item?._id}>{item?.name}</option>
                         })
                       }
-
-                       
                       </select>
                     </div>
                   </div>
