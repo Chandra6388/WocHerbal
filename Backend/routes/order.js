@@ -22,7 +22,7 @@ router.use(protect);
 
 // Order routes
 router.post('/new', validate('createOrder'), newOrder);
-router.get('/me', myOrders);
+router.get('/order', myOrders);
 router.get('/:id', getSingleOrder);
 router.delete('/:id', deleteOrder);
 

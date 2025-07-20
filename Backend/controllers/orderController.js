@@ -4,7 +4,6 @@ const Cart = require('../models/Cart');
 const { createOrder: createRazorpayOrder, verifyPayment } = require('../utils/razorpay');
 const ErrorHandler = require('../utils/errorHandler');
 
-// Create new order => /api/orders/new
 exports.newOrder = async (req, res, next) => {
   try {
     const {
@@ -38,7 +37,6 @@ exports.newOrder = async (req, res, next) => {
   }
 };
 
-// Get single order => /api/orders/:id
 exports.getSingleOrder = async (req, res, next) => {
   try {
     const order = await Order.findById(req.params.id).populate('user', 'name email');
@@ -59,7 +57,6 @@ exports.getSingleOrder = async (req, res, next) => {
   }
 };
 
-// Get logged in user orders => /api/orders/me
 exports.myOrders = async (req, res, next) => {
   try {
     const orders = await Order.find({ user: req.user._id });
