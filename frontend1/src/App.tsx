@@ -23,7 +23,7 @@ import Products from "@/pages/Products";
 import ProductDetail from "@/pages/ProductDetail";
 import Contact from "./pages/Contact";
 import About from "./pages/About";
-import Blog from "./pages/Blog";
+import Blog from "./pages/BlogList";
 import Testimonials from "./pages/Testimonials";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";

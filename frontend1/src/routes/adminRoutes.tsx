@@ -10,11 +10,7 @@ import Notifications from "@/pages/admin/Notifications";
 import BlogManagement from "@/pages/admin/BlogManagement";
 import AdminSidebar from '@/components/admin/AdminSidebarNew';
 import Category from '@/pages/admin/Category';
-import { BlogPost } from "@/pages/Blog";
-
-import Layout from "@/components/Layout";
-
-
+import  BlogPost  from "@/pages/Blog";
 
 const AdminRoutes = () => (
   <div className="min-h-screen bg-background flex">
