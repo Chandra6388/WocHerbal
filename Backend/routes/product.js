@@ -47,7 +47,7 @@ router.delete('/reviews', deleteReview);
 
 
 // Admin routes
-router.get('/admin/all', adminOnly, getAllProducts);
+router.post('/admin/all', adminOnly, getAllProducts);
 router.put('/admin/approve/:id', adminOnly, approveProduct);
 router.get('/admin/stats', adminOnly, getProductStats);
 

@@ -87,7 +87,8 @@ const Products = () => {
   const [totalRevenueState, setTotalRevenueState] = useState<number>(0);
 
   const getProducts = () => {
-    getAllProducts()
+    const req = {user:"admin"}
+    getAllProducts(req)
       .then((data) => {
         if (data?.status == "success") {
           setProducts(data.products);

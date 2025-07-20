@@ -259,15 +259,17 @@ exports.deleteReview = async (req, res, next) => {
 // Admin: Get all products for approval => /api/products/admin/all
 exports.getAllProducts = async (req, res, next) => {
   try {
-    const { page = 1, limit = 10, status, approvalStatus } = req.query;
+    const { page = 1, limit = 10, user } = req.body;
+
+    console.log("req", req)
+    return 
 
     const query = {};
     if (status) query.status = status;
     if (approvalStatus) query.approvalStatus = approvalStatus;
 
     const products = await Product.find(query)
-      .populate('user', 'name email')
-      .populate('approvedBy', 'name')
+      .populate('category', 'name')
       .limit(limit * 1)
       .skip((page - 1) * limit)
       .exec();
@@ -319,8 +321,7 @@ exports.approveProduct = async (req, res, next) => {
     next(error);
   }
 };
-
-// Get product statistics => /api/products/stats
+ 
 exports.getProductStats = async (req, res, next) => {
   try {
     const stats = await Product.aggregate([
