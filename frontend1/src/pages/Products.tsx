@@ -11,12 +11,13 @@ import {
 } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
 import { getUserProducts } from "@/services/admin/productService";
-import { toast } from "sonner";
+import { useToast } from "../hooks/use-toast";
+
 import {
   Addfavorlist,
   getfavorlist,
   removeFavorlist,
-  
+
 } from "@/services/productsServices";
 
 interface Product {
@@ -43,6 +44,7 @@ interface Product {
 }
 
 const Products = () => {
+  const { toast } = useToast();
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [products, setProducts] = useState<Product[]>([]);
   const { addToCart } = useCart();
@@ -61,8 +63,6 @@ const Products = () => {
       : products.filter((product) => product.category === selectedCategory);
 
   const handleAddToCart = (product: Product) => {
-
-    console.log("sss", product)
     addToCart({
       id: product._id,
       name: product.name,
@@ -75,69 +75,128 @@ const Products = () => {
     getProducts();
     handleGetFavorites();
   }, []);
+  // update path as per your project
 
-  const getProducts = () => {
-    getUserProducts()
-      .then((data) => {
-        if (data?.status === "success") {
-          setProducts(data.products);
-        } else {
-          setProducts([]);
-        }
-      })
-      .catch((error) => {
-        toast.error("Failed to fetch products");
-        console.error(error);
+  const getProducts = async () => {
+    try {
+      const data = await getUserProducts();
+      if (data?.status === 'success') {
+        setProducts(data.products);
+      } else {
+        setProducts([]);
+        toast({
+          title: 'No Products Found',
+          description: data?.message || 'No products were returned from the server.',
+          variant: 'default',
+          duration: 4000,
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      toast({
+        title: 'Fetch Error',
+        description:
+          error?.response?.data?.message ||
+          error?.message ||
+          'An unexpected error occurred while fetching products.',
+        variant: 'destructive',
+        duration: 4000,
       });
+    }
   };
+
 
   const handleAddToFavorites = (product: Product) => {
     Addfavorlist({ productId: product._id })
       .then((data) => {
         if (data?.status === "success") {
-          toast.success("Product added to favorites");
+          toast({
+            title: "Added to Favorites",
+            description: `${product.name} has been added to your favorites.`,
+            variant: "success",
+            duration: 3000,
+          });
           handleGetFavorites();
         } else {
-          toast.error("Failed to add product to favorites");
+          toast({
+            title: "Failed to Add",
+            description: data?.message || "Could not add product to favorites.",
+            variant: "destructive",
+            duration: 3000,
+          });
         }
       })
       .catch((error) => {
-        toast.error("Error adding product to favorites");
-        console.error(error);
+        console.error("Error adding to favorites:", error);
+        toast({
+          title: "Something went wrong",
+          description: error?.message || "Unable to add product to favorites.",
+          variant: "destructive",
+          duration: 3000,
+        });
       });
   };
+
 
   const handleGetFavorites = () => {
     getfavorlist({})
       .then((data) => {
         if (data?.status === "success") {
-          setFavorList(data.favorites);
+          setFavorList(data.favorites || []);
           console.log("Favorites:", data.favorites);
         } else {
-          toast.error("Failed to fetch favorites");
+          toast({
+            title: "Failed to Load Favorites",
+            description: data?.message || "Unable to fetch your favorite products.",
+            variant: "destructive",
+            duration: 3000,
+          });
         }
       })
       .catch((error) => {
-        toast.error("Error fetching favorites");
-        console.error(error);
+        console.error("Error fetching favorites:", error);
+        toast({
+          title: "Error",
+          description: "Something went wrong while fetching favorites.",
+          variant: "destructive",
+          duration: 3000,
+        });
       });
   };
+
 
   const handleRemoveFromFavorites = (productId: string) => {
     removeFavorlist({ productId })
       .then((data) => {
         if (data?.status === "success") {
-          toast.success("Product removed from favorites");
-          handleGetFavorites(); // Refresh favorites list
+          toast({
+            title: "Removed from Favorites",
+            description: "Product was successfully removed from your favorites.",
+            variant: "success",
+            duration: 3000,
+          });
+
+          handleGetFavorites(); // Refresh list
         } else {
-          toast.error("Failed to remove product from favorites");
+          toast({
+            title: "Failed to Remove",
+            description: data?.message || "Could not remove product from favorites.",
+            variant: "destructive",
+            duration: 3000,
+          });
         }
       })
       .catch((error) => {
-        toast.error("Error removing product from favorites");
-        console.error(error);
+        console.error("Error removing from favorites:", error);
+        toast({
+          title: "Server Error",
+          description: error?.message || "Something went wrong while removing from favorites.",
+          variant: "destructive",
+          duration: 3000,
+        });
       });
   };
+
 
 
   return (
@@ -174,6 +233,11 @@ const Products = () => {
             >
               <CardHeader className="p-0">
                 <div className="relative aspect-square overflow-hidden rounded-t-lg">
+                  {product.stock === 0 && (
+                    <div className="absolute top-2 left-2 z-10 bg-red-600 text-white text-xs px-2 py-1 rounded-full shadow-md">
+                      Out of Stock
+                    </div>
+                  )}
                   <div className="absolute top-2 right-2 z-10 bg-white p-1 rounded-full shadow-md cursor-pointer hover:text-red-500 transition-colors">
                     {favorList.some((fav) => fav._id === product._id) ? (
                       <Heart
@@ -196,6 +260,8 @@ const Products = () => {
                       />
                     )}
                   </div>
+
+                  {/* 📷 Product Image */}
                   <Link to={`/product/${product._id}`}>
                     <img
                       src={product.images}
@@ -205,6 +271,7 @@ const Products = () => {
                   </Link>
                 </div>
               </CardHeader>
+
 
               <CardContent className="p-4">
                 <Link to={`/product/${product._id}`}>

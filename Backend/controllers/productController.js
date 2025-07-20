@@ -14,22 +14,22 @@ exports.newProduct = async (req, res, next) => {
   }
 };
 
-// Get all products => /api/products
 exports.getProducts = async (req, res, next) => {
   try {
     const resPerPage = 8;
-    const productsCount = await Product.countDocuments();
 
-    const apiFeatures = new APIFeatures(Product.find(), req.query)
+    // Count only active products
+    const productsCount = await Product.countDocuments({ status: 'active' });
+
+    // Start with only active products in the query
+    const apiFeatures = new APIFeatures(Product.find({ status: 'active' }), req.query)
       .search()
       .filter();
 
     let products = await apiFeatures.query;
-
     let filteredProductsCount = products.length;
 
     apiFeatures.pagination(resPerPage);
-
     products = await apiFeatures.query.clone();
 
     res.status(200).json({
@@ -37,14 +37,13 @@ exports.getProducts = async (req, res, next) => {
       productsCount,
       resPerPage,
       filteredProductsCount,
-      products
+      products,
     });
   } catch (error) {
     next(error);
   }
 };
 
-// Get single product details => /api/products/:id
 exports.getSingleProduct = async (req, res, next) => {
   try {
     const product = await Product.findById(req.params.id)
@@ -77,7 +76,6 @@ exports.getSingleProduct = async (req, res, next) => {
   }
 };
 
-// Update Product => /api/products/:id
 exports.updateProduct = async (req, res, next) => {
   try {
     console.log("req.params.id", req.params.id)
@@ -105,7 +103,6 @@ exports.updateProduct = async (req, res, next) => {
   }
 };
 
-// Delete Product => /api/products/:id
 exports.deleteProduct = async (req, res, next) => {
   try {
     const product = await Product.findById(req.params.id);
@@ -127,12 +124,9 @@ exports.deleteProduct = async (req, res, next) => {
   }
 };
 
-
-// Create/Update product review => /api/products/review
 exports.createProductReview = async (req, res, next) => {
   try {
     const { rating, title, comment, productId } = req.body;
-
     const review = {
       user: req.user._id,
       name: req.user.name,
@@ -179,7 +173,6 @@ exports.createProductReview = async (req, res, next) => {
   }
 };
 
-// Get Product Reviews => /api/products/reviews
 exports.getProductReviews = async (req, res, next) => {
   try {
     const product = await Product.findById(req.query.id);
@@ -200,7 +193,6 @@ exports.getProductReviews = async (req, res, next) => {
   }
 };
 
-// Delete Product Review => /api/products/reviews
 exports.deleteReview = async (req, res, next) => {
   try {
     const product = await Product.findById(req.query.productId);
@@ -238,7 +230,6 @@ exports.deleteReview = async (req, res, next) => {
   }
 };
 
-// Admin: Get all products for approval => /api/products/admin/all
 exports.getAllProducts = async (req, res, next) => {
   try {
     const { page = 1, limit = 10, user } = req.body;
@@ -264,7 +255,6 @@ exports.getAllProducts = async (req, res, next) => {
   }
 };
 
-// Admin: Approve/Reject product => /api/products/admin/approve/:id
 exports.approveProduct = async (req, res, next) => {
   try {
     const { approvalStatus, rejectionReason } = req.body;
@@ -341,7 +331,6 @@ exports.getProductStats = async (req, res, next) => {
   }
 };
 
-// Get featured products => /api/products/featured
 exports.getFeaturedProducts = async (req, res, next) => {
   try {
     const products = await Product.find({
@@ -359,7 +348,6 @@ exports.getFeaturedProducts = async (req, res, next) => {
   }
 };
 
-// Get products by category => /api/products/category/:category
 exports.getProductsByCategory = async (req, res, next) => {
   try {
     const { category } = req.params;
@@ -392,7 +380,6 @@ exports.getProductsByCategory = async (req, res, next) => {
   }
 };
 
-
 exports.updateProductStatus = async (req, res, next) => {
   try {
     const { status } = req.body;
@@ -419,9 +406,6 @@ exports.updateProductStatus = async (req, res, next) => {
     next(error);
   }
 };
-
-
-
 
 exports.updateStockAndSoldCount = async (req, res, next) => {
   try {
