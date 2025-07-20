@@ -1,42 +1,63 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Textarea } from '../../components/ui/textarea';
 import { Badge } from '../../components/ui/badge';
 import { Plus, Edit, Trash2, Upload, Eye, Globe, FileText, Calendar, User } from 'lucide-react';
-import { useToast } from '../../hooks/use-toast';
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
 
+import { useToast } from '../../hooks/use-toast';
+import { updateBlog, publishBlog, deleteBlog, getBlogById, getAllBlogs, addBlog } from '@/services/admin/blogsService'
 interface BlogPost {
-  id: string;
+  _id?: string;
   title: string;
   description: string;
   content: string;
   image: string;
   author: string;
-  status: 'draft' | 'published';
-  createdAt: string;
+  isPublished?: boolean;
 }
-
+ 
 const BlogManagement = () => {
-  const [posts, setPosts] = useState<BlogPost[]>([
-    {
-      id: '1',
-      title: 'The Science Behind Ayurvedic Hair Care',
-      description: 'Discover how ancient Ayurvedic principles combined with modern science create powerful hair care solutions.',
-      content: 'Full content here...',
-      image: 'https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?w=1080&h=1080&fit=crop',
-      author: 'Dr. Priya Sharma',
-      status: 'published',
-      createdAt: '2024-01-15'
-    }
-  ]);
-
+  const MySwal = withReactContent(Swal);
+  const [posts, setPosts] = useState<BlogPost[]>([]);
   const [isEditing, setIsEditing] = useState(false);
   const [editingPost, setEditingPost] = useState<Partial<BlogPost>>({});
   const { toast } = useToast();
 
-  const handleSave = () => {
+  useEffect(() => {
+    getBlogs()
+  }, [])
+
+  const getBlogs = async () => {
+    try {
+      const res = await getAllBlogs({});
+      if (res?.status === "success") {
+        setPosts(res.blogs || []);
+
+      } else {
+        setPosts([]);
+        toast({
+          title: "No Blogs Found",
+          description: res?.message || "No blog posts available right now.",
+          variant: "default",
+          duration: 3000,
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching blogs:", error);
+      toast({
+        title: "🚫 Failed to Load Blogs",
+        description: "Something went wrong while fetching the blog posts. Please try again.",
+        variant: "destructive",
+        duration: 3000,
+      });
+    }
+  };
+
+  const handleSave = async () => {
     if (!editingPost.title || !editingPost.description || !editingPost.content) {
       toast({
         title: "Please fill all required fields",
@@ -45,49 +66,186 @@ const BlogManagement = () => {
       return;
     }
 
-    if (editingPost.id) {
-      // Update existing post
-      setPosts(prev => prev.map(post =>
-        post.id === editingPost.id ? { ...post, ...editingPost } as BlogPost : post
-      ));
+    if (editingPost._id) {
+      await updateBlog(editingPost)
+        .then((res) => {
+          if (res?.status == "success") {
+            getBlogs()
+            toast({
+              title: "🎉 Blog Updated!",
+              description: "Your blog post has been updated successfully.",
+              variant: "success",
+              duration: 3000,
+            });
+          }
+          else {
+            toast({
+              title: "⚠️ Couldn't Updated Blog",
+              description: res?.message || "Something went wrong while update your blog post. Please try again.",
+              variant: "destructive",
+              duration: 3000,
+            });
+          }
+        })
+        .catch((error) => {
+          console.error("error", error);
+          toast({
+            title: "🚫 Blog updation Failed",
+            description: "Oops! Something went wrong while update your blog. Please try again later.",
+            variant: "destructive",
+            duration: 3000,
+          });
+        });
     } else {
-      // Create new post
       const newPost: BlogPost = {
-        id: Date.now().toString(),
         title: editingPost.title!,
         description: editingPost.description!,
         content: editingPost.content!,
         image: editingPost.image || 'https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?w=1080&h=1080&fit=crop',
         author: editingPost.author || 'Admin',
-        status: 'draft',
-        createdAt: new Date().toISOString().split('T')[0]
       };
-      setPosts(prev => [newPost, ...prev]);
+
+      await addBlog(newPost)
+        .then((res) => {
+          if (res?.status === "success") {
+            getBlogs()
+            toast({
+              title: "🎉 Blog Published!",
+              description: "Your blog post has been saved and published successfully.",
+              variant: "success",
+              duration: 3000,
+            });
+          } else {
+            toast({
+              title: "⚠️ Couldn't Save Blog",
+              description: res?.message || "Something went wrong while saving your blog post. Please try again.",
+              variant: "destructive",
+              duration: 3000,
+            });
+          }
+        })
+        .catch((error) => {
+          console.error("error", error);
+          toast({
+            title: "🚫 Blog Submission Failed",
+            description: "Oops! Something went wrong while submitting your blog. Please try again later.",
+            variant: "destructive",
+            duration: 3000,
+          });
+        });
     }
 
     setIsEditing(false);
     setEditingPost({});
-    toast({
-      title: "Blog post saved successfully!"
-    });
+
   };
 
-  const handlePublish = (id: string) => {
-    setPosts(prev => prev.map(post =>
-      post.id === id
-        ? { ...post, status: post.status === 'published' ? 'draft' : 'published' }
-        : post
-    ));
-    toast({
-      title: "Blog post status updated!"
+  const handlePublish = async (id: string, isPublishing: boolean) => {
+    const actionText = !isPublishing ? "publish" : "unpublish";
+    const confirm = await MySwal.fire({
+      title: `Are you sure you want to ${actionText} this blog?`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: `Yes, ${actionText}`,
+      cancelButtonText: "Cancel",
+      confirmButtonColor: !isPublishing ? "#10B981" : "#F59E0B",
+      cancelButtonColor: "#EF4444",
     });
+
+    if (!confirm.isConfirmed) {
+      toast({
+        title: "Cancelled",
+        description: `Blog post was not ${!isPublishing ? "published" : "unpublished"}.`,
+        variant: "default",
+        duration: 3000,
+      });
+      return;
+    }
+
+    try {
+      const req = { id, isPublished: !isPublishing };
+      const res = await publishBlog(req);
+
+      if (res?.status === "success") {
+        toast({
+          title: `✅ Blog ${!isPublishing ? "Published" : "Unpublished"}`,
+          description: `The blog has been successfully ${!isPublishing ? "published" : "unpublished"}.`,
+          variant: "success",
+          duration: 3000,
+        });
+
+        // Optional: Refresh blog list if you maintain state
+        getBlogs?.();
+      } else {
+        toast({
+          title: "⚠️ Action Failed",
+          description: res?.message || `Could not ${actionText} the blog. Please try again.`,
+          variant: "destructive",
+          duration: 3000,
+        });
+      }
+    } catch (error: any) {
+      console.error("Publish/Unpublish Error:", error);
+      toast({
+        title: "🚫 Server Error",
+        description: error?.response?.data?.message || `Error while trying to ${actionText} the blog.`,
+        variant: "destructive",
+        duration: 3000,
+      });
+    }
   };
 
-  const handleDelete = (id: string) => {
-    setPosts(prev => prev.filter(post => post.id !== id));
-    toast({
-      title: "Blog post deleted successfully!"
+  const handleDelete = async (id: string) => {
+    const confirmResult = await MySwal.fire({
+      title: "Are you sure?",
+      text: "Do you really want to delete this blog post? This action cannot be undone.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "Cancel",
     });
+
+    if (!confirmResult.isConfirmed) {
+      toast({
+        title: "Cancelled",
+        description: "Your blog post was not deleted.",
+        variant: "default",
+        duration: 3000,
+      });
+      return;
+    }
+
+    try {
+      const req = { id: id }
+      console.log("SS", req)
+      const res = await deleteBlog(req);
+      if (res?.status === "success") {
+        getBlogs()
+        toast({
+          title: "🗑️ Blog Deleted",
+          description: "The blog post has been deleted successfully.",
+          variant: "success",
+          duration: 3000,
+        });
+      } else {
+        toast({
+          title: "⚠️ Delete Failed",
+          description: res?.message || "Something went wrong while deleting the blog post.",
+          variant: "destructive",
+          duration: 3000,
+        });
+      }
+    } catch (error: any) {
+      console.error("Delete error:", error);
+      toast({
+        title: "🚫 Server Error",
+        description: error?.response?.data?.message || "An unexpected error occurred. Please try again.",
+        variant: "destructive",
+        duration: 3000,
+      });
+    }
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -101,7 +259,6 @@ const BlogManagement = () => {
 
   return (
     <div className="space-y-8">
-      {/* Header Section */}
       <div className="bg-gradient-to-r from-forest-50 to-accent/5 rounded-2xl p-8 border border-accent/10">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
@@ -124,7 +281,7 @@ const BlogManagement = () => {
           <CardHeader className="bg-gradient-to-r from-forest-50 to-accent/5 border-b border-accent/10">
             <CardTitle className="text-2xl font-playfair text-forest-700 flex items-center gap-2">
               <FileText className="w-6 h-6" />
-              {editingPost.id ? 'Edit Blog Post' : 'Create New Blog Post'}
+              {editingPost._id ? 'Edit Blog Post' : 'Create New Blog Post'}
             </CardTitle>
           </CardHeader>
           <CardContent className="p-8 space-y-8">
@@ -241,17 +398,17 @@ const BlogManagement = () => {
           <h2 className="text-2xl font-playfair font-bold text-forest-700">All Blog Posts</h2>
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
-              {posts.filter(p => p.status === 'published').length} Published
+              {posts.filter(p => p.isPublished === true).length} Published
             </span>
             <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">
-              {posts.filter(p => p.status === 'draft').length} Drafts
+              {posts.filter(p => p.isPublished === false).length} Drafts
             </span>
           </div>
         </div>
 
         <div className="grid gap-6">
           {posts.map((post) => (
-            <Card key={post.id} className="border-2 border-accent/10 hover:border-accent/30 transition-all shadow-lg hover:shadow-xl">
+            <Card key={post._id} className="border-2 border-accent/10 hover:border-accent/30 transition-all shadow-lg hover:shadow-xl">
               <CardContent className="p-6">
                 <div className="flex flex-col lg:flex-row gap-6">
                   <div className="w-full lg:w-48 h-32 lg:h-32 rounded-xl overflow-hidden bg-gradient-to-br from-forest-100 to-accent/20 flex-shrink-0">
@@ -270,13 +427,13 @@ const BlogManagement = () => {
                             {post.title}
                           </h3>
                           <Badge
-                            variant={post.status === 'published' ? 'default' : 'secondary'}
-                            className={post.status === 'published'
+                            variant={post.isPublished === true ? 'default' : 'secondary'}
+                            className={post.isPublished === true
                               ? 'bg-green-100 text-green-800 border-green-200'
                               : 'bg-yellow-100 text-yellow-800 border-yellow-200'
                             }
                           >
-                            {post.status === 'published' ? 'Published' : 'Draft'}
+                            {post.isPublished === true ? 'Published' : 'Draft'}
                           </Badge>
                         </div>
                         <div className="flex items-center gap-4 text-sm text-muted-foreground">
@@ -286,7 +443,7 @@ const BlogManagement = () => {
                           </span>
                           <span className="flex items-center gap-1">
                             <Calendar className="w-4 h-4" />
-                            {new Date(post.createdAt).toLocaleDateString()}
+                            {/* {new Date(post.createdAt).toLocaleDateString()} */}
                           </span>
                         </div>
                       </div>
@@ -310,19 +467,19 @@ const BlogManagement = () => {
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => handlePublish(post.id)}
-                        className={post.status === 'published'
+                        onClick={() => handlePublish(post._id, post.isPublished)}
+                        className={post.isPublished !== true
                           ? 'border-yellow-300 hover:bg-yellow-50 text-yellow-700 hover:border-yellow-400'
                           : 'border-green-300 hover:bg-green-50 text-green-700 hover:border-green-400'
                         }
                       >
                         <Globe className="w-4 h-4 mr-1" />
-                        {post.status === 'published' ? 'Unpublish' : 'Publish'}
+                        {post.isPublished === true ? 'Publish' : 'Unpublish'}
                       </Button>
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => window.open(`/admin/blog/${post.id}`, '_blank')}
+                        onClick={() => window.open(`/admin/blog/${post._id}`, '_blank')}
                         className="border-blue-300 hover:bg-blue-50 text-blue-700 hover:border-blue-400"
                       >
                         <Eye className="w-4 h-4 mr-1" />
@@ -331,7 +488,7 @@ const BlogManagement = () => {
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => handleDelete(post.id)}
+                        onClick={() => handleDelete(post._id)}
                         className="border-red-300 hover:bg-red-50 text-red-700 hover:border-red-400"
                       >
                         <Trash2 className="w-4 h-4 mr-1" />

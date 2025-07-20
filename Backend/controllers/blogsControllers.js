@@ -30,8 +30,9 @@ exports.getBlogById = async (req, res, next) => {
 };
 
 exports.updateBlog = async (req, res, next) => {
+ 
   try {
-    const updatedBlog = await Blog.findByIdAndUpdate(req.params.id, req.body, {
+    const updatedBlog = await Blog.findByIdAndUpdate(req.body._id, req.body, {
       new: true,
       runValidators: true,
     });
@@ -44,7 +45,7 @@ exports.updateBlog = async (req, res, next) => {
 
 exports.deleteBlog = async (req, res, next) => {
   try {
-    const deleted = await Blog.findByIdAndDelete(req.params.id);
+    const deleted = await Blog.findByIdAndDelete(req.body.id);
     if (!deleted) return res.status(404).json({ status: 'fail', message: 'Blog not found' });
     res.status(200).json({ status: 'success', message: 'Blog deleted successfully' });
   } catch (error) {
@@ -56,8 +57,8 @@ exports.deleteBlog = async (req, res, next) => {
 exports.publishBlog = async (req, res, next) => {
   try {
     const blog = await Blog.findByIdAndUpdate(
-      req.params.id,
-      { isPublished: true },
+      req.body.id,
+      { isPublished: req?.body?.isPublished },
       { new: true }
     );
 
