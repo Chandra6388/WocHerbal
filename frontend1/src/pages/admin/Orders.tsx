@@ -8,8 +8,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Eye, Download, Edit } from 'lucide-react';
-import { toast } from 'sonner';
 import { getAllOrder } from '@/services/admin/order'
+import { useToast } from "@/hooks/use-toast";
 
 interface Order {
   _id: string;
@@ -57,11 +57,12 @@ interface orderItems {
 }
 
 const Orders = () => {
+  const { toast } = useToast();
   const [orders, setOrders] = useState<Order[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
   const [updateData, setUpdateData] = useState<{
-    deliveryStatus: 'pending' | 'shipped' | 'delivered';
+    deliveryStatus: string;
     trackingId: string;
   }>({
     deliveryStatus: 'pending',
@@ -69,20 +70,37 @@ const Orders = () => {
   });
 
 
-  const allOrder = async () => {
-    await getAllOrder()
-      .then((res) => {
-        if (res?.status == "success") {
-          setOrders(res?.orders)
-        }
-        else {
-          setOrders([])
-        }
-      })
-      .catch((error) => {
-        console.log("Error in fetching the order")
-      })
+const allOrder = async () => {
+  const req = { user: "admin" };
+  try {
+    const res = await getAllOrder(req);
+
+    if (res?.status === "success" && Array.isArray(res.orders)) {
+      setOrders(res.orders);
+    } else {
+      setOrders([]);
+      toast({
+        title: "No Orders Found",
+        description: res?.message || "No orders available right now.",
+        variant: "info",
+        duration: 3000,
+      });
+    }
+  } catch (error) {
+    console.error("Error fetching orders:", error);
+    setOrders([]);
+    toast({
+      title: "Server Error",
+      description:
+        error?.response?.data?.message ||
+        error?.message ||
+        "An unexpected error occurred while fetching orders.",
+      variant: "destructive",
+      duration: 4000,
+    });
   }
+};
+
 
   useEffect(() => {
     allOrder()
@@ -131,13 +149,17 @@ const Orders = () => {
           ? { ...order, ...updateData }
           : order
       ));
-      toast.success('Order updated successfully!');
+      toast({
+        title: "success",
+        description: "Order updated successfully!",
+        variant: "success",
+        duration: 3000,
+      });
       setIsUpdateDialogOpen(false);
     }
   };
 
   const handleExportOrders = () => {
-    // Simple CSV export simulation
     const csvContent = [
       ['Order ID', 'Customer', 'Product', 'Amount', 'Payment Status', 'Delivery Status', 'Date'].join(','),
       ...orders.map(order => [
@@ -158,13 +180,14 @@ const Orders = () => {
     a.download = 'orders.csv';
     a.click();
     window.URL.revokeObjectURL(url);
-    toast.success('Orders exported successfully!');
+    toast({
+        title: "success",
+        description: "Orders exported successfully!",
+        variant: "success",
+        duration: 3000,
+      });
   };
 
-
-
-
-  console.log("orders", orders)
   return (
     <div className="p-6 space-y-6">
       <div className="flex justify-between items-center">

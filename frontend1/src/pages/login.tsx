@@ -46,15 +46,9 @@ const LoginPage = () => {
           });
           navigate(from);
         } else {
-          toast({
-            title: "Login Failed",
-            description: "Invalid email or password",
-            variant: "destructive",
-            duration: 3000,
-          });
+          
         }
       } else {
-        // Provide a placeholder or actual value for the required third argument (e.g., username)
         const success = await register(
           formData.email,
           formData.password,

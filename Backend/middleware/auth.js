@@ -65,6 +65,7 @@ exports.authorizeRoles = (...roles) => {
 };
 
 exports.adminOnly = (req, res, next) => {
+  
   if (req?.body?.user !== 'admin') {
     return res.status(403).json({
       status: 'error',

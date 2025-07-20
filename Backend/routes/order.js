@@ -31,7 +31,7 @@ router.post('/create-payment', createPayment);
 router.post('/verify-payment', verifyPayment);
 
 // Admin routes
-router.get('/admin/all', adminOnly, allOrders);
+router.post('/admin/all', adminOnly, allOrders);
 router.put('/admin/order/:id', adminOnly, updateOrder);
 router.get('/admin/stats', adminOnly, getOrderStats);
 router.post('/admin/refund/:id', adminOnly, refundOrder);

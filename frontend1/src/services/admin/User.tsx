@@ -2,15 +2,34 @@ import axios from 'axios';
 import { API_URL } from '@/Utils/config';
 
 
-export const getAllUser = async () => {
+export const getAllUser = async (data) => {
   try {
-    const response = await axios.get(`${API_URL}/admin/users`);
+    const response = await axios.post(`${API_URL}/admin/users`, data);
     return response.data;
   } catch (error) {
     throw error.response.data;
   }
 };
 
+
+export const updateUserStatus = async (data) => {
+  try {
+    const response = await axios.put(`${API_URL}/admin/users/updateUserStatus/${data?.id}`, data);
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+
+export const deletUser = async (data) => {
+  try {
+    const response = await axios.post(`${API_URL}/admin/users/delete/${data?.id}`, data);
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
 
 export const createOrder = async (productData) => {
   try {

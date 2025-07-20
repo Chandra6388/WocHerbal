@@ -105,10 +105,8 @@ exports.getDashboardStats = async (req, res, next) => {
   }
 };
 
-// Get all users (POST, data from req.body if needed)
 exports.getAllUsers = async (req, res, next) => {
   try {
-    // Optionally, you can filter users based on req.body if needed
     const users = await User.find({role:"user"});
     res.json({
       status: 'success',
@@ -119,7 +117,6 @@ exports.getAllUsers = async (req, res, next) => {
   }
 };
 
-// Add a new user (POST, data from req.body)
 exports.addUser = async (req, res, next) => {
   try {
     const { name, email, password, phone, address, status } = req.body;
@@ -133,7 +130,6 @@ exports.addUser = async (req, res, next) => {
   }
 };
 
-// Update a user (POST, user id and data from req.body)
 exports.updateUser = async (req, res, next) => {
   try {
     const { id, name, email, phone, address, status } = req.body;
@@ -152,7 +148,6 @@ exports.updateUser = async (req, res, next) => {
   }
 };
 
-// Delete a user (POST, user id from req.body)
 exports.deleteUser = async (req, res, next) => {
   try {
     const { id } = req.body;
@@ -167,7 +162,6 @@ exports.deleteUser = async (req, res, next) => {
   }
 };
 
-// Update user status => /api/admin/users/:id/status
 exports.updateUserStatus = async (req, res, next) => {
   try {
     const { status } = req.body;
@@ -194,7 +188,6 @@ exports.updateUserStatus = async (req, res, next) => {
   }
 };
 
-// Get user details with orders and reviews => /api/admin/users/:id
 exports.getUserDetails = async (req, res, next) => {
   try {
     const user = await User.findById(req.params.id).select('-password');
@@ -231,7 +224,6 @@ exports.getUserDetails = async (req, res, next) => {
   }
 };
 
-// Get all reviews (admin) => /api/admin/reviews
 exports.getAllReviews = async (req, res, next) => {
   try {
     const { page = 1, limit = 10, status, productId, userId } = req.query;
@@ -262,7 +254,6 @@ exports.getAllReviews = async (req, res, next) => {
   }
 };
 
-// Approve/Reject review => /api/admin/reviews/:id/approve
 exports.approveReview = async (req, res, next) => {
   try {
     const { status, rejectionReason } = req.body;
@@ -296,7 +287,6 @@ exports.approveReview = async (req, res, next) => {
   }
 };
 
-// Send notification => /api/admin/notifications/send
 exports.sendNotification = async (req, res, next) => {
   try {
     const { recipients, type, title, message, priority = 'normal' } = req.body;
@@ -341,7 +331,6 @@ exports.sendNotification = async (req, res, next) => {
   }
 };
 
-// Get help requests => /api/admin/help-requests
 exports.getHelpRequests = async (req, res, next) => {
   try {
     const { page = 1, limit = 10, status, priority, category } = req.query;
@@ -372,7 +361,6 @@ exports.getHelpRequests = async (req, res, next) => {
   }
 };
 
-// Respond to help request => /api/admin/help-requests/:id/respond
 exports.respondToHelpRequest = async (req, res, next) => {
   try {
     const { message, status } = req.body;
@@ -417,7 +405,6 @@ exports.respondToHelpRequest = async (req, res, next) => {
   }
 };
 
-// Get sales report => /api/admin/sales-report
 exports.getSalesReport = async (req, res, next) => {
   try {
     const { startDate, endDate, groupBy = 'day' } = req.query;

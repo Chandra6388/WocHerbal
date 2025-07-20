@@ -73,7 +73,6 @@ exports.myOrders = async (req, res, next) => {
   }
 };
 
-// Admin: Get all orders => /api/orders/admin/all
 exports.allOrders = async (req, res, next) => {
   try {
     const { page = 1, limit = 10, status, startDate, endDate } = req.query;

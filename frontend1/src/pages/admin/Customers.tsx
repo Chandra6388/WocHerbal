@@ -4,25 +4,25 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import Swal from 'sweetalert2';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
-import { 
+import {
   Search, Eye, Edit, Trash2, UserPlus, Download, Filter,
   Mail, Phone, MapPin, Calendar, ShoppingBag, Star
 } from 'lucide-react';
-import { toast } from 'sonner';
-import { getAllUser } from '@/services/admin/User';
+import { getAllUser, updateUserStatus, deletUser } from '@/services/admin/User';
+import { useToast } from "@/hooks/use-toast";
 
 interface Customer {
-  id: string;
+  _id: string;
   name: string;
   email: string;
   phone: string;
   address: {
-    city:string,
-    country:string,
-    street:string
+    city: string,
+    country: string,
+    street: string
   };
   createdAt: string;
   totalOrders: number;
@@ -33,6 +33,7 @@ interface Customer {
 }
 
 const Customers = () => {
+  const { toast } = useToast();
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -41,32 +42,38 @@ const Customers = () => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const filteredCustomers = customers.filter(customer => {
     const matchesSearch = customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         customer.email.toLowerCase().includes(searchTerm.toLowerCase());
+      customer.email.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || customer.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
-
-  useEffect(()=>{
+  useEffect(() => {
     allUsers()
-  },[])
+  }, [])
 
-  const allUsers = () => {
-      getAllUser()
-        .then(data => {
-          if(data?.status=="success") {
-            setCustomers(data.data);
-          }
-          else{
-            setCustomers([]);
-          }
-        })
-        .catch(error => {
-          toast.error('Failed to fetch products');
-          console.error(error);
-        });
+  const allUsers = async () => {
+    try {
+      const req = { user: "admin" }
+      const res = await getAllUser(req);
+      if (res?.status === "success" && Array.isArray(res.data)) {
+        setCustomers(res.data);
+      } else {
+        setCustomers([]);
+      }
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      setCustomers([]);
+      toast({
+        title: "Server Error",
+        description:
+          error?.response?.data?.message ||
+          error?.message ||
+          "An unexpected error occurred while fetching users.",
+        variant: "destructive",
+        duration: 4000,
+      });
     }
-  
+  };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -86,21 +93,111 @@ const Customers = () => {
     setIsViewDialogOpen(true);
   };
 
-  const handleEditCustomer = (customer: Customer) => {
-    setSelectedCustomer(customer);
-    setIsEditDialogOpen(true);
+  const handleDeleteCustomer = async (customerId: string) => {
+    const req = { user: 'admin', id: customerId };
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: 'This customer will be permanently deleted!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, delete!',
+      cancelButtonText: 'Cancel',
+    });
+
+    if (!result.isConfirmed) return;
+
+    // Step 2: Proceed with deletion
+    try {
+      const res = await deletUser(req);
+
+      if (res?.status === 'success') {
+        toast({
+          title: 'Customer Deleted',
+          description: 'Customer has been successfully deleted.',
+          variant: 'success',
+          duration: 4000,
+        });
+
+        allUsers(); // Refresh user list
+      } else {
+        toast({
+          title: 'Failed to Delete',
+          description: res?.message || 'Something went wrong. Please try again.',
+          variant: 'destructive',
+          duration: 4000,
+        });
+      }
+    } catch (error) {
+      console.error('Error deleting customer:', error);
+      toast({
+        title: 'Error',
+        description:
+          error?.response?.data?.message ||
+          error?.message ||
+          'Unexpected error occurred while deleting the customer.',
+        variant: 'destructive',
+        duration: 4000,
+      });
+    }
   };
 
-  const handleDeleteCustomer = (customerId: string) => {
-    setCustomers(customers.filter(c => c.id !== customerId));
-    toast.success('Customer deleted successfully!');
-  };
+  const handleUpdateStatus = async (customer: Customer) => {
+    const newStatus: 'active' | 'inactive' =
+      customer.status === 'active' ? 'inactive' : 'active';
 
-  const handleUpdateStatus = (customerId: string, newStatus: 'active' | 'inactive' | 'blocked') => {
-    setCustomers(customers.map(c => 
-      c.id === customerId ? { ...c, status: newStatus } : c
-    ));
-    toast.success('Customer status updated successfully!');
+    const result = await Swal.fire({
+      title: 'Change Status?',
+      text: `Are you sure you want to change ${customer.name}'s status to "${newStatus}"?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, change it!',
+      cancelButtonText: 'Cancel',
+    });
+
+    if (!result.isConfirmed) return;
+
+    const req = {
+      id: customer._id,
+      status: newStatus,
+      user: 'admin',
+    };
+
+    try {
+      const res = await updateUserStatus(req);
+      if (res?.status === 'success') {
+        toast({
+          title: 'Status Updated',
+          description: `Customer "${customer.name}" has been marked as "${newStatus}".`,
+          variant: 'success',
+          duration: 4000,
+        });
+
+        allUsers?.(); // Refresh user list
+      } else {
+        toast({
+          title: 'Failed to Update',
+          description: res?.message || 'Unable to update user status. Please try again.',
+          variant: 'destructive',
+          duration: 4000,
+        });
+      }
+    } catch (error) {
+      console.error('Error updating user status:', error);
+
+      toast({
+        title: 'Server Error',
+        description:
+          error?.response?.data?.message ||
+          error?.message ||
+          'An unexpected error occurred while updating customer status.',
+        variant: 'destructive',
+        duration: 4000,
+      });
+    }
   };
 
   const handleExportCustomers = () => {
@@ -124,10 +221,13 @@ const Customers = () => {
     a.download = 'customers.csv';
     a.click();
     window.URL.revokeObjectURL(url);
-    toast.success('Customer data exported successfully!');
+    toast({
+        title: 'success',
+        description: "Customer data exported successfully!",
+        variant: 'success',
+        duration: 4000,
+      });
   };
-
-  console.log("selectedCustomer", selectedCustomer)
 
   return (
     <div className="p-6 space-y-6">
@@ -147,8 +247,6 @@ const Customers = () => {
           </Button>
         </div>
       </div>
-
-      {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardContent className="p-6">
@@ -177,7 +275,9 @@ const Customers = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Total Revenue</p>
-                <p className="text-2xl font-bold">₹{customers?.reduce((sum, c) => sum + c.totalSpent, 0).toLocaleString()}</p>
+                {/* <p className="text-2xl font-bold">₹{customers?.reduce((sum, c) => sum + c.totalSpent, 0).toLocaleString()}</p> */}
+                <p className="text-2xl font-bold">₹ 0</p>
+
               </div>
               <ShoppingBag className="h-8 w-8 text-green-600" />
             </div>
@@ -188,7 +288,8 @@ const Customers = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Avg. Order Value</p>
-                <p className="text-2xl font-bold">₹{Math.round(customers?.reduce((sum, c) => sum + c.totalSpent, 0) / customers.reduce((sum, c) => sum + c.totalOrders, 0))}</p>
+                <p className="text-2xl font-bold">₹ 0</p>
+                {/* <p className="text-2xl font-bold">₹{Math.round(customers?.reduce((sum, c) => sum + c.totalSpent, 0) / customers.reduce((sum, c) => sum + c.totalOrders, 0))}</p> */}
               </div>
               <Star className="h-8 w-8 text-yellow-600" />
             </div>
@@ -241,7 +342,7 @@ const Customers = () => {
             </TableHeader>
             <TableBody>
               {filteredCustomers?.map((item) => (
-                <TableRow key={item.id}>
+                <TableRow key={item._id}>
                   <TableCell>
                     <div>
                       <p className="font-medium">{item?.name}</p>
@@ -251,7 +352,7 @@ const Customers = () => {
                   <TableCell>
                     <div>
                       <p className="text-sm">{item?.phone}</p>
-                      <p className="text-sm text-muted-foreground">{`${item?.address?.street || ""}, ${item?.address?.city || ""}, ${item?.address?.country || ""}`}</p>
+                      <p className="text-sm text-muted-foreground">{`${item?.address?.street || ""} ${item?.address?.city || ""} ${item?.address?.country || ""}`}</p>
                     </div>
                   </TableCell>
                   <TableCell>
@@ -261,18 +362,33 @@ const Customers = () => {
                     </div>
                   </TableCell>
                   <TableCell>₹ {item?.totalSpent?.toLocaleString() || 0}</TableCell>
-                  <TableCell>{getStatusBadge(item?.status)}</TableCell>
-                  {/* <TableCell>{new Date(item?.lastOrder)?.toLocaleDateString()}</TableCell> */}
-                  <TableCell>{ "N/A"}</TableCell>
+                  <TableCell>
+                    <label className="inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        className="sr-only peer"
+                        checked={item?.status === "active"}
+                        onChange={() => handleUpdateStatus(item)}
+                      />
+                      <div
+                        className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full
+                            dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full
+                            peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px]
+                            after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all
+                            dark:border-gray-600"
+                        style={{
+                          backgroundColor: item?.status === "active" ? "#8bf0bd" : "",
+                        }}
+                      ></div>
+                    </label>
+                  </TableCell>
+                  <TableCell>{"N/A"}</TableCell>
                   <TableCell>
                     <div className="flex gap-2">
                       <Button variant="outline" size="sm" onClick={() => handleViewCustomer(item)}>
                         <Eye className="h-4 w-4" />
                       </Button>
-                      <Button variant="outline" size="sm" onClick={() => handleEditCustomer(item)}>
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button variant="destructive" size="sm" onClick={() => handleDeleteCustomer(item.id)}>
+                      <Button variant="destructive" size="sm" onClick={() => handleDeleteCustomer(item._id)}>
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
@@ -284,7 +400,6 @@ const Customers = () => {
         </CardContent>
       </Card>
 
-      {/* View Customer Dialog */}
       <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
@@ -342,27 +457,7 @@ const Customers = () => {
                 <div>
                   <p className="text-sm text-muted-foreground">Status</p>
                   <div className="mt-2 flex gap-2">
-                    <Button 
-                      size="sm" 
-                      variant={selectedCustomer.status === 'active' ? 'default' : 'outline'}
-                      onClick={() => handleUpdateStatus(selectedCustomer.id, 'active')}
-                    >
-                      Active
-                    </Button>
-                    <Button 
-                      size="sm" 
-                      variant={selectedCustomer.status === 'inactive' ? 'default' : 'outline'}
-                      onClick={() => handleUpdateStatus(selectedCustomer.id, 'inactive')}
-                    >
-                      Inactive
-                    </Button>
-                    <Button 
-                      size="sm" 
-                      variant={selectedCustomer.status === 'blocked' ? 'destructive' : 'outline'}
-                      onClick={() => handleUpdateStatus(selectedCustomer.id, 'blocked')}
-                    >
-                      Block
-                    </Button>
+                    {getStatusBadge(selectedCustomer?.status)}
                   </div>
                 </div>
               </div>

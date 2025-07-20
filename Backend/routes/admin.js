@@ -13,16 +13,17 @@ const {
   getHelpRequests,
   respondToHelpRequest,
   getSalesReport,
+  deleteUser
 } = require('../controllers/adminController');
 
 router.use(protect);
 router.use(adminOnly);
 
 router.get('/dashboard', getDashboardStats);
-
-router.get('/users', getAllUsers);
-router.put('/users/:id/status', updateUserStatus);
+router.post('/users', getAllUsers);
+router.put('/users/updateUserStatus/:id', updateUserStatus);
 router.get('/users/:id', getUserDetails);
+router.post('/users/delete/:id', deleteUser);
 router.get('/reviews', getAllReviews);
 router.put('/reviews/:id/approve', approveReview);
 router.post('/notifications/send', sendNotification);

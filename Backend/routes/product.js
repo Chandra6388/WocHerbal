@@ -22,7 +22,7 @@ const {
 } = require('../controllers/productController');
 
 // Public routes
-router.get('/', getProducts);
+router.get('/all', getProducts);
 router.get('/featured', getFeaturedProducts);
 router.get('/category/:category', getProductsByCategory);
 router.get('/:id', getSingleProduct);

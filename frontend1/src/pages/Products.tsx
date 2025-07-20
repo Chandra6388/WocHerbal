@@ -10,7 +10,7 @@ import {
   CardHeader,
 } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
-import { getAllProducts } from "@/services/admin/productService";
+import { getUserProducts } from "@/services/admin/productService";
 import { toast } from "sonner";
 import {
   Addfavorlist,
@@ -48,19 +48,6 @@ const Products = () => {
   const { addToCart } = useCart();
   const [favorList, setFavorList] = useState<Product[]>([]);
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await getAllProducts();
-        setProducts(response.data);
-      } catch (error) {
-        console.error("Failed to fetch products:", error);
-      }
-    };
-
-    fetchProducts();
-  }, []);
-
   const categories = [
     { id: "all", name: "All Products" },
     { id: "men", name: "For Men" },
@@ -90,7 +77,7 @@ const Products = () => {
   }, []);
 
   const getProducts = () => {
-    getAllProducts()
+    getUserProducts()
       .then((data) => {
         if (data?.status === "success") {
           setProducts(data.products);
@@ -151,11 +138,6 @@ const Products = () => {
         console.error(error);
       });
   };
-
-
-
-console.log("filteredProducts", filteredProducts) 
-
 
 
   return (

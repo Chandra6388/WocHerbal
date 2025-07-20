@@ -10,6 +10,15 @@ export const getAllProducts = async (data) => {
   }
 };
 
+export const getUserProducts = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/products/all`,);
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
 export const addNewProduct = async (productData) => {
   try {
     const response = await axios.post(`${API_URL}/products/new`, productData);
@@ -100,6 +109,7 @@ export const updateCategory = async (data) => {
     throw error.response.data;
   }
 };
+
 export const deleteCategory = async (productData) => {
   try {
     const response = await axios.post(
