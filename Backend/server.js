@@ -20,6 +20,8 @@ const notificationRoutes = require('./routes/notification');
 const helpRoutes = require('./routes/help');
 const category = require('./routes/category');
 const shipmentRoutes = require('./routes/Shipment');
+const blogsRoutes = require('./routes/blogs');
+
 
 
 // Middleware
@@ -68,6 +70,8 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/help', helpRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/shipment', shipmentRoutes);
+app.use('/api/blogs', blogsRoutes);
+
 
 // Health check
 app.get('/api/health', (req, res) => {
