@@ -64,7 +64,6 @@ const Checkout = () => {
     paymentMethod: "razorpay",
   });
 
-  console.log("items", items)
 
   useEffect(() => {
     if (items.length === 0) navigate("/cart");
@@ -103,9 +102,16 @@ const Checkout = () => {
       method:
         formData.paymentMethod === "razorpay" ? "Razorpay" : "Cash on Delivery",
     },
-    totalPrice:totalPrice,
+    totalPrice: totalPrice,
 
   });
+
+
+  const productIds = items.map(item => ({
+    product: item.product._id,
+    quantity: item.quantity
+  }));
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -114,7 +120,13 @@ const Checkout = () => {
       try {
         const orderRes = await createOrder(createOrderPayload());
         if (orderRes.status === "success") {
-          const productIds = items.map((item) => item.product?._id);
+          const productIds = items.map(item => ({
+            product: item.product._id,
+            quantity: item.quantity
+          }));
+
+          console.log("psdsdsds", productIds)
+
           await updateStockAndSoldCount(productIds);
           toast.success("Order placed successfully!");
           clearCart();
@@ -151,9 +163,11 @@ const Checkout = () => {
               createOrderPayload(response.razorpay_payment_id)
             );
             if (orderRes.status === "success") {
-              // Update stock and soldCount for all products in the order
-              const productIds = items.map((item) => item.product?._id);
-              await updateStockAndSoldCount({ ids: productIds });
+              const productIds = items.map(item => ({
+                product: item.product._id,
+                quantity: item.quantity
+              }));
+              await updateStockAndSoldCount(productIds);
               toast.success("Order placed successfully!");
               clearCart();
               navigate("/orders");

@@ -409,27 +409,37 @@ exports.updateProductStatus = async (req, res, next) => {
 
 exports.updateStockAndSoldCount = async (req, res, next) => {
   try {
-    const { ids } = req.body;
+    const ids = req.body;
+
+    console.log("ids", ids)
     if (!Array.isArray(ids) || ids.length === 0) {
       return res.status(400).json({ status: 'error', message: 'No product ids provided' });
     }
 
+    const productIds = ids.map(item => item.product);
+    const quantityMap = ids.reduce((acc, item) => {
+      acc[item.product] = item.quantity;
+      return acc;
+    }, {});
 
-    const products = await Product.find({ _id: { $in: ids } });
+    const products = await Product.find({ _id: { $in: productIds } });
+
     if (!products.length) {
       return res.status(404).json({ status: 'error', message: 'No products found for provided ids' });
     }
 
-
     const updatePromises = products.map(async (product) => {
+      const quantity = quantityMap[product._id.toString()] || 0;
 
-      if (product.stock > 0) {
-        product.stock -= 1;
-        product.soldCount = (product.soldCount || 0) + 1;
+      if (product.stock >= quantity) {
+        product.stock -= quantity;
+        product.soldCount = (product.soldCount || 0) + quantity;
         await product.save();
       }
+
       return product;
     });
+
     const updatedProducts = await Promise.all(updatePromises);
 
     res.status(200).json({
@@ -437,6 +447,7 @@ exports.updateStockAndSoldCount = async (req, res, next) => {
       message: 'Stock and soldCount updated for products',
       products: updatedProducts
     });
+
   } catch (error) {
     next(error);
   }
