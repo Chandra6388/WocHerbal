@@ -89,6 +89,8 @@ exports.allOrders = async (req, res, next) => {
       .skip((page - 1) * limit)
       .sort('-createdAt');
 
+      console.log("order", orders)
+
     const count = await Order.countDocuments(query);
 
     res.status(200).json({
@@ -337,8 +339,6 @@ exports.refundOrder = async (req, res, next) => {
     next(error);
   }
 };
-
-
 
 // Get overall revenue
 exports.getOverallRevenue = async (req, res) => {

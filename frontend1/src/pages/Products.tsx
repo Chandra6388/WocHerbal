@@ -319,7 +319,7 @@ const Products = () => {
                       Out of Stock
                     </div>
                   )}
-                  <div className="absolute top-2 right-2 z-10 bg-white p-1 rounded-full shadow-md cursor-pointer hover:text-red-500 transition-colors">
+                  {isAuthenticated && <div className="absolute top-2 right-2 z-10 bg-white p-1 rounded-full shadow-md cursor-pointer hover:text-red-500 transition-colors">
                     {favorList.some((fav) => fav._id === product._id) ? (
                       <Heart
                         className="w-5 h-5"
@@ -340,7 +340,7 @@ const Products = () => {
                         }}
                       />
                     )}
-                  </div>
+                  </div>}
                   <Link to={`/product/${product._id}`}>
                     <img
                       src={product.images}

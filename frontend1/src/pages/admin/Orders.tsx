@@ -225,7 +225,7 @@ const allOrder = async () => {
                   <TableCell className="font-medium">{order._id}</TableCell>
                   <TableCell>{order?.user?.name}</TableCell>
                   <TableCell>{order.orderItems[0]?.name}</TableCell>
-                  <TableCell>₹ {order?.itemsPrice}</TableCell>
+                  <TableCell>₹ {order?.totalPrice}</TableCell>
                   <TableCell>{getPaymentStatusBadge(order.orderStatus)}</TableCell>
                   <TableCell>{getDeliveryStatusBadge("pending")}</TableCell>
                   <TableCell>{new Date(order.createdAt).toLocaleDateString()}</TableCell>

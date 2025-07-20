@@ -16,7 +16,6 @@ import { createOrder, createOrderByrazorpay } from "@/services/admin/User";
 import { toast } from "sonner";
 import { loadRazorpayScript } from "@/Utils/RazorpayLoader";
 import { updateStockAndSoldCount } from "@/services/admin/productService";
-
 interface RazorpayOptions {
   key: string;
   amount: number;
@@ -65,6 +64,8 @@ const Checkout = () => {
     paymentMethod: "razorpay",
   });
 
+  console.log("items", items)
+
   useEffect(() => {
     if (items.length === 0) navigate("/cart");
     if (!isAuthenticated) navigate("/auth", { state: { from: "/checkout" } });
@@ -77,12 +78,14 @@ const Checkout = () => {
   };
 
   const formattedItems = items.map((item) => ({
-    product: item.id,
-    quantity: item.quantity,
-    name: item?.name,
-    image: item?.image,
-    price: item?.price,
+    product: item?.product?._id,
+    quantity: item?.quantity,
+    name: item?.product?.name,
+    image: item?.product?.images,
+    price: item?.product?.price,
   }));
+
+
 
   const createOrderPayload = (paymentId: string | null = null) => ({
     user: user?._id,
@@ -94,13 +97,14 @@ const Checkout = () => {
       country: "India",
       phoneNo: formData.phone,
     },
-
     paymentInfo: {
       id: paymentId || "COD",
       status: paymentId ? "Paid" : "Pending",
       method:
         formData.paymentMethod === "razorpay" ? "Razorpay" : "Cash on Delivery",
     },
+    totalPrice:totalPrice,
+
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -110,7 +114,7 @@ const Checkout = () => {
       try {
         const orderRes = await createOrder(createOrderPayload());
         if (orderRes.status === "success") {
-          const productIds = items.map((item) => item.id);
+          const productIds = items.map((item) => item.product?._id);
           await updateStockAndSoldCount(productIds);
           toast.success("Order placed successfully!");
           clearCart();
@@ -148,7 +152,7 @@ const Checkout = () => {
             );
             if (orderRes.status === "success") {
               // Update stock and soldCount for all products in the order
-              const productIds = items.map((item) => item.id);
+              const productIds = items.map((item) => item.product?._id);
               await updateStockAndSoldCount({ ids: productIds });
               toast.success("Order placed successfully!");
               clearCart();
@@ -321,24 +325,24 @@ const Checkout = () => {
               <CardContent className="space-y-4">
                 {items.map((item) => (
                   <div
-                    key={item.id}
+                    key={item?.product?._id}
                     className="flex justify-between items-center"
                   >
                     <div className="flex items-center gap-3">
                       <img
-                        src={item.image}
-                        alt={item.name}
+                        src={item?.product?.images}
+                        alt={item?.product?.name}
                         className="w-12 h-12 object-cover rounded"
                       />
                       <div>
-                        <p className="font-medium">{item.name}</p>
+                        <p className="font-medium">{item?.product?.name}</p>
                         <p className="text-sm text-muted-foreground">
                           Qty: {item.quantity}
                         </p>
                       </div>
                     </div>
                     <p className="font-semibold">
-                      ₹{item.price * item.quantity}
+                      ₹{item?.product?.price * item?.quantity}
                     </p>
                   </div>
                 ))}
