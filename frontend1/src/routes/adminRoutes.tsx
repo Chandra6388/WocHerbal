@@ -1,7 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import NotFound from "@/pages/NotFound";
-
-// Admin Pages
 import Dashboard from "@/pages/admin/Dashboard";
 import AdminProducts from "@/pages/admin/Products";
 import Reviews from "@/pages/admin/Reviews";

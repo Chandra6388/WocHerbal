@@ -19,8 +19,8 @@ router.use(protect);
 // Cart routes
 router.post('/', getCart);
 router.post('/add', addToCart);
-router.put('/update', updateCartItem);
-router.delete('/remove/:productId', removeFromCart);
+router.post('/update', updateCartItem);
+router.post('/remove/:productId', removeFromCart);
 router.delete('/clear', clearCart);
 
 // Coupon routes

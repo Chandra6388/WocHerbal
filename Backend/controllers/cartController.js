@@ -2,7 +2,6 @@ const Cart = require('../models/Cart');
 const Product = require('../models/Product');
 const ErrorHandler = require('../utils/errorHandler');
 
-// Get user cart => /api/cart
 exports.getCart = async (req, res, next) => {
   try {
     let cart = await Cart.findOne({ user: req.body.userId }).populate('items.product');
@@ -142,7 +141,6 @@ exports.updateCartItem = async (req, res, next) => {
   }
 };
 
-// Remove item from cart => /api/cart/remove
 exports.removeFromCart = async (req, res, next) => {
   try {
     const { productId } = req.params;

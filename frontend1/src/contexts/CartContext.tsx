@@ -1,13 +1,23 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { addToCartProduct, getAddToCartProduct } from '@/services/user/cartService'
+import { addToCartProduct, getAddToCartProduct, updateCartItem, removeCartItem } from '@/services/user/cartService'
 import { useToast } from "../hooks/use-toast";
 
 interface CartItem {
-  id: string;
-  name: string;
-  price: number;
-  image: string;
+  product: {
+    _id: string,
+    name: string,
+    description: string,
+    benefits: string,
+    price: number,
+    ratings: number,
+    images: string;
+    category: string,
+    weight: number,
+    stock: number,
+    numOfReviews: number,
+
+  };
   quantity: number;
 }
 
@@ -17,8 +27,8 @@ interface CartContextType {
     id: string;
     userId: string
   }) => void;
-  removeFromCart: (id: string) => void;
-  updateQuantity: (id: string, quantity: number) => void;
+  removeFromCart: (id: string, userId: string) => void;
+  updateQuantity: (id: string, quantity: number, userId: string) => void;
   getAddToCart: (id: string) => void
   clearCart: () => void;
   totalItems: number;
@@ -29,7 +39,6 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const useCart = () => {
-
   const context = useContext(CartContext);
   if (!context) {
     throw new Error('useCart must be used within a CartProvider');
@@ -39,18 +48,7 @@ export const useCart = () => {
 
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { toast } = useToast();
-  const [items, setItems] = useState<CartItem[]>([]);
-
-  useEffect(() => {
-    const storedCart = localStorage.getItem('cart');
-    if (storedCart) {
-      setItems(JSON.parse(storedCart));
-    }
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(items));
-  }, [items]);
+  const [items, setItems] = useState([]);
 
   const addToCart = async (data) => {
     const req = { productId: data?.id, userId: data?.userId };
@@ -63,6 +61,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
           variant: "success",
           duration: 3000,
         });
+        getAddToCart(data?.userId)
       } else {
         toast({
           title: "Failed to Add",
@@ -89,7 +88,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const res = await getAddToCartProduct(req);
 
       if (res?.status === "success") {
-        setItems(res.cart || []);
+        setItems(res.cart?.items || []);
       } else {
         toast({
           title: "Unable to Fetch Cart",
@@ -114,32 +113,92 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return items.some(item => item.id === id);
   };
 
-  const removeFromCart = (id: string) => {
-    setItems(current => current.filter(item => item.id !== id));
+  const removeFromCart = async (id: string, userId: string) => {
+    const req = { id, userId };
+
+    try {
+      const res = await removeCartItem(req);
+
+      if (res?.status === "success") {
+        setItems(current => current.filter(item => item.id !== id));
+        getAddToCart(userId)
+        toast({
+          title: "Item Removed",
+          description: "The product has been removed from your cart.",
+          variant: "success",
+          duration: 3000,
+        });
+      } else {
+        toast({
+          title: "Failed to Remove",
+          description: res?.message || "Unable to remove the item from the cart.",
+          variant: "destructive",
+          duration: 3000,
+        });
+      }
+    } catch (error: any) {
+      console.error("Error removing cart item:", error);
+      toast({
+        title: "Server Error",
+        description:
+          error?.response?.data?.message ||
+          error?.message ||
+          "Something went wrong while removing the item from your cart.",
+        variant: "destructive",
+        duration: 3000,
+      });
+    }
   };
 
-  const updateQuantity = (id: string, quantity: number) => {
-    if (quantity <= 0) {
-      removeFromCart(id);
-      return;
+
+  const updateQuantity = async (id: string, quantity: number, userId: string) => {
+    const req = { productId: id, quantity, userId };
+    try {
+      const res = await updateCartItem(req);
+      if (res?.status === "success") {
+        toast({
+          title: "Success",
+          description: "Cart value updated successfully.",
+          variant: "success",
+          duration: 3000,
+        });
+        getAddToCart(userId)
+        setItems(current =>
+          current.map(item =>
+            item.id === id ? { ...item, quantity } : item
+          )
+        );
+
+      } else {
+        toast({
+          title: "Unable to Update Cart",
+          description: res?.message || "Something went wrong.",
+          variant: "destructive",
+          duration: 3000,
+        });
+      }
+    } catch (error: any) {
+      console.error("Error updating cart quantity:", error);
+      toast({
+        title: "Server Error",
+        description:
+          error?.response?.data?.message ||
+          error?.message ||
+          "Something went wrong while updating the cart.",
+        variant: "destructive",
+        duration: 3000,
+      });
     }
-    setItems(current =>
-      current.map(item =>
-        item.id === id ? { ...item, quantity } : item
-      )
-    );
   };
+
 
   const clearCart = () => {
     setItems([]);
   };
 
-  
-  // const totalItems = items?.reduce((sum, item) => sum + item.quantity, 0)  || 0;
-  const totalItems = 0
 
-  // const totalPrice = items?.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const totalPrice = 0
+  const totalItems = items?.reduce((sum, item) => sum + item.quantity, 0) || 0;
+  const totalPrice = items?.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
   return (
     <CartContext.Provider value={{
