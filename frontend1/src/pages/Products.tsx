@@ -55,7 +55,7 @@ const Products = () => {
   const { toast } = useToast();
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [products, setProducts] = useState<Product[]>([]);
-  const {items, addToCart } = useCart();
+  const {items, addToCart , isInCart} = useCart();
   const [favorList, setFavorList] = useState<Product[]>([]);
   const [category, setCategory] = useState<Category[]>([]);
   const userdata = getUserFromToken() as { id: string };
@@ -412,7 +412,7 @@ const Products = () => {
               </div>
 
               <CardFooter className="p-4 pt-0">
-                {isAddedToCart(product) ?  <Button
+                {isInCart(product?._id) ?  <Button
                   onClick={() => navigate('/cart')}
                   className="w-full"
                   disabled={product.stock === 0}
