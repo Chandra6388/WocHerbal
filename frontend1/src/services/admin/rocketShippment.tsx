@@ -4,7 +4,8 @@ import { API_URL } from "@/Utils/config";
 export const getRocketShipmentsAvailabilty = async (data) => {
   try {
     const response = await axios.post(
-      `${API_URL}/admin/shipping/getServiceability`,
+      `${API_URL}/shipment/getServiceability`,
+
       data
     );
     return response.data;

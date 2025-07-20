@@ -1,8 +1,17 @@
 const axios = require('axios');
+const User = require('../models/User');
+
 
 exports.getServiceability = async (req, res) => {
     try {
-        const { pickup_postcode, delivery_postcode, cod = 0, weight = 0.5 } = req.body;
+        const { _id, pickup_postcode, delivery_postcode, cod = 0, weight = 0.5 } = req.body;
+
+
+        await User.findByIdAndUpdate(_id, {
+            $set: {
+                pincode: delivery_postcode
+            }
+        });
 
         const loginRes = await axios.post('https://apiv2.shiprocket.in/v1/external/auth/login', {
             email: process.env.Email,
@@ -18,7 +27,7 @@ exports.getServiceability = async (req, res) => {
             });
         }
 
-        // Step 2: Call serviceability API
+
         const response = await axios.get(
             'https://apiv2.shiprocket.in/v1/external/courier/serviceability/',
             {
@@ -34,7 +43,7 @@ exports.getServiceability = async (req, res) => {
             }
         );
 
-        const courierCompanies = response.data?.data?.available_courier_companies;
+        const courierCompanies = response.data;
 
         if (Array.isArray(courierCompanies) && courierCompanies.length > 0) {
             return res.status(200).json({

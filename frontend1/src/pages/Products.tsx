@@ -1,3 +1,4 @@
+// ... your imports stay the same
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Star, ShoppingCart, Heart } from "lucide-react";
@@ -12,7 +13,7 @@ import {
 import { Badge } from "../components/ui/badge";
 import { getUserProducts } from "@/services/admin/productService";
 import { useToast } from "../hooks/use-toast";
-
+import { getRocketShipmentsAvailabilty } from "@/services/admin/rocketShippment";
 import {
   Addfavorlist,
   getfavorlist,
@@ -46,8 +47,11 @@ const Products = () => {
   const { toast } = useToast();
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [products, setProducts] = useState<Product[]>([]);
-  const { addToCart } = useCart();
+  const { addToCart, items } = useCart();
   const [favorList, setFavorList] = useState<Product[]>([]);
+  const [pincodeInputs, setPincodeInputs] = useState<{ [key: string]: string }>(
+    {}
+  ); // product-wise pincode
 
   const categories = [
     { id: "all", name: "All Products" },
@@ -70,40 +74,43 @@ const Products = () => {
     });
   };
 
+  const userdata = items.map((item) => ({
+    _id: item.id,
+  }));
+
   useEffect(() => {
     getProducts();
     handleGetFavorites();
   }, []);
-  // update path as per your project
 
   const getProducts = async () => {
     try {
       const data = await getUserProducts();
-      if (data?.status === 'success') {
+      if (data?.status === "success") {
         setProducts(data.products);
       } else {
         setProducts([]);
         toast({
-          title: 'No Products Found',
-          description: data?.message || 'No products were returned from the server.',
-          variant: 'default',
+          title: "No Products Found",
+          description:
+            data?.message || "No products were returned from the server.",
+          variant: "default",
           duration: 4000,
         });
       }
-    } catch (error) {
-      console.error('Error fetching products:', error);
+    } catch (error: any) {
+      console.error("Error fetching products:", error);
       toast({
-        title: 'Fetch Error',
+        title: "Fetch Error",
         description:
           error?.response?.data?.message ||
           error?.message ||
-          'An unexpected error occurred while fetching products.',
-        variant: 'destructive',
+          "An unexpected error occurred while fetching products.",
+        variant: "destructive",
         duration: 4000,
       });
     }
   };
-
 
   const handleAddToFavorites = (product: Product) => {
     Addfavorlist({ productId: product._id })
@@ -125,7 +132,7 @@ const Products = () => {
           });
         }
       })
-      .catch((error) => {
+      .catch((error: any) => {
         console.error("Error adding to favorites:", error);
         toast({
           title: "Something went wrong",
@@ -136,17 +143,16 @@ const Products = () => {
       });
   };
 
-
   const handleGetFavorites = () => {
     getfavorlist({})
       .then((data) => {
         if (data?.status === "success") {
           setFavorList(data.favorites || []);
-          console.log("Favorites:", data.favorites);
         } else {
           toast({
             title: "Failed to Load Favorites",
-            description: data?.message || "Unable to fetch your favorite products.",
+            description:
+              data?.message || "Unable to fetch your favorite products.",
             variant: "destructive",
             duration: 3000,
           });
@@ -163,40 +169,84 @@ const Products = () => {
       });
   };
 
-
   const handleRemoveFromFavorites = (productId: string) => {
     removeFavorlist({ productId })
       .then((data) => {
         if (data?.status === "success") {
           toast({
             title: "Removed from Favorites",
-            description: "Product was successfully removed from your favorites.",
+            description:
+              "Product was successfully removed from your favorites.",
             variant: "success",
             duration: 3000,
           });
-
-          handleGetFavorites(); // Refresh list
+          handleGetFavorites();
         } else {
           toast({
             title: "Failed to Remove",
-            description: data?.message || "Could not remove product from favorites.",
+            description:
+              data?.message || "Could not remove product from favorites.",
             variant: "destructive",
             duration: 3000,
           });
         }
       })
-      .catch((error) => {
+      .catch((error: any) => {
         console.error("Error removing from favorites:", error);
         toast({
           title: "Server Error",
-          description: error?.message || "Something went wrong while removing from favorites.",
+          description:
+            error?.message ||
+            "Something went wrong while removing from favorites.",
           variant: "destructive",
           duration: 3000,
         });
       });
   };
 
+  const handleVerifyPincode = async (product: Product) => {
+    try {
+      const payload = {
+        _id: userdata._id,
+        pickup_postcode: 452018,
+        delivery_postcode: pincodeInputs[product._id],
+        cod: 0,
+        weight: product.weight || "0.5",
+      };
 
+      const response = await getRocketShipmentsAvailabilty(payload);
+      if (response?.status === "success") {
+        toast({
+          title: "Pincode Verified",
+          description: `Delivery is available for ${
+            pincodeInputs[product._id]
+          }.`,
+          variant: "success",
+          duration: 3000,
+        });
+      } else {
+        toast({
+          title: "Delivery Unavailable",
+          description: `No delivery available for ${
+            pincodeInputs[product._id]
+          }.`,
+          variant: "destructive",
+          duration: 3000,
+        });
+      }
+    } catch (error: any) {
+      console.error("Error verifying pincode:", error);
+      toast({
+        title: "Verification Error",
+        description:
+          error?.response?.data?.message ||
+          error?.message ||
+          "An error occurred while verifying the pincode.",
+        variant: "destructive",
+        duration: 3000,
+      });
+    }
+  };
 
   return (
     <div className="min-h-screen pt-20 bg-background">
@@ -259,8 +309,6 @@ const Products = () => {
                       />
                     )}
                   </div>
-
-                  {/* 📷 Product Image */}
                   <Link to={`/product/${product._id}`}>
                     <img
                       src={product.images}
@@ -270,7 +318,6 @@ const Products = () => {
                   </Link>
                 </div>
               </CardHeader>
-
 
               <CardContent className="p-4">
                 <Link to={`/product/${product._id}`}>
@@ -304,6 +351,28 @@ const Products = () => {
                   )}
                 </div>
               </CardContent>
+
+              <div className="flex items-center gap-2 mb-3 px-4">
+                <input
+                  type="number"
+                  placeholder="Enter pincode"
+                  className="border rounded px-2 py-1 text-sm w-2/3"
+                  value={pincodeInputs[product._id] || ""}
+                  onChange={(e) =>
+                    setPincodeInputs((prev) => ({
+                      ...prev,
+                      [product._id]: e.target.value,
+                    }))
+                  }
+                />
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleVerifyPincode(product)}
+                >
+                  Verify Pincode
+                </Button>
+              </div>
 
               <CardFooter className="p-4 pt-0">
                 <Button

@@ -74,7 +74,11 @@ const userSchema = new mongoose.Schema({
   lastLogin: {
     type: Date,
     default: Date.now
-  }
+  },
+  pincode: {
+    type: Number,
+    default: null
+  },
 }, {
   timestamps: true
 });
@@ -89,7 +93,7 @@ userSchema.pre('save', async function (next) {
 
 // Compare user password
 userSchema.methods.comparePassword = async function (enteredPassword) {
-  console.log(enteredPassword, this.password);
+
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
