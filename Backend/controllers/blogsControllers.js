@@ -21,7 +21,7 @@ exports.getAllBlogs = async (req, res, next) => {
 
 exports.getBlogById = async (req, res, next) => {
   try {
-    const blog = await Blog.findById(req.params.id);
+    const blog = await Blog.findById(req.body.id);
     if (!blog) return res.status(404).json({ status: 'fail', message: 'Blog not found' });
     res.status(200).json({ status: 'success', blog });
   } catch (error) {
