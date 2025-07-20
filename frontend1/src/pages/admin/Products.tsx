@@ -651,17 +651,13 @@ const Products = () => {
                         onChange={(e) =>
                           setFormData({
                             ...formData,
-                            status: e.target.value as
-                              | "active"
-                              | "inactive"
-                              | "out-of-stock",
+                            status: e.target.value as "active" | "inactive",
                           })
                         }
                         className="w-full px-3 py-2 border border-input rounded-md"
                       >
                         <option value="active">Active</option>
                         <option value="inactive">Inactive</option>
-                        <option value="out-of-stock">Out of Stock</option>
                       </select>
                     </div>
                   </div>
@@ -880,7 +876,6 @@ const Products = () => {
                     >
                       <option value="active">Active</option>
                       <option value="inactive">Inactive</option>
-                      <option value="out-of-stock">Out of Stock</option>
                     </select>
                   </TableCell>
                   <TableCell>

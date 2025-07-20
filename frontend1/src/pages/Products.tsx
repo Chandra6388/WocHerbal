@@ -17,7 +17,6 @@ import {
   Addfavorlist,
   getfavorlist,
   removeFavorlist,
-
 } from "@/services/productsServices";
 
 interface Product {

@@ -15,7 +15,8 @@ const {
   getSalesReport,
   deleteUser
 } = require('../controllers/adminController');
-
+const { getServiceability } = require('../controllers/rocketShippment');
+// All routes require admin authentication
 router.use(protect);
 router.use(adminOnly);
 
@@ -30,5 +31,10 @@ router.post('/notifications/send', sendNotification);
 router.get('/help-requests', getHelpRequests);
 router.post('/help-requests/:id/respond', respondToHelpRequest);
 router.get('/sales-report', getSalesReport);
+
+
+//shiiping 
+
+router.post('/shipping/getServiceability', getServiceability);
 
 module.exports = router; 

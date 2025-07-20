@@ -165,9 +165,6 @@ exports.deleteOrder = async (req, res, next) => {
 exports.createPayment = async (req, res, next) => {
   try {
     const { amount, currency = 'INR' } = req.body;
-
-
-
     const razorpayOrder = await createRazorpayOrder(amount, currency, `order_${Date.now()}`);
 
     res.status(200).json({
