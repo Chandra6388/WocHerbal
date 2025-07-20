@@ -519,17 +519,13 @@ const Products = () => {
                         onChange={(e) =>
                           setFormData({
                             ...formData,
-                            status: e.target.value as
-                              | "active"
-                              | "inactive"
-                              | "out-of-stock",
+                            status: e.target.value as "active" | "inactive",
                           })
                         }
                         className="w-full px-3 py-2 border border-input rounded-md"
                       >
                         <option value="active">Active</option>
                         <option value="inactive">Inactive</option>
-                        <option value="out-of-stock">Out of Stock</option>
                       </select>
                     </div>
                   </div>
@@ -749,17 +745,13 @@ const Products = () => {
                       onChange={(e) =>
                         handleStatusChange(
                           product._id!,
-                          e.target.value as
-                            | "active"
-                            | "inactive"
-                            | "out-of-stock"
+                          e.target.value as "active" | "inactive"
                         )
                       }
                       className="px-2 py-1 border rounded"
                     >
                       <option value="active">Active</option>
                       <option value="inactive">Inactive</option>
-                      <option value="out-of-stock">Out of Stock</option>
                     </select>
                   </TableCell>
                   <TableCell>

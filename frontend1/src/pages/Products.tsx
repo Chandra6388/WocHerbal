@@ -16,7 +16,6 @@ import {
   Addfavorlist,
   getfavorlist,
   removeFavorlist,
-  
 } from "@/services/productsServices";
 
 interface Product {
@@ -149,12 +148,6 @@ const Products = () => {
         console.error(error);
       });
   };
-
-
-
-
-
-
 
   return (
     <div className="min-h-screen pt-20 bg-background">

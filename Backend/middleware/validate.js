@@ -46,7 +46,7 @@ const schemas = {
     stock: Joi.number().integer().min(0).required(),
     tags: Joi.array().items(Joi.string()).optional(),
     specifications: Joi.object().optional(),
-    status: Joi.string().valid('active', 'inactive', 'out_of_stock').optional(),
+    status: Joi.string().valid('active', 'inactive').optional(),
     discount: Joi.number().min(0).max(100).optional(),
     originalPrice: Joi.number().positive().optional(),
     images: Joi.string().optional(),
