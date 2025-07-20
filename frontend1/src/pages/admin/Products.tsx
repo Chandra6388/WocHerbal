@@ -833,9 +833,6 @@ const Products = () => {
                       </div>
                     </div>
                   </TableCell>
-                  {/* <TableCell>
-                    <span className="font-mono text-sm">{product.sku}</span>
-                  </TableCell> */}
                   <TableCell>{product.category?.name}</TableCell>
                   <TableCell>
                     <div>
@@ -880,9 +877,6 @@ const Products = () => {
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-2">
-                      {/* <Button variant="outline" size="sm">
-                        <Eye className="h-4 w-4" />
-                      </Button> */}
                       <Button
                         variant="outline"
                         size="sm"

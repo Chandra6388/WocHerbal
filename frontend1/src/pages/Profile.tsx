@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Mail, Phone, MapPin, Edit3, Save, X } from 'lucide-react';
+import { User, Image, Phone, MapPin, Edit3, Save, X } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
@@ -8,6 +8,15 @@ import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { useToast } from '../hooks/use-toast';
 import { getUserProfile, updateProfile as updateProfileAPI } from '@/services/authSerives';
+import { getmyOrder } from '@/services/user/orderService';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { getUserFromToken } from '@/Utils/TokenData';
 import {
   Dialog,
@@ -42,9 +51,12 @@ const Profile = () => {
   const { toast } = useToast();
   const { isAuthenticated } = useAuth();
   const userdata = getUserFromToken() as { id: string };
-
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [profiledata, setProfiledata] = useState<UserProfile | null>(null);
+  const [myAllOrder, setMyAllOrder] = useState([]);
+
+
+  console.log("myAllOrder", myAllOrder)
 
   const [formData, setFormData] = useState({
     name: '',
@@ -64,6 +76,7 @@ const Profile = () => {
       navigate('/auth');
     } else {
       getProfiledata();
+      myOrder()
     }
   }, [isAuthenticated]);
 
@@ -77,12 +90,12 @@ const Profile = () => {
             typeof res.user.address === 'object' && res.user.address !== null
               ? res.user.address
               : {
-                  street: '',
-                  city: '',
-                  state: '',
-                  zipCode: '',
-                  country: '',
-                };
+                street: '',
+                city: '',
+                state: '',
+                zipCode: '',
+                country: '',
+              };
 
           setFormData({
             name: res.user.name || '',
@@ -90,6 +103,22 @@ const Profile = () => {
             phone: res.user.phone || '',
             address: addr,
           });
+        }
+      })
+      .catch(() => {
+        toast({
+          title: 'Error',
+          description: 'Failed to fetch profile data.',
+          variant: 'destructive',
+        });
+      });
+  };
+
+  const myOrder = () => {
+    getmyOrder({ id: userdata?.id })
+      .then((res) => {
+        if (res?.status === 'success') {
+          setMyAllOrder(res?.orders)
         }
       })
       .catch(() => {
@@ -213,14 +242,65 @@ const Profile = () => {
               <CardTitle>Order History</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-center py-8">
+              {myAllOrder?.length == 0 ? <div className="text-center py-8">
                 <p className="text-muted-foreground">
                   Your order history will appear here once you make your first purchase.
                 </p>
                 <Button className="mt-4" onClick={() => navigate('/products')}>
                   Shop Now
                 </Button>
-              </div>
+              </div> :
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Product</TableHead>
+                      <TableHead>Quantity</TableHead>
+                      <TableHead>Price</TableHead>
+                      <TableHead>Status</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {myAllOrder?.map((order) =>
+                      order.orderItems.map((item, index) => (
+                        <TableRow key={`${order._id}-${index}`}>
+                          <TableCell>
+                            <div className="flex items-center space-x-3">
+                              <div className="w-12 h-12 bg-muted rounded-lg flex items-center justify-center overflow-hidden">
+                                {item.image ? (
+                                  <img
+                                    src={item.image}
+                                    alt={item.name}
+                                    className="w-full h-full object-cover"
+                                  />
+                                ) : (
+                                  <Image className="h-6 w-6 text-muted-foreground" />
+                                )}
+                              </div>
+                              <div>
+                                <p className="font-medium">{item.name}</p>
+                              </div>
+                            </div>
+                          </TableCell>
+
+                          <TableCell>{item.quantity}</TableCell>
+
+                          <TableCell>₹{item.price}</TableCell>
+
+                          <TableCell>
+                            <span className="text-blue-600 font-medium">
+                              {order.orderStatus}
+                            </span>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+
+              }
+
+
+
             </CardContent>
           </Card>
         </div>
