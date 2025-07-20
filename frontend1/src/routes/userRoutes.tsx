@@ -5,14 +5,15 @@ import Products from "@/pages/Products";
 import Cart from "@/pages/Cart";
 import Checkout from "@/pages/Checkout";
 import Profile from "@/pages/Profile";
+import { BlogPost } from "@/pages/Blog";
 
 const UserRoutes = () => (
     <Routes>
         <Route path="/" element={<Layout><Index /></Layout>} />
-        <Route path="/products" element={<Layout><Products/></Layout>} />
-        <Route path="/cart" element={<Layout><Cart/></Layout>} />
-        <Route path="/profile" element={<Layout><Profile/></Layout>} />
-        <Route path="/checkout" element={<Layout><Checkout/></Layout>} />
+        <Route path="/products" element={<Layout><Products /></Layout>} />
+        <Route path="/cart" element={<Layout><Cart /></Layout>} />
+        <Route path="/profile" element={<Layout><Profile /></Layout>} />
+        <Route path="/checkout" element={<Layout><Checkout /></Layout>} />
     </Routes>
 );
 

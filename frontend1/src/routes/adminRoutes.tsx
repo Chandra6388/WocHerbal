@@ -10,6 +10,9 @@ import Notifications from "@/pages/admin/Notifications";
 import BlogManagement from "@/pages/admin/BlogManagement";
 import AdminSidebar from '@/components/admin/AdminSidebarNew';
 import Category from '@/pages/admin/Category';
+import { BlogPost } from "@/pages/Blog";
+
+import Layout from "@/components/Layout";
 
 
 
@@ -28,6 +31,7 @@ const AdminRoutes = () => (
         <Route path="notifications" element={<Notifications />} />
         <Route path="blog" element={<BlogManagement />} />
         <Route path="reviews" element={<Reviews />} />
+        <Route path="/blog/:id" element={<BlogPost />} />
         <Route path="settings" element={<div className="p-6">Settings - Coming Soon</div>} />
         <Route path="*" element={<NotFound />} />
       </Routes>

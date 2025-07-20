@@ -14,7 +14,8 @@ import {
   Settings,
   LogOut,
   Leaf,
-  Layers3 
+  Layers3,
+  FileText
 } from 'lucide-react';
 
 const sidebarItems = [
@@ -25,9 +26,12 @@ const sidebarItems = [
   { icon: ShoppingCart, label: 'Orders', path: '/admin/orders' },
   { icon: Truck, label: 'Order Tracking', path: '/admin/tracking' },
   { icon: Users, label: 'Customers', path: '/admin/customers' },
+  { icon: FileText, label: 'Blog', path: '/admin/blog' },
+
   { icon: Bell, label: 'Notifications', path: '/admin/notifications' },
   { icon: Settings, label: 'Settings', path: '/admin/settings' },
 ];
+
 
 const AdminSidebar = () => {
   const { logout, adminUser } = useAdminAuth();

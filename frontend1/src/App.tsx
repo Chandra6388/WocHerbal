@@ -32,6 +32,7 @@ import Profile from "./pages/Profile";
 import TrackOrder from "./pages/TrackOrder";
 import AdminRoute from "@/routes/adminRoutes";
 import { getUserFromToken } from "./Utils/TokenData";
+
 const queryClient = new QueryClient();
 
 const ProtectedRoute: React.FC = () =>
@@ -65,10 +66,11 @@ const AppRoutes: React.FC = () => {
       <Route path="/orders" element={<Layout><Orders /></Layout>} />
       <Route path="/profile" element={<Layout><Profile /></Layout>} />
       <Route path="/track-order" element={<Layout><TrackOrder /></Layout>} />
-      <Route path="/login" element={<Login />}/>
-      <Route path="/register" element={<Register />}/>
-      <Route path="/forgot-password" element={<ForgotPassword/>} />
-      <Route path="/not-found" element={<NotFound />}/>
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/not-found" element={<NotFound />} />
+
       <Route element={<ProtectedRoute />}><Route path="/purchase/:productId" element={<Products />} /></Route>
       <Route path="/admin/*" element={<AdminRoute />} />
       <Route path="*" element={<Navigate to="/not-found" />} />
