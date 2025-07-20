@@ -22,8 +22,7 @@ const {
   getUserStats
 } = require('../controllers/userController');
 
-// All routes require authentication
-router.use(protect);
+
 
 // Profile routes
 router.get('/profile', getUserProfile);
@@ -45,7 +44,7 @@ router.post('/wishlist/add', addToWishlist);
 router.delete('/wishlist/remove/:productId', removeFromWishlist);
 
 // Favorites routes
-router.get('/favorites', getFavorites);
+router.post('/favorites', getFavorites);
 router.post('/favorites/add', addToFavorites);
 router.delete('/favorites/remove/:productId', removeFromFavorites);
 

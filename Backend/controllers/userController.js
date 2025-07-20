@@ -226,7 +226,7 @@ exports.removeFromWishlist = async (req, res, next) => {
 // Get user favorites => /api/user/favorites
 exports.getFavorites = async (req, res, next) => {
   try {
-    const user = await User.findById(req.user.id).populate('favorites');
+    const user = await User.findById(req.body.id).populate('favorites');
 
     res.status(200).json({
       status: 'success',

@@ -13,6 +13,7 @@ import {
 import { Badge } from "../components/ui/badge";
 import { getUserProducts } from "@/services/admin/productService";
 import { useToast } from "../hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 import { getUserFromToken } from '@/Utils/TokenData';
 import { getRocketShipmentsAvailabilty } from "@/services/admin/rocketShippment";
 import {
@@ -53,15 +54,16 @@ interface Category {
 const Products = () => {
   const navigate = useNavigate()
   const { toast } = useToast();
+  const { isAuthenticated } = useAuth();
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [products, setProducts] = useState<Product[]>([]);
-  const {items, addToCart , isInCart} = useCart();
+  const { items, addToCart, isInCart } = useCart();
   const [favorList, setFavorList] = useState<Product[]>([]);
   const [category, setCategory] = useState<Category[]>([]);
   const userdata = getUserFromToken() as { id: string };
   const [pincodeInputs, setPincodeInputs] = useState<{ [key: string]: string }>(
     {}
-  ); // product-wise pincode
+  );
 
   const getAllCategory = () => {
     getCategory()
@@ -95,10 +97,10 @@ const Products = () => {
       : products.filter((product) => product.category === selectedCategory);
 
   const handleAddToCart = (product: Product) => {
-    addToCart({id: product._id, userId :userdata?.id as string});
+    addToCart({ id: product._id, userId: userdata?.id as string });
   };
 
- 
+
 
   useEffect(() => {
     getProducts();
@@ -166,7 +168,9 @@ const Products = () => {
   };
 
   const handleGetFavorites = () => {
-    getfavorlist({})
+    if (!isAuthenticated) return
+    const req = { id: userdata?.id }
+    getfavorlist(req)
       .then((data) => {
         if (data?.status === "success") {
           setFavorList(data.favorites || []);
@@ -226,13 +230,6 @@ const Products = () => {
       });
   };
 
-
-  const isAddedToCart = (signleProduct)=>{
-  return false
-
-  }
-
-  
   const handleVerifyPincode = async (product: Product) => {
     try {
       const payload = {
@@ -248,18 +245,16 @@ const Products = () => {
       if (response?.status === "success") {
         toast({
           title: "Pincode Verified",
-          description: `Delivery is available for ${
-            pincodeInputs[product._id]
-          }.`,
+          description: `Delivery is available for ${pincodeInputs[product._id]
+            }.`,
           variant: "success",
           duration: 3000,
         });
       } else {
         toast({
           title: "Delivery Unavailable",
-          description: `No delivery available for ${
-            pincodeInputs[product._id]
-          }.`,
+          description: `No delivery available for ${pincodeInputs[product._id]
+            }.`,
           variant: "destructive",
           duration: 3000,
         });
@@ -412,7 +407,7 @@ const Products = () => {
               </div>
 
               <CardFooter className="p-4 pt-0">
-                {isInCart(product?._id) ?  <Button
+                {isInCart(product?._id) ? <Button
                   onClick={() => navigate('/cart')}
                   className="w-full"
                   disabled={product.stock === 0}
@@ -427,8 +422,8 @@ const Products = () => {
                   <ShoppingCart className="w-4 h-4 mr-2" />
                   Add to Cart
                 </Button>}
-                
-               
+
+
               </CardFooter>
             </Card>
           ))}

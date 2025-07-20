@@ -22,7 +22,7 @@ export const Addfavorlist = async (data) => {
 
 export const getfavorlist = async (data) => {
   try {
-    const response = await axios.get(`${API_URL}/user/favorites`, data);
+    const response = await axios.post(`${API_URL}/user/favorites`, data);
     return response.data;
   } catch (error) {
     throw error.response.data;
