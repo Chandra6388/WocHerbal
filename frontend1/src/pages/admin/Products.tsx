@@ -36,7 +36,8 @@ import {
   DollarSign,
   AlertTriangle,
 } from "lucide-react";
-import { toast } from "sonner";
+import { useToast } from "@/hooks/use-toast";
+
 import {
   getAllProducts,
   addNewProduct,
@@ -55,7 +56,10 @@ interface Product {
   description: string;
   benefits: string;
   images: string;
-  category: string;
+  category: {
+    name: string;
+    _id:string
+  };
   stock: number;
   soldCount?: number;
   status: "active" | "inactive" | "out-of-stock";
@@ -85,47 +89,92 @@ const Products = () => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [totalRevenueState, setTotalRevenueState] = useState<number>(0);
-
-  const getProducts = () => {
-    const req = {user:"admin"}
-    getAllProducts(req)
-      .then((data) => {
-        if (data?.status == "success") {
-          setProducts(data.products);
-        } else {
-          setProducts([]);
-        }
-      })
-      .catch((error) => {
-        toast.error("Failed to fetch products");
-        console.error(error);
-      });
-  };
+  const { toast } = useToast();
 
   useEffect(() => {
     getProducts();
     handleGetOverallRevenue();
+    getAllCategory();
   }, []);
+
+  const getProducts = () => {
+    const req = { user: "admin" };
+    getAllProducts(req)
+      .then((data) => {
+        if (data?.status === "success" && Array.isArray(data.products)) {
+          setProducts(data.products);
+        } else {
+          setProducts([]);
+          toast({
+            title: "No Products Found",
+            description: "There are no products available at the moment.",
+            variant: "info",
+            duration: 3000,
+          });
+        }
+      })
+      .catch((error) => {
+        console.error("getProducts error:", error);
+        const errMsg =
+          error?.response?.data?.message ||
+          error?.message ||
+          "An unexpected error occurred while fetching products.";
+        setProducts([]);
+        toast({
+          title: "Error Loading Products",
+          description: errMsg,
+          variant: "destructive",
+          duration: 4000,
+        });
+      });
+  };
 
   const getAllCategory = () => {
     getCategory()
       .then((data) => {
-        if (data?.status == "success") {
-          setFormData({ ...formData, category: data?.allCategory[0]?._id });
-          setCategory(data.allCategory);
+        if (data?.status === "success" && Array.isArray(data.allCategory)) {
+          if (data.allCategory.length > 0) {
+            setFormData((prev) => ({
+              ...prev,
+              category: data.allCategory[0]?._id,
+            }));
+            setCategory(data.allCategory);
+          } else {
+            setCategory([]);
+            toast({
+              title: "No Categories Found",
+              description: "Please add at least one category to proceed.",
+              variant: "info",
+              duration: 3000,
+            });
+          }
         } else {
           setCategory([]);
+          toast({
+            title: "Unable to Load Categories",
+            description: "Something went wrong. Please try again later.",
+            variant: "destructive",
+            duration: 3000,
+          });
         }
       })
       .catch((error) => {
-        toast.error("Failed to fetch products");
-        console.error(error);
+        console.error("getAllCategory error:", error);
+
+        const errMsg =
+          error?.response?.data?.message ||
+          error?.message ||
+          "An unexpected error occurred while fetching categories.";
+
+        setCategory([]);
+        toast({
+          title: "Error Fetching Categories",
+          description: errMsg,
+          variant: "destructive",
+          duration: 4000,
+        });
       });
   };
-
-  useEffect(() => {
-    getAllCategory();
-  }, []);
 
   const [formData, setFormData] = useState({
     _id: "",
@@ -192,7 +241,7 @@ const Products = () => {
       originalPrice: product.originalPrice?.toString() || "",
       description: product.description,
       benefits: product.benefits,
-      category: product.category,
+      category: product.category?._id,
       stock: product.stock.toString(),
       status: product.status,
       tags: product.tags.join(", "),
@@ -206,68 +255,112 @@ const Products = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const productData = {
-      ...formData,
-      price: parseFloat(formData.price),
-      originalPrice: formData.originalPrice
-        ? parseFloat(formData.originalPrice)
-        : undefined,
-      stock: parseInt(formData.stock),
-      tags: formData.tags
-        .split(",")
-        .map((tag) => tag.trim())
-        .filter((tag) => tag.length > 0),
-      images: selectedImage || "/placeholder.svg",
-    };
-
-    if (editingProduct) {
-      const req = {
-        id: formData._id,
-        productData: productData,
-      };
-      await updateNewProduct(req)
-        .then(() => {
-          toast.success("Product Updated successfully!");
-          setIsDialogOpen(false);
-        })
-        .catch((error) => {
-          toast.error("Failed to add product");
-          console.error(error);
+    try {
+      if (!formData.name || !formData.price || !formData.stock || !formData.category) {
+        toast({
+          title: "Missing Required Fields",
+          description: "Please fill out all mandatory fields before submitting.",
+          variant: "destructive",
+          duration: 3000,
         });
-    } else {
-      const newProduct: Product = {
-        ...productData,
-        soldCount: 0,
-        rating: 0,
-        reviews: [],
+        return;
+      }
+
+      const productData = {
+        ...formData,
+        price: parseFloat(formData.price),
+        originalPrice: formData.originalPrice ? parseFloat(formData.originalPrice) : undefined,
+        stock: parseInt(formData.stock),
+        tags: formData.tags
+          .split(",")
+          .map((tag) => tag.trim())
+          .filter((tag) => tag.length > 0),
+        images: selectedImage || "/placeholder.svg",
       };
 
-      const { _id, ...productWithoutId } = newProduct;
-      await addNewProduct(productWithoutId)
-        .then(() => {
-          setProducts([...products, newProduct]);
-          toast.success("Product added successfully!");
-          setIsDialogOpen(false);
-        })
-        .catch((error) => {
-          toast.error("Failed to add product");
-          console.error(error);
+      if (editingProduct) {
+        const req = {
+          id: formData._id,
+          productData,
+        };
+
+        await updateNewProduct(req);
+        toast({
+          title: "Product Updated",
+          description: `${formData.name} has been successfully updated.`,
+          variant: "success",
+          duration: 3000,
         });
+        getProducts()
+      } else {
+        const newProduct = {
+          ...productData,
+          soldCount: 0,
+          rating: 0,
+          reviews: [],
+        };
+
+        const { _id, ...productWithoutId } = newProduct;
+        const response = await addNewProduct(productWithoutId);
+
+        setProducts((prev) => [...prev, response?.product || newProduct]);
+        toast({
+          title: "Product Added",
+          description: `${formData.name} has been successfully added.`,
+          variant: "success",
+          duration: 3000,
+        });
+      }
+
+      setIsDialogOpen(false);
+    } catch (error) {
+      console.error("Product submission error:", error);
+      toast({
+        title: "Something went wrong",
+        description:
+          error?.response?.data?.error ||
+          error?.error ||
+          "An unexpected error occurred while saving the product.",
+        variant: "destructive",
+        duration: 4000,
+      });
     }
   };
 
   const handleDeleteProduct = async (id: string) => {
-    await deleteProduct(id)
-      .then((res) => {
-        if (res?.status == "success") {
-          toast.success("Product deleted successfully!");
-        } else {
-          toast.error(res?.message);
-        }
-      })
-      .catch((error) => {
-        toast.error("some error in delete product");
+    try {
+      const res = await deleteProduct(id);
+
+      if (res?.status === "success") {
+        toast({
+          title: "Product Deleted",
+          description: "The product was deleted successfully.",
+          variant: "success",
+          duration: 3000,
+        });
+
+        setProducts((prev) => prev.filter((product) => product._id !== id));
+      } else {
+        toast({
+          title: "Deletion Failed",
+          description: res?.message || "Could not delete the product. Please try again.",
+          variant: "destructive",
+          duration: 3000,
+        });
+      }
+    } catch (error) {
+      console.error("Product deletion error:", error);
+
+      toast({
+        title: "Server Error",
+        description:
+          error?.response?.data?.message ||
+          error?.message ||
+          "An unexpected error occurred while deleting the product.",
+        variant: "destructive",
+        duration: 4000,
       });
+    }
   };
 
   const getStatusBadge = (status: string) => {
@@ -292,12 +385,7 @@ const Products = () => {
   ).length;
   const outOfStockProducts = products.filter((p) => p.stock === 0).length;
   const totalSales = products.reduce((sum, p) => sum + p.soldCount, 0);
-  const totalRevenue = products.reduce(
-    (sum, p) => sum + p.soldCount * p.price,
-    0
-  );
-  // If you want to use the state variable, update it here:
-  // useEffect(() => { setTotalRevenueState(totalRevenue); }, [products]);
+
 
   const handleStatusChange = async (
     productId: string,
@@ -305,35 +393,68 @@ const Products = () => {
   ) => {
     try {
       const res = await updateProductStatus(productId, status);
+
       if (res?.status === "success") {
-        toast.success("Product status updated!");
+        toast({
+          title: "Status Updated",
+          description: `Product marked as "${status.replace(/-/g, " ")}".`,
+          variant: "success",
+          duration: 3000,
+        });
+
         getProducts();
       } else {
-        toast.error(res?.message || "Failed to update status");
+        toast({
+          title: "Update Failed",
+          description: res?.message || "Could not update the product status.",
+          variant: "destructive",
+          duration: 3000,
+        });
       }
     } catch (error) {
-      toast.error("Error updating product status");
-      console.error(error);
+      console.error("Product status update error:", error);
+
+      toast({
+        title: "Server Error",
+        description:
+          error?.response?.data?.message ||
+          error?.message ||
+          "An unexpected error occurred while updating status.",
+        variant: "destructive",
+        duration: 4000,
+      });
     }
   };
 
   const handleGetOverallRevenue = async () => {
     try {
       const res = await getoverallRevenue();
-      if (res?.status === "success") {
+      if (res?.success) {
         setTotalRevenueState(res.overallRevenue);
       } else {
-        toast.error(res?.message || "Failed to fetch revenue");
+        toast({
+          title: "Unable to Fetch Revenue",
+          description: res?.message || "Unexpected response received.",
+          variant: "destructive",
+          duration: 3000,
+        });
       }
     } catch (error) {
-      toast.error("Error fetching overall revenue");
-      console.error(error);
+      console.error("Revenue fetch error:", error);
+      toast({
+        title: "Server Error",
+        description:
+          error?.response?.data?.message ||
+          error?.message ||
+          "An unexpected error occurred while fetching revenue.",
+        variant: "destructive",
+        duration: 4000,
+      });
     }
   };
 
   return (
     <div className="p-6 space-y-6">
-      {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
         <div>
           <h1 className="text-3xl font-bold">Product Management</h1>
@@ -361,7 +482,6 @@ const Products = () => {
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Left Column */}
                 <div className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="name">Product Name</Label>
@@ -432,25 +552,6 @@ const Products = () => {
                       required
                     />
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="status">Category</Label>
-                      <select
-                        id="status"
-                        value={formData.category}
-                        onChange={(e) =>
-                          setFormData({ ...formData, category: e.target.value })
-                        }
-                        className="w-full px-3 py-2 border border-input rounded-md"
-                      >
-                       {
-                        category?.map((item)=>{
-                          return  <option value={item?._id}>{item?.name}</option>
-                        })
-                      }
-                      </select>
-                    </div>
-                  </div>
                 </div>
 
                 {/* Right Column */}
@@ -500,6 +601,37 @@ const Products = () => {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
+                      <Label htmlFor="status">Category</Label>
+                      <select
+                        id="status"
+                        value={formData.category}
+                        onChange={(e) =>
+                          setFormData({ ...formData, category: e.target.value })
+                        }
+                        className="w-full px-3 py-2 border border-input rounded-md"
+                      >
+                        {
+                          category?.map((item) => {
+                            return <option value={item?._id}>{item?.name}</option>
+                          })
+                        }
+                      </select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="weight">Weight/Volume</Label>
+                      <Input
+                        id="weight"
+                        value={formData.weight}
+                        onChange={(e) =>
+                          setFormData({ ...formData, weight: e.target.value })
+                        }
+                        placeholder="e.g. 100ml"
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+
+                    <div className="space-y-2">
                       <Label htmlFor="stock">Stock Quantity</Label>
                       <Input
                         id="stock"
@@ -547,17 +679,7 @@ const Products = () => {
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="weight">Weight/Volume</Label>
-                      <Input
-                        id="weight"
-                        value={formData.weight}
-                        onChange={(e) =>
-                          setFormData({ ...formData, weight: e.target.value })
-                        }
-                        placeholder="e.g. 100ml"
-                      />
-                    </div>
+
                   </div>
                 </div>
               </div>
@@ -718,7 +840,7 @@ const Products = () => {
                   {/* <TableCell>
                     <span className="font-mono text-sm">{product.sku}</span>
                   </TableCell> */}
-                  <TableCell>{product.category}</TableCell>
+                  <TableCell>{product.category?.name}</TableCell>
                   <TableCell>
                     <div>
                       <span className="font-semibold">₹{product.price}</span>
@@ -731,13 +853,12 @@ const Products = () => {
                   </TableCell>
                   <TableCell>
                     <span
-                      className={`font-semibold ${
-                        product.stock === 0
-                          ? "text-red-600"
-                          : product.stock <= 10
+                      className={`font-semibold ${product.stock === 0
+                        ? "text-red-600"
+                        : product.stock <= 10
                           ? "text-yellow-600"
                           : "text-green-600"
-                      }`}
+                        }`}
                     >
                       {product.stock}
                     </span>
@@ -750,9 +871,9 @@ const Products = () => {
                         handleStatusChange(
                           product._id!,
                           e.target.value as
-                            | "active"
-                            | "inactive"
-                            | "out-of-stock"
+                          | "active"
+                          | "inactive"
+                          | "out-of-stock"
                         )
                       }
                       className="px-2 py-1 border rounded"

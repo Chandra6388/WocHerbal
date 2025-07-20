@@ -89,14 +89,6 @@ exports.updateProduct = async (req, res, next) => {
       });
     }
 
-    // Check if user is admin or product owner
-    if (req.user.role !== 'admin' && product.user.toString() !== req.user.id) {
-      return res.status(403).json({
-        status: 'error',
-        message: 'You are not authorized to update this product'
-      });
-    }
-
     product = await Product.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true,
@@ -125,17 +117,7 @@ exports.deleteProduct = async (req, res, next) => {
       });
     }
 
-    // Authorization check
-    if (req.user.role !== 'admin' && product.user?.toString() !== req.user.id) {
-      return res.status(403).json({
-        status: 'error',
-        message: 'You are not authorized to delete this product'
-      });
-    }
-
-    // Delete the product
     await product.deleteOne(); // modern method in Mongoose 7+
-
     res.status(200).json({
       status: 'success',
       message: 'Product deleted successfully'
@@ -260,13 +242,7 @@ exports.deleteReview = async (req, res, next) => {
 exports.getAllProducts = async (req, res, next) => {
   try {
     const { page = 1, limit = 10, user } = req.body;
-
-    console.log("req", req)
-    return 
-
     const query = {};
-    if (status) query.status = status;
-    if (approvalStatus) query.approvalStatus = approvalStatus;
 
     const products = await Product.find(query)
       .populate('category', 'name')

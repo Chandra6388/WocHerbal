@@ -42,7 +42,6 @@ const schemas = {
     soldCount: Joi.number().min(0).optional(),
     weight: Joi.string().optional(),
     category: Joi.string().required(),
-
     stock: Joi.number().integer().min(0).required(),
     tags: Joi.array().items(Joi.string()).optional(),
     specifications: Joi.object().optional(),

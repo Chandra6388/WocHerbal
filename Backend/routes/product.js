@@ -28,10 +28,6 @@ router.get('/category/:category', getProductsByCategory);
 router.get('/:id', getSingleProduct);
 router.get('/:id/reviews', getProductReviews);
 
-// Protected routes
-// router.use(protect);
-
-// Product CRUD
 router.post('/new', validate('createProduct'), newProduct);
 router.put('/:id', updateProduct);
 router.delete('/:id', deleteProduct);
@@ -39,14 +35,10 @@ router.put('/:id/status', updateProductStatus);
 router.post('/stock-sold', updateStockAndSoldCount);
 
 
-
-// Review routes
 router.post('/review', validate('createReview'), createProductReview);
 router.delete('/reviews', deleteReview);
 
 
-
-// Admin routes
 router.post('/admin/all', adminOnly, getAllProducts);
 router.put('/admin/approve/:id', adminOnly, approveProduct);
 router.get('/admin/stats', adminOnly, getProductStats);
