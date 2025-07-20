@@ -9,24 +9,15 @@ import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { useToast } from '../hooks/use-toast';
 
-const Auth = () => {
+const RegisterPage = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    password: '',
-    confirmPassword: ''
-  });
+  const [formData, setFormData] = useState({ name: '', email: '', phone: '', password: '', confirmPassword: '' });
   const [loading, setLoading] = useState(false);
-
   const { login, register } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
-
-  const from = location.state?.from || '/';
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -35,63 +26,50 @@ const Auth = () => {
     });
   };
 
- const handleSubmit = async (e: React.FormEvent) => {
+  const isFormValid =
+    formData.name.trim() &&
+    formData.email.trim() &&
+    formData.phone.trim() &&
+    formData.password &&
+    formData.confirmPassword 
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
     try {
-      if (isLogin) {
-        const success = await login(formData.email, formData.password);
-        if (success) {
-          toast({
-            title: "Login Successful",
-            description: "Welcome back!",
-            variant: "success",
-            duration: 3000,
-          });
-          navigate(from);
-        } else {
-          toast({
-            title: "Login Failed",
-            description: "Invalid email or password",
-            variant: "destructive",
-            duration: 3000,
-          });
-        }
+      if (formData.password !== formData.confirmPassword) {
+        toast({
+          title: "Password Mismatch",
+          description: "Passwords do not match",
+          variant: "destructive",
+          duration: 3000,
+        });
+        return;
+      }
+      const success = await register(formData.name, formData.email, formData.password, formData.phone);
+
+      if (success) {
+        toast({
+          title: "Registration Successful",
+          description: "Welcome to WocHerbal!",
+          variant: "success",
+          duration: 3000,
+        });
+        navigate('/');
       } else {
-        if (formData.password !== formData.confirmPassword) {
-          toast({
-            title: "Password Mismatch",
-            description: "Passwords do not match",
-            variant: "destructive",
-            duration: 3000,
-          });
-          return;
-        }
-        const success = await register(formData.name, formData.email, formData.password, formData.phone);
-        if (success) {
-          toast({
-            title: "Registration Successful",
-            description: "Welcome to WocHerbal!",
-            variant: "success",
-            duration: 3000,
-          });
-          navigate(from);
-        } else {
-          toast({
-            title: "Registration Failed",
-            description: "User already exists or invalid data",
-            variant: "destructive",
-            duration: 3000,
-          });
-        }
+        toast({
+          title: "Registration Failed",
+          description: "User already exists or invalid data",
+          variant: "destructive",
+          duration: 3000,
+        });
       }
     } catch (error) {
       toast({
         title: "Error",
         description: "Something went wrong. Please try again.",
         variant: "destructive",
-        duration: 3000, 
+        duration: 3000,
       });
     } finally {
       setLoading(false);
@@ -105,24 +83,22 @@ const Auth = () => {
           <Card>
             <CardHeader>
               <CardTitle className="text-2xl text-center">
-                {isLogin ? 'Login' : 'Sign Up'}
+                Sign Up
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {!isLogin && (
-                  <div>
-                    <Label htmlFor="name">Full Name</Label>
-                    <Input
-                      id="name"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleInputChange}
-                      required
-                      disabled={loading}
-                    />
-                  </div>
-                )}
+                <div>
+                  <Label htmlFor="name">Full Name</Label>
+                  <Input
+                    id="name"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    required
+                    disabled={loading}
+                  />
+                </div>
                 <div>
                   <Label htmlFor="email">Email</Label>
                   <Input
@@ -135,20 +111,16 @@ const Auth = () => {
                     disabled={loading}
                   />
                 </div>
-
-                {!isLogin && (
-                  <div>
-                    <Label htmlFor="phone">Phone Number</Label>
-                    <Input
-                      id="phone"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleInputChange}
-                      disabled={loading}
-                    />
-                  </div>
-                )}
-
+                <div>
+                  <Label htmlFor="phone">Phone Number</Label>
+                  <Input
+                    id="phone"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleInputChange}
+                    disabled={loading}
+                  />
+                </div>
                 <div>
                   <Label htmlFor="password">Password</Label>
                   <div className="relative">
@@ -170,35 +142,35 @@ const Auth = () => {
                     </button>
                   </div>
                 </div>
-
-                {!isLogin && (
-                  <div>
-                    <Label htmlFor="confirmPassword">Confirm Password</Label>
-                    <Input
-                      id="confirmPassword"
-                      name="confirmPassword"
-                      type="password"
-                      value={formData.confirmPassword}
-                      onChange={handleInputChange}
-                      required
-                      disabled={loading}
-                    />
-                  </div>
-                )}
-
-                <Button onClick={handleSubmit} className="w-full" disabled={loading}>
-                  {loading ? 'Please wait...' : (isLogin ? 'Login' : 'Sign Up')}
+                <div>
+                  <Label htmlFor="confirmPassword">Confirm Password</Label>
+                  <Input
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    type="password"
+                    value={formData.confirmPassword}
+                    onChange={handleInputChange}
+                    required
+                    disabled={loading}
+                  />
+                </div>
+                <Button
+                  onClick={handleSubmit}
+                  className="w-full"
+                  disabled={loading || !isFormValid}
+                >
+                  {loading ? 'Please wait...' : 'Sign Up'}
                 </Button>
+
               </div>
 
               <div className="mt-4 text-center" >
                 <button
                   type="button"
-                  onClick={() => setIsLogin(!isLogin)}
+                  onClick={() => navigate('/login')}
                   className="text-primary hover:underline"
                   disabled={loading}
-                >
-                  {isLogin ? "Don't have an account? Sign up" : "Already have an account? Login"}
+                >Already have an account? Login
                 </button>
               </div>
             </CardContent>
@@ -209,4 +181,4 @@ const Auth = () => {
   );
 };
 
-export default Auth;
+export default RegisterPage;
