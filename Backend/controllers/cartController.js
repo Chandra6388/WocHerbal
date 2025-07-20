@@ -5,7 +5,7 @@ const ErrorHandler = require('../utils/errorHandler');
 // Get user cart => /api/cart
 exports.getCart = async (req, res, next) => {
   try {
-    let cart = await Cart.findOne({ user: req.user._id }).populate('items.product');
+    let cart = await Cart.findOne({ user: req.body.userId }).populate('items.product');
 
     if (!cart) {
       cart = await Cart.create({
@@ -25,12 +25,9 @@ exports.getCart = async (req, res, next) => {
   }
 };
 
-// Add item to cart => /api/cart/add
 exports.addToCart = async (req, res, next) => {
   try {
     const { productId, quantity = 1 } = req.body;
-
-    // Check if product exists and is available
     const product = await Product.findById(productId);
     if (!product) {
       return res.status(404).json({
@@ -39,7 +36,7 @@ exports.addToCart = async (req, res, next) => {
       });
     }
 
-    if (product.status !== 'active' || product.approvalStatus !== 'approved') {
+    if (product.status !== 'active') {
       return res.status(400).json({
         status: 'error',
         message: 'Product is not available for purchase'
@@ -53,18 +50,17 @@ exports.addToCart = async (req, res, next) => {
       });
     }
 
-    let cart = await Cart.findOne({ user: req.user._id });
+    let cart = await Cart.findOne({ user: req.body?.userId });
 
     if (!cart) {
       cart = await Cart.create({
-        user: req.user._id,
+        user: req.body?.userId,
         items: [],
         totalItems: 0,
         totalPrice: 0
       });
     }
-
-    // Check if product already exists in cart
+ 
     const existingItem = cart.items.find(
       item => item.product.toString() === productId
     );
@@ -78,12 +74,9 @@ exports.addToCart = async (req, res, next) => {
         price: product.price
       });
     }
-
     cart.calculateTotals();
     await cart.save();
-
     await cart.populate('items.product');
-
     res.status(200).json({
       status: 'success',
       message: 'Item added to cart successfully',
@@ -93,12 +86,10 @@ exports.addToCart = async (req, res, next) => {
     next(error);
   }
 };
-
-// Update cart item quantity => /api/cart/update
+ 
 exports.updateCartItem = async (req, res, next) => {
   try {
     const { productId, quantity } = req.body;
-
     if (quantity < 1) {
       return res.status(400).json({
         status: 'error',

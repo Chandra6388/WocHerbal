@@ -4,14 +4,26 @@ import { Plus, Minus, Trash2, ShoppingBag } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { getUserFromToken } from '@/Utils/TokenData';
+import { useEffect } from 'react';
+
+
 
 
 const Cart = () => {
-  const { items, updateQuantity, removeFromCart, totalPrice, totalItems } = useCart();
+  const userdata = getUserFromToken() as { id: string };
+  const { getAddToCart, updateQuantity, removeFromCart, totalPrice, totalItems } = useCart();
   const navigate = useNavigate();
 
+  
+useEffect(() => {
+  if (userdata?.id) {
+    getAddToCart(userdata.id);
+  }
+}, [userdata?.id]);
 
-  console.log("CPPP", items)
+
+  let items = []
   if (items.length === 0) {
     return (
       <div className="min-h-screen pt-20 flex items-center justify-center">
@@ -37,7 +49,7 @@ const Cart = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Cart Items */}
           <div className="lg:col-span-2 space-y-4">
-            {items.map((item) => (
+            {/* {items.map((item) => (
               <Card key={item.id}>
                 <CardContent className="p-6">
                   <div className="flex items-center gap-4">
@@ -85,7 +97,7 @@ const Cart = () => {
                   </div>
                 </CardContent>
               </Card>
-            ))}
+            ))} */}
           </div>
 
           {/* Order Summary */}
@@ -112,7 +124,7 @@ const Cart = () => {
                   <span>Total</span>
                   <span>₹{Math.round(totalPrice * 1.18)}</span>
                 </div>
-                
+
                 <Button
                   size="lg"
                   className="w-full"
@@ -120,7 +132,7 @@ const Cart = () => {
                 >
                   Proceed to Checkout
                 </Button>
-                
+
                 <Link to="/products">
                   <Button variant="outline" className="w-full">
                     Continue Shopping

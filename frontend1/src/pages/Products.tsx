@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Star, ShoppingCart, Heart } from "lucide-react";
 import { useCart } from "../contexts/CartContext";
 import { Button } from "../components/ui/button";
@@ -12,6 +12,7 @@ import {
 import { Badge } from "../components/ui/badge";
 import { getUserProducts } from "@/services/admin/productService";
 import { useToast } from "../hooks/use-toast";
+import { getUserFromToken } from '@/Utils/TokenData';
 
 import {
   Addfavorlist,
@@ -19,6 +20,7 @@ import {
   removeFavorlist,
 } from "@/services/productsServices";
 
+import { getCategory } from '@/services/admin/productService';
 interface Product {
   _id: string;
   name: string;
@@ -42,19 +44,46 @@ interface Product {
   }[];
 }
 
+interface Category {
+  _id?: string
+  name: string;
+  status: 'active' | 'inactive' | 'out-of-stock';
+}
 const Products = () => {
+  const navigate = useNavigate()
   const { toast } = useToast();
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [products, setProducts] = useState<Product[]>([]);
-  const { addToCart } = useCart();
+  const {items, addToCart } = useCart();
   const [favorList, setFavorList] = useState<Product[]>([]);
+  const [category, setCategory] = useState<Category[]>([]);
+  const userdata = getUserFromToken() as { id: string };
 
-  const categories = [
-    { id: "all", name: "All Products" },
-    { id: "men", name: "For Men" },
-    { id: "women", name: "For Women" },
-    { id: "growth", name: "Hair Growth" },
-  ];
+  const getAllCategory = () => {
+    getCategory()
+      .then(data => {
+        if (data?.status == "success") {
+          setCategory(data.allCategory);
+        }
+        else {
+          setCategory([]);
+        }
+      })
+      .catch(error => {
+        toast({
+          title: 'Error',
+          description: "Failed to fetch products",
+          variant: 'default',
+          duration: 4000,
+        });
+        console.error(error);
+      });
+  }
+
+
+  useEffect(() => {
+    getAllCategory();
+  }, []);
 
   const filteredProducts =
     selectedCategory === "all"
@@ -62,19 +91,13 @@ const Products = () => {
       : products.filter((product) => product.category === selectedCategory);
 
   const handleAddToCart = (product: Product) => {
-    addToCart({
-      id: product._id,
-      name: product.name,
-      price: product.price,
-      image: product.images,
-    });
+    addToCart({id: product._id, userId :userdata?.id as string});
   };
 
   useEffect(() => {
     getProducts();
     handleGetFavorites();
   }, []);
-  // update path as per your project
 
   const getProducts = async () => {
     try {
@@ -136,7 +159,6 @@ const Products = () => {
       });
   };
 
-
   const handleGetFavorites = () => {
     getfavorlist({})
       .then((data) => {
@@ -162,7 +184,6 @@ const Products = () => {
         });
       });
   };
-
 
   const handleRemoveFromFavorites = (productId: string) => {
     removeFavorlist({ productId })
@@ -196,6 +217,10 @@ const Products = () => {
       });
   };
 
+  const isAddedToCart = (signleProduct)=>{
+  return false
+
+  }
 
 
   return (
@@ -212,11 +237,18 @@ const Products = () => {
         </div>
 
         <div className="flex flex-wrap justify-center gap-4 mb-12">
-          {categories.map((category) => (
+          <Button
+            variant={selectedCategory === "all" ? "default" : "outline"}
+            onClick={() => setSelectedCategory("all")}
+            className="rounded-full"
+          >
+            All Products
+          </Button>
+          {category.map((category) => (
             <Button
-              key={category.id}
-              variant={selectedCategory === category.id ? "default" : "outline"}
-              onClick={() => setSelectedCategory(category.id)}
+              key={category._id}
+              variant={selectedCategory === category._id ? "default" : "outline"}
+              onClick={() => setSelectedCategory(category._id)}
               className="rounded-full"
             >
               {category.name}
@@ -260,7 +292,6 @@ const Products = () => {
                     )}
                   </div>
 
-                  {/* 📷 Product Image */}
                   <Link to={`/product/${product._id}`}>
                     <img
                       src={product.images}
@@ -306,14 +337,23 @@ const Products = () => {
               </CardContent>
 
               <CardFooter className="p-4 pt-0">
-                <Button
+                {isAddedToCart(product) ?  <Button
+                  onClick={() => navigate('/cart')}
+                  className="w-full"
+                  disabled={product.stock === 0}
+                >
+                  <ShoppingCart className="w-4 h-4 mr-2" />
+                  Go to Cart
+                </Button> : <Button
                   onClick={() => handleAddToCart(product)}
                   className="w-full"
                   disabled={product.stock === 0}
                 >
                   <ShoppingCart className="w-4 h-4 mr-2" />
                   Add to Cart
-                </Button>
+                </Button>}
+                
+               
               </CardFooter>
             </Card>
           ))}

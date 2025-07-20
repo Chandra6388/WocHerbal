@@ -19,10 +19,11 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showReviewUpload, setShowReviewUpload] = useState(false);
   const { user, logout, isAdmin } = useAuth();
-  const { items } = useCart();
+  // const { items } = useCart();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
 
+  let items=[]
   const handleLogout = () => {
     logout();
     navigate("/");

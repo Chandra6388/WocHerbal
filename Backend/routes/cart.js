@@ -17,7 +17,7 @@ const {
 router.use(protect);
 
 // Cart routes
-router.get('/', getCart);
+router.post('/', getCart);
 router.post('/add', addToCart);
 router.put('/update', updateCartItem);
 router.delete('/remove/:productId', removeFromCart);
