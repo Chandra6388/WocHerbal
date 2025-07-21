@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -58,7 +59,7 @@ interface Product {
   images: string;
   category: {
     name: string;
-    _id:string
+    _id: string;
   };
   stock: number;
   soldCount?: number;
@@ -199,16 +200,38 @@ const Products = () => {
     return matchesSearch && matchesStatus;
   });
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const file = e.target.files?.[0];
+  //   if (file) {
+  //     const reader = new FileReader();
+  //     reader.onload = (e) => {
+  //       const imageUrl = e.target?.result as string;
+  //       setImagePreview(imageUrl);
+  //       setSelectedImage(imageUrl);
+  //     };
+  //     reader.readAsDataURL(file);
+  //   }
+  // };
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const imageUrl = e.target?.result as string;
-        setImagePreview(imageUrl);
-        setSelectedImage(imageUrl);
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", "my_unsigned_preset"); // Your actual unsigned preset name
+
+    try {
+      const response = await axios.post(
+        "https://api.cloudinary.com/v1_1/dlpeqbowx/image/upload",
+        formData
+      );
+
+      const imageUrl = response.data.secure_url;
+      console.log("Uploaded Image URL:", imageUrl);
+      setImagePreview(imageUrl);
+      setSelectedImage(imageUrl);
+    } catch (error) {
+      console.error("Image upload failed:", error);
     }
   };
 
@@ -256,10 +279,16 @@ const Products = () => {
     e.preventDefault();
 
     try {
-      if (!formData.name || !formData.price || !formData.stock || !formData.category) {
+      if (
+        !formData.name ||
+        !formData.price ||
+        !formData.stock ||
+        !formData.category
+      ) {
         toast({
           title: "Missing Required Fields",
-          description: "Please fill out all mandatory fields before submitting.",
+          description:
+            "Please fill out all mandatory fields before submitting.",
           variant: "destructive",
           duration: 3000,
         });
@@ -269,7 +298,9 @@ const Products = () => {
       const productData = {
         ...formData,
         price: parseFloat(formData.price),
-        originalPrice: formData.originalPrice ? parseFloat(formData.originalPrice) : undefined,
+        originalPrice: formData.originalPrice
+          ? parseFloat(formData.originalPrice)
+          : undefined,
         stock: parseInt(formData.stock),
         tags: formData.tags
           .split(",")
@@ -291,7 +322,7 @@ const Products = () => {
           variant: "success",
           duration: 3000,
         });
-        getProducts()
+        getProducts();
       } else {
         const newProduct = {
           ...productData,
@@ -343,7 +374,8 @@ const Products = () => {
       } else {
         toast({
           title: "Deletion Failed",
-          description: res?.message || "Could not delete the product. Please try again.",
+          description:
+            res?.message || "Could not delete the product. Please try again.",
           variant: "destructive",
           duration: 3000,
         });
@@ -385,7 +417,6 @@ const Products = () => {
   ).length;
   const outOfStockProducts = products.filter((p) => p.stock === 0).length;
   const totalSales = products.reduce((sum, p) => sum + p.soldCount, 0);
-
 
   const handleStatusChange = async (
     productId: string,
@@ -610,11 +641,11 @@ const Products = () => {
                         }
                         className="w-full px-3 py-2 border border-input rounded-md"
                       >
-                        {
-                          category?.map((item) => {
-                            return <option value={item?._id}>{item?.name}</option>
-                          })
-                        }
+                        {category?.map((item) => {
+                          return (
+                            <option value={item?._id}>{item?.name}</option>
+                          );
+                        })}
                       </select>
                     </div>
                     <div className="space-y-2">
@@ -630,7 +661,6 @@ const Products = () => {
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
-
                     <div className="space-y-2">
                       <Label htmlFor="stock">Stock Quantity</Label>
                       <Input
@@ -674,9 +704,7 @@ const Products = () => {
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
-
-                  </div>
+                  <div className="grid grid-cols-2 gap-4"></div>
                 </div>
               </div>
 
@@ -846,12 +874,13 @@ const Products = () => {
                   </TableCell>
                   <TableCell>
                     <span
-                      className={`font-semibold ${product.stock === 0
-                        ? "text-red-600"
-                        : product.stock <= 10
+                      className={`font-semibold ${
+                        product.stock === 0
+                          ? "text-red-600"
+                          : product.stock <= 10
                           ? "text-yellow-600"
                           : "text-green-600"
-                        }`}
+                      }`}
                     >
                       {product.stock}
                     </span>
@@ -864,9 +893,9 @@ const Products = () => {
                         handleStatusChange(
                           product._id!,
                           e.target.value as
-                          | "active"
-                          | "inactive"
-                          | "out-of-stock"
+                            | "active"
+                            | "inactive"
+                            | "out-of-stock"
                         )
                       }
                       className="px-2 py-1 border rounded"

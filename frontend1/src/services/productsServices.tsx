@@ -1,6 +1,6 @@
 import axios from "axios";
 import { API_URL } from "../Utils/config";
-axios.defaults.withCredentials = true;
+// axios.defaults.withCredentials = true;
 
 export const getAllProducts = async (data) => {
   try {
