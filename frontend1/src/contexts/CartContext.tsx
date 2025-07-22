@@ -2,6 +2,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { addToCartProduct, getAddToCartProduct, updateCartItem, removeCartItem } from '@/services/user/cartService'
 import { useToast } from "../hooks/use-toast";
+import { getUserFromToken } from '@/Utils/TokenData';
+import { useAuth } from "@/contexts/AuthContext";
 
 interface CartItem {
   product: {
@@ -49,6 +51,8 @@ export const useCart = () => {
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { toast } = useToast();
   const [items, setItems] = useState([]);
+  const userdata = getUserFromToken() as { id: string };
+  const { isAuthenticated } = useAuth();
 
   const addToCart = async (data) => {
     const req = { productId: data?.id, userId: data?.userId };
@@ -81,6 +85,14 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+   useEffect(() => {
+    if (userdata?.id) {
+        getAddToCart(userdata.id);
+    }
+    if(!isAuthenticated){
+      setItems([])
+    }
+  }, [userdata?.id , isAuthenticated]);
 
   const getAddToCart = async (userId: string) => {
     const req = { userId: userId };
@@ -108,9 +120,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-
   const isInCart = (id: string): boolean => {
-    return items.some(item => item.id === id);
+    return items.some(item => item?.product?._id === id);
   };
 
   const removeFromCart = async (id: string, userId: string) => {
@@ -149,7 +160,6 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
     }
   };
-
 
   const updateQuantity = async (id: string, quantity: number, userId: string) => {
     const req = { productId: id, quantity, userId };
@@ -190,7 +200,6 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
     }
   };
-
 
   const clearCart = () => {
     setItems([]);

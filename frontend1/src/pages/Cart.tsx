@@ -14,11 +14,7 @@ const Cart = () => {
   const { getAddToCart,items, updateQuantity, removeFromCart, totalPrice, totalItems } = useCart();
   const navigate = useNavigate(); 
 
-  useEffect(() => {
-    if (userdata?.id) {
-        getAddToCart(userdata.id);
-    }
-  }, [userdata?.id]);
+ 
 
 
   if (items.length === 0) {

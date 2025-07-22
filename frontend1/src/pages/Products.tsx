@@ -4,25 +4,17 @@ import { Link, useNavigate } from "react-router-dom";
 import { Star, ShoppingCart, Heart } from "lucide-react";
 import { useCart } from "../contexts/CartContext";
 import { Button } from "../components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-} from "../components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader, } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
 import { getUserProducts } from "@/services/admin/productService";
 import { useToast } from "../hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { getUserFromToken } from '@/Utils/TokenData';
 import { getRocketShipmentsAvailabilty } from "@/services/admin/rocketShippment";
-import {
-  Addfavorlist,
-  getfavorlist,
-  removeFavorlist,
-} from "@/services/productsServices";
+import { Addfavorlist, getfavorlist, removeFavorlist, } from "@/services/productsServices";
 
 import { getCategory } from '@/services/admin/productService';
+
 interface Product {
   _id: string;
   name: string;
@@ -61,9 +53,7 @@ const Products = () => {
   const [favorList, setFavorList] = useState<Product[]>([]);
   const [category, setCategory] = useState<Category[]>([]);
   const userdata = getUserFromToken() as { id: string };
-  const [pincodeInputs, setPincodeInputs] = useState<{ [key: string]: string }>(
-    {}
-  );
+  const [pincodeInputs, setPincodeInputs] = useState<{ [key: string]: string }>({});
 
   const getAllCategory = () => {
     getCategory()
@@ -91,6 +81,7 @@ const Products = () => {
     getAllCategory();
   }, []);
 
+
   const filteredProducts =
     selectedCategory === "all"
       ? products
@@ -99,8 +90,6 @@ const Products = () => {
   const handleAddToCart = (product: Product) => {
     addToCart({ id: product._id, userId: userdata?.id as string });
   };
-
-
 
   useEffect(() => {
     getProducts();
@@ -414,7 +403,8 @@ const Products = () => {
                 >
                   <ShoppingCart className="w-4 h-4 mr-2" />
                   Go to Cart
-                </Button> : <Button
+                </Button> : 
+                <Button
                   onClick={() => handleAddToCart(product)}
                   className="w-full"
                   disabled={product.stock === 0}
@@ -422,8 +412,6 @@ const Products = () => {
                   <ShoppingCart className="w-4 h-4 mr-2" />
                   Add to Cart
                 </Button>}
-
-
               </CardFooter>
             </Card>
           ))}

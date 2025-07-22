@@ -18,7 +18,7 @@ const Hero = () => {
 
   const productImages = [
     featuredProduct.image,
-    "/lovable-uploads/4654272e-82ea-4eff-8386-6d9f4a2fcced.png",
+    "/uploads/4654272e-82ea-4eff-8386-6d9f4a2fcced.png",
     featuredProduct.image
   ];
 

@@ -55,9 +55,6 @@ const Profile = () => {
   const [profiledata, setProfiledata] = useState<UserProfile | null>(null);
   const [myAllOrder, setMyAllOrder] = useState([]);
 
-
-  console.log("myAllOrder", myAllOrder)
-
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -130,9 +127,7 @@ const Profile = () => {
       });
   };
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
     if (name in formData.address) {
@@ -157,6 +152,7 @@ const Profile = () => {
         name: formData.name,
         phone: formData.phone,
         address: formData.address,
+        id:userdata?.id
       });
 
       if (success) {

@@ -52,6 +52,8 @@ const AppRoutes: React.FC = () => {
     }
   }, [isAuthenticated, user, navigate]);
 
+  console.log("isAuthenticated", isAuthenticated)
+
   return (
     <Routes>
       <Route path="/" element={<Layout><Index />{" "}</Layout>} />

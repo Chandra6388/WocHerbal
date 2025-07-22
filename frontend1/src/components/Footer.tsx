@@ -10,10 +10,11 @@ const Footer = () => {
           {/* Brand */}
           <div className="space-y-4">
             <Link to="/" className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-accent rounded-full flex items-center justify-center">
-                <Leaf className="w-5 h-5 text-background" />
-              </div>
-              <span className="text-xl font-playfair font-bold">WocHerbal</span>
+              <img
+                src="/uploads/WOChairOil_2.png"
+                alt=""
+                className="w-28"
+              />
             </Link>
             <p className="text-muted-foreground">
               Natural wellness reimagined with the power of Ayurveda and Panchgavya.

@@ -24,15 +24,17 @@ exports.getUserProfile = async (req, res, next) => {
 // Update user profile => /api/user/profile/update
 exports.updateProfile = async (req, res, next) => {
   try {
+    console.log("req.body.id", req.body)
     const newUserData = {
       name: req.body.name,
       email: req.body.email,
       phone: req.body.phone,
-      address: req.body.address
+      address: req.body.address,
     };
     console.log('Updating user profile with data:', req.user);
 
-    const user = await User.findByIdAndUpdate(req.user.id, newUserData, {
+
+    const user = await User.findByIdAndUpdate(req.body.id, newUserData, {
       new: true,
       runValidators: true,
       useFindAndModify: false

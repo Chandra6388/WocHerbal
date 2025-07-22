@@ -41,12 +41,12 @@ const Header = () => {
       <div className="container mx-auto px-6">
         <div className="flex items-center justify-between h-16">
           <Link to="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-r from-forest-500 to-earth-500 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">W</span>
-            </div>
-            <span className="text-xl font-playfair font-bold text-forest-800">
-              WocHerbal
-            </span>
+            <img
+              src="/uploads/WOChairOil_2.png"
+              alt=""
+              className="w-24"
+              style={{ filter: 'brightness(0) saturate(100%)' }}
+            />
           </Link>
           <nav className="hidden md:flex items-center space-x-8">
             <Link
