@@ -71,9 +71,9 @@ exports.login = async (req, res) => {
 
 exports.getServiceability = async (req, res) => {
     try {
-        const { _id, pickup_postcode, delivery_postcode, cod = 0, weight = 0.5 } = req.body;
+        const { delivery_postcode, cod = 0, weight = 0.5 } = req.body;
+        let pickup_postcode = 466001;
 
-        await User.findByIdAndUpdate(_id, { $set: { pincode: delivery_postcode } });
         const response = await shiprocket.get('/v1/external/courier/serviceability/', {
             params: { pickup_postcode, delivery_postcode, cod, weight }
         });
@@ -82,7 +82,7 @@ exports.getServiceability = async (req, res) => {
         const courierCompanies = response.data.data?.available_courier_companies || [];
         res.status(200).json({ available: courierCompanies.length > 0, couriers: courierCompanies });
     } catch (error) {
-        console.log("res", error)
+        console.log("res", error.response?.data);
         console.error('Error in getServiceability:', error.message);
         res.status(error.response?.status || 500).json({ status: 'error', message: error.response?.data?.message || 'Internal Server Error' });
     }

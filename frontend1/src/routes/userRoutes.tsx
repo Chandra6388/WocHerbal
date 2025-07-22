@@ -5,7 +5,6 @@ import Products from "@/pages/Products";
 import Cart from "@/pages/Cart";
 import Checkout from "@/pages/Checkout";
 import Profile from "@/pages/Profile";
-import { BlogPost } from "@/pages/Blog";
 
 const UserRoutes = () => (
     <Routes>

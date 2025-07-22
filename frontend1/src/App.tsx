@@ -42,8 +42,11 @@ const AppRoutes: React.FC = () => {
   const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
   useEffect(() => {
+    if (!isAuthenticated && window.location.pathname.includes("admin")) {
+      navigate("/login");
+    }
     if (isAuthenticated && window.location.pathname === "/") {
-      console.log("User ", user);
+      // if (!isAuthenticated && window.location.pathname)
       if (user?.role === "admin") {
         navigate("/admin/dashboard");
       } else {
@@ -52,29 +55,116 @@ const AppRoutes: React.FC = () => {
     }
   }, [isAuthenticated, user, navigate]);
 
-  console.log("isAuthenticated", isAuthenticated)
-
   return (
     <Routes>
-      <Route path="/" element={<Layout><Index />{" "}</Layout>} />
-      <Route path="/products" element={<Layout><Products /></Layout>} />
-      <Route path="/contact" element={<Layout><Contact /></Layout>} />
-      <Route path="/about" element={<Layout><About /></Layout>} />
-      <Route path="/blog" element={<Layout><Blog /></Layout>} />
-      <Route path="/testimonials" element={<Layout><Testimonials /></Layout>} />
-      <Route path="/product/:id" element={<Layout><ProductDetail /></Layout>} />
-      <Route path="/cart" element={<Layout><Cart /></Layout>} />
-      <Route path="/checkout" element={<Layout><Checkout /></Layout>} />
-      <Route path="/orders" element={<Layout><Orders /></Layout>} />
-      <Route path="/profile" element={<Layout><Profile /></Layout>} />
-      <Route path="/track-order" element={<Layout><TrackOrder /></Layout>} />
+      <Route
+        path="/"
+        element={
+          <Layout>
+            <Index />{" "}
+          </Layout>
+        }
+      />
+      <Route
+        path="/products"
+        element={
+          <Layout>
+            <Products />
+          </Layout>
+        }
+      />
+      <Route
+        path="/contact"
+        element={
+          <Layout>
+            <Contact />
+          </Layout>
+        }
+      />
+      <Route
+        path="/about"
+        element={
+          <Layout>
+            <About />
+          </Layout>
+        }
+      />
+      <Route
+        path="/blog"
+        element={
+          <Layout>
+            <Blog />
+          </Layout>
+        }
+      />
+      <Route
+        path="/testimonials"
+        element={
+          <Layout>
+            <Testimonials />
+          </Layout>
+        }
+      />
+      <Route
+        path="/product/:id"
+        element={
+          <Layout>
+            <ProductDetail />
+          </Layout>
+        }
+      />
+      <Route
+        path="/cart"
+        element={
+          <Layout>
+            <Cart />
+          </Layout>
+        }
+      />
+      <Route
+        path="/checkout"
+        element={
+          <Layout>
+            <Checkout />
+          </Layout>
+        }
+      />
+      <Route
+        path="/orders"
+        element={
+          <Layout>
+            <Orders />
+          </Layout>
+        }
+      />
+      <Route
+        path="/profile"
+        element={
+          <Layout>
+            <Profile />
+          </Layout>
+        }
+      />
+      <Route
+        path="/track-order"
+        element={
+          <Layout>
+            <TrackOrder />
+          </Layout>
+        }
+      />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/not-found" element={<NotFound />} />
 
-      <Route element={<ProtectedRoute />}><Route path="/purchase/:productId" element={<Products />} /></Route>
-      <Route path="/admin/*" element={<AdminRoute />} />
+      <Route element={<ProtectedRoute />}>
+        <Route path="/purchase/:productId" element={<Products />} />
+      </Route>
+      <Route
+        path="/admin/*"
+        element={isAuthenticated ? <AdminRoute /> : <Login />}
+      />
       <Route path="*" element={<Navigate to="/not-found" />} />
     </Routes>
   );

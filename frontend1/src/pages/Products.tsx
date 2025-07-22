@@ -4,16 +4,25 @@ import { Link, useNavigate } from "react-router-dom";
 import { Star, ShoppingCart, Heart } from "lucide-react";
 import { useCart } from "../contexts/CartContext";
 import { Button } from "../components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, } from "../components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
 import { getUserProducts } from "@/services/admin/productService";
 import { useToast } from "../hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import { getUserFromToken } from '@/Utils/TokenData';
+import { getUserFromToken } from "@/Utils/TokenData";
 import { getRocketShipmentsAvailabilty } from "@/services/admin/rocketShippment";
-import { Addfavorlist, getfavorlist, removeFavorlist, } from "@/services/productsServices";
+import {
+  Addfavorlist,
+  getfavorlist,
+  removeFavorlist,
+} from "@/services/productsServices";
 
-import { getCategory } from '@/services/admin/productService';
+import { getCategory } from "@/services/admin/productService";
 
 interface Product {
   _id: string;
@@ -39,12 +48,12 @@ interface Product {
 }
 
 interface Category {
-  _id?: string
+  _id?: string;
   name: string;
-  status: 'active' | 'inactive' | 'out-of-stock';
+  status: "active" | "inactive" | "out-of-stock";
 }
 const Products = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const { toast } = useToast();
   const { isAuthenticated } = useAuth();
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
@@ -53,34 +62,38 @@ const Products = () => {
   const [favorList, setFavorList] = useState<Product[]>([]);
   const [category, setCategory] = useState<Category[]>([]);
   const userdata = getUserFromToken() as { id: string };
-  const [pincodeInputs, setPincodeInputs] = useState<{ [key: string]: string }>({});
-
-  const getAllCategory = () => {
-    getCategory()
-      .then(data => {
-        if (data?.status == "success") {
-          setCategory(data.allCategory);
-        }
-        else {
-          setCategory([]);
-        }
-      })
-      .catch(error => {
-        toast({
-          title: 'Error',
-          description: "Failed to fetch products",
-          variant: 'default',
-          duration: 4000,
-        });
-        console.error(error);
-      });
-  }
-
+  const [pincodeInputs, setPincodeInputs] = useState<{ [key: string]: string }>(
+    {}
+  );
 
   useEffect(() => {
     getAllCategory();
   }, []);
 
+  useEffect(() => {
+    getProducts();
+    handleGetFavorites();
+  }, []);
+
+  const getAllCategory = () => {
+    getCategory()
+      .then((data) => {
+        if (data?.status == "success") {
+          setCategory(data.allCategory);
+        } else {
+          setCategory([]);
+        }
+      })
+      .catch((error) => {
+        toast({
+          title: "Error",
+          description: "Failed to fetch products",
+          variant: "default",
+          duration: 4000,
+        });
+        console.error(error);
+      });
+  };
 
   const filteredProducts =
     selectedCategory === "all"
@@ -88,13 +101,12 @@ const Products = () => {
       : products.filter((product) => product.category === selectedCategory);
 
   const handleAddToCart = (product: Product) => {
+    if (!isAuthenticated && !userdata?.id) {
+      navigate("/login");
+      return;
+    }
     addToCart({ id: product._id, userId: userdata?.id as string });
   };
-
-  useEffect(() => {
-    getProducts();
-    handleGetFavorites();
-  }, []);
 
   const getProducts = async () => {
     try {
@@ -157,8 +169,8 @@ const Products = () => {
   };
 
   const handleGetFavorites = () => {
-    if (!isAuthenticated) return
-    const req = { id: userdata?.id }
+    if (!isAuthenticated) return;
+    const req = { id: userdata?.id };
     getfavorlist(req)
       .then((data) => {
         if (data?.status === "success") {
@@ -222,28 +234,28 @@ const Products = () => {
   const handleVerifyPincode = async (product: Product) => {
     try {
       const payload = {
-        _id: userdata.id,
-        pickup_postcode: 452018,
         delivery_postcode: pincodeInputs[product._id],
         cod: 0,
         weight: product.weight || "0.5",
       };
 
-
       const response = await getRocketShipmentsAvailabilty(payload);
-      if (response?.status === "success") {
+      console.log("res", response);
+      if (response?.available) {
         toast({
           title: "Pincode Verified",
-          description: `Delivery is available for ${pincodeInputs[product._id]
-            }.`,
+          description: `Delivery is available for ${
+            pincodeInputs[product._id]
+          }.`,
           variant: "success",
           duration: 3000,
         });
       } else {
         toast({
           title: "Delivery Unavailable",
-          description: `No delivery available for ${pincodeInputs[product._id]
-            }.`,
+          description: `No delivery available for ${
+            pincodeInputs[product._id]
+          }.`,
           variant: "destructive",
           duration: 3000,
         });
@@ -286,7 +298,9 @@ const Products = () => {
           {category.map((category) => (
             <Button
               key={category._id}
-              variant={selectedCategory === category._id ? "default" : "outline"}
+              variant={
+                selectedCategory === category._id ? "default" : "outline"
+              }
               onClick={() => setSelectedCategory(category._id)}
               className="rounded-full"
             >
@@ -308,28 +322,30 @@ const Products = () => {
                       Out of Stock
                     </div>
                   )}
-                  {isAuthenticated && <div className="absolute top-2 right-2 z-10 bg-white p-1 rounded-full shadow-md cursor-pointer hover:text-red-500 transition-colors">
-                    {favorList.some((fav) => fav._id === product._id) ? (
-                      <Heart
-                        className="w-5 h-5"
-                        style={{ color: "red" }}
-                        fill="red"
-                        stroke="red"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleRemoveFromFavorites(product._id);
-                        }}
-                      />
-                    ) : (
-                      <Heart
-                        className="w-5 h-5 text-gray-500 hover:text-red-500 transition-colors"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleAddToFavorites(product);
-                        }}
-                      />
-                    )}
-                  </div>}
+                  {isAuthenticated && (
+                    <div className="absolute top-2 right-2 z-10 bg-white p-1 rounded-full shadow-md cursor-pointer hover:text-red-500 transition-colors">
+                      {favorList.some((fav) => fav._id === product._id) ? (
+                        <Heart
+                          className="w-5 h-5"
+                          style={{ color: "red" }}
+                          fill="red"
+                          stroke="red"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRemoveFromFavorites(product._id);
+                          }}
+                        />
+                      ) : (
+                        <Heart
+                          className="w-5 h-5 text-gray-500 hover:text-red-500 transition-colors"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleAddToFavorites(product);
+                          }}
+                        />
+                      )}
+                    </div>
+                  )}
                   <Link to={`/product/${product._id}`}>
                     <img
                       src={product.images}
@@ -396,22 +412,25 @@ const Products = () => {
               </div>
 
               <CardFooter className="p-4 pt-0">
-                {isInCart(product?._id) ? <Button
-                  onClick={() => navigate('/cart')}
-                  className="w-full"
-                  disabled={product.stock === 0}
-                >
-                  <ShoppingCart className="w-4 h-4 mr-2" />
-                  Go to Cart
-                </Button> : 
-                <Button
-                  onClick={() => handleAddToCart(product)}
-                  className="w-full"
-                  disabled={product.stock === 0}
-                >
-                  <ShoppingCart className="w-4 h-4 mr-2" />
-                  Add to Cart
-                </Button>}
+                {isInCart(product?._id) ? (
+                  <Button
+                    onClick={() => navigate("/cart")}
+                    className="w-full"
+                    disabled={product.stock === 0}
+                  >
+                    <ShoppingCart className="w-4 h-4 mr-2" />
+                    Go to Cart
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={() => handleAddToCart(product)}
+                    className="w-full"
+                    disabled={product.stock === 0}
+                  >
+                    <ShoppingCart className="w-4 h-4 mr-2" />
+                    Add to Cart
+                  </Button>
+                )}
               </CardFooter>
             </Card>
           ))}
