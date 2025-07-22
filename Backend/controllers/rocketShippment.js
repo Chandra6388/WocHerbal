@@ -7,15 +7,25 @@ let shiprocketToken = null;
 let tokenExpiry = null;
 
 async function getShiprocketToken() {
+
     if (shiprocketToken && tokenExpiry && Date.now() < tokenExpiry) {
         return shiprocketToken;
     }
- 
+    let user = await User.findOne({ role: "admin" }).select('accessToken');
+
+    if (user && user.accessToken) {
+        shiprocketToken = user.accessToken;
+        return shiprocketToken;
+    }
+    console.log("Genrate new token");
+
+
     const loginRes = await axios.post('https://apiv2.shiprocket.in/v1/external/auth/login', {
         email: process.env.SHIPROCKET_EMAIL,
         password: process.env.SHIPROCKET_PASSWORD
     });
     shiprocketToken = loginRes?.data?.token;
+    await User.updateOne({ role: "admin" }, { accessToken: shiprocketToken });
     // 10 days expiry
     tokenExpiry = Date.now() + 10 * 24 * 60 * 60 * 1000;
     return shiprocketToken;
@@ -27,12 +37,25 @@ function getAxiosInstance() {
     });
     instance.interceptors.request.use(async (config) => {
         const token = await getShiprocketToken();
+
         config.headers['Authorization'] = `Bearer ${token}`;
         return config;
     });
     return instance;
 }
 
+function UpdateUserAccessToken() {
+    User.findOneAndUpdate({ role: "admin" }, { accessToken: null })
+        .then(() => {
+            console.log("User access token updated successfully");
+            shiprocketToken = null; // Reset token in memory
+            tokenExpiry = null; // Reset token expiry
+
+        })
+        .catch((error) => {
+            console.error("Error updating user access token:", error);
+        });
+}
 const shiprocket = getAxiosInstance();
 
 exports.login = async (req, res) => {
@@ -48,18 +71,18 @@ exports.login = async (req, res) => {
 
 exports.getServiceability = async (req, res) => {
     try {
-        const { _id, pickup_postcode, delivery_postcode, cod = 0, weight = 0.5 } = req.body;
+        const { delivery_postcode, cod = 0, weight = 0.5 } = req.body;
+        let pickup_postcode = 466001;
 
-        await User.findByIdAndUpdate(_id, { $set: { pincode: delivery_postcode } });
         const response = await shiprocket.get('/v1/external/courier/serviceability/', {
             params: { pickup_postcode, delivery_postcode, cod, weight }
         });
-        
-        
+
+
         const courierCompanies = response.data.data?.available_courier_companies || [];
         res.status(200).json({ available: courierCompanies.length > 0, couriers: courierCompanies });
     } catch (error) {
-        console.log("res", error)
+        console.log("res", error.response?.data);
         console.error('Error in getServiceability:', error.message);
         res.status(error.response?.status || 500).json({ status: 'error', message: error.response?.data?.message || 'Internal Server Error' });
     }
@@ -175,3 +198,18 @@ exports.trackShipment = async (req, res) => {
         res.status(error.response?.status || 500).json({ status: 'error', message: error.response?.data?.message || 'Internal Server Error' });
     }
 };
+
+
+exports.getOrders = async (req, res) => {
+    try {
+        const response = await shiprocket.get('/v1/external/orders');
+        res.status(200).json({ status: 'success', data: response.data });
+    } catch (error) {
+        let ErrorMessage = error?.response?.data?.message || error.message;
+        if (ErrorMessage.includes("Wrong number of segments")) {
+            shiprocketToken = null; // Reset token to force re-login
+            UpdateUserAccessToken(); // Clear access token in DB
+        }
+        res.status(error.response?.status || 500).json({ status: 'error', message: error.response?.data?.message || 'Internal Server Error' });
+    }
+}

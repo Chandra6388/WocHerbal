@@ -31,6 +31,7 @@ exports.updateProfile = async (req, res, next) => {
       phone: req.body.phone,
       address: req.body.address,
     };
+    console.log('Updating user profile with data:', req.user);
 
 
     const user = await User.findByIdAndUpdate(req.body.id, newUserData, {
