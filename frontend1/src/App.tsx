@@ -32,7 +32,7 @@ import Profile from "./pages/Profile";
 import TrackOrder from "./pages/TrackOrder";
 import AdminRoute from "@/routes/adminRoutes";
 import { getUserFromToken } from "./Utils/TokenData";
-
+import ScrollToTop from '@/components/ScrollToTop'
 const queryClient = new QueryClient();
 
 const ProtectedRoute: React.FC = () =>
@@ -177,6 +177,7 @@ const App: React.FC = () => {
         <CartProvider>
           <TooltipProvider>
             <BrowserRouter>
+            <ScrollToTop /> 
               <AppRoutes />
               <Toaster />
               <Sonner />

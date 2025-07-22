@@ -22,7 +22,7 @@ import {
 } from "lucide-react";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-
+import { uploadToCloudinary } from '@/services/admin/blogsService'
 import { useToast } from "../../hooks/use-toast";
 import {
   updateBlog,
@@ -189,9 +189,8 @@ const BlogManagement = () => {
     if (!confirm.isConfirmed) {
       toast({
         title: "Cancelled",
-        description: `Blog post was not ${
-          !isPublishing ? "published" : "unpublished"
-        }.`,
+        description: `Blog post was not ${!isPublishing ? "published" : "unpublished"
+          }.`,
         variant: "default",
         duration: 3000,
       });
@@ -205,9 +204,8 @@ const BlogManagement = () => {
       if (res?.status === "success") {
         toast({
           title: `✅ Blog ${!isPublishing ? "Published" : "Unpublished"}`,
-          description: `The blog has been successfully ${
-            !isPublishing ? "published" : "unpublished"
-          }.`,
+          description: `The blog has been successfully ${!isPublishing ? "published" : "unpublished"
+            }.`,
           variant: "success",
           duration: 3000,
         });
@@ -298,26 +296,11 @@ const BlogManagement = () => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("upload_preset", "my_unsigned_preset"); // change this if needed
-
-    try {
-      const response = await axios.post(
-        "https://api.cloudinary.com/v1_1/dlpeqbowx/image/upload",
-        formData
-      );
-
-      const imageUrl = response.data.secure_url;
-      console.log("Uploaded Image URL:", imageUrl);
-
-      setEditingPost(imageUrl); // Update state with image URL
-    } catch (error: any) {
-      console.error(
-        "Image upload failed:",
-        error?.response?.data || error.message
-      );
-    }
+    const uploadedImageUrls = await uploadToCloudinary(file)
+    setEditingPost((prev) => ({
+      ...prev,
+      image: uploadedImageUrls,
+    }))
   };
 
   return (
