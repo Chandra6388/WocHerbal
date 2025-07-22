@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Button } from '../components/ui/button';
+import { Button } from '../../components/ui/button';
 import { ArrowLeft, Calendar, User, Clock, Share2, Heart } from 'lucide-react';
 import {getBlogById } from '@/services/admin/blogsService'
 import { useToast } from '@/hooks/use-toast';

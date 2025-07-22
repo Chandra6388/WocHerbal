@@ -17,7 +17,7 @@ interface BlogPost {
     createdAt: string;
     category?: string;
     readTime?: string;
-    isPublished:boolean;
+    isPublished: boolean;
 }
 
 
@@ -55,18 +55,18 @@ const BlogList = () => {
         }
     };
 
-    const filterPublishBlog = posts.filter(item=>item?.isPublished)
+    const filterPublishBlog = posts.filter(item => item?.isPublished)
 
 
-     if (filterPublishBlog?.length==0) {
+    if (filterPublishBlog?.length == 0) {
         return (
-          <div className="min-h-screen flex items-center justify-center">
-            <div className="text-center">
-              <h1 className="text-2xl font-bold text-foreground mb-4">No Blog post is found</h1>
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="text-center">
+                    <h1 className="text-2xl font-bold text-foreground mb-4">No Blog post is found</h1>
+                </div>
             </div>
-          </div>
         );
-      }
+    }
 
 
     return (

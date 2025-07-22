@@ -1,64 +1,65 @@
-import React from 'react';
 import { Card, CardContent } from './ui/card';
 import { Button } from './ui/button';
 import { ArrowRight, Calendar, User, Clock } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
+import React, { useState, useEffect } from 'react';
+import { getBlogById, getAllBlogs } from '@/services/admin/blogsService'
 
 interface BlogPost {
-  id: string;
+  _id: string;
   title: string;
+  content: string;
   description: string;
   image: string;
   author: string;
-  date: string;
-  readTime: string;
-  category: string;
+  createdAt: string;
+  category?: string;
+  readTime?: string;
+  isPublished: boolean;
 }
 
-const mockBlogPosts: BlogPost[] = [
-  {
-    id: '1',
-    title: 'The Science Behind Ayurvedic Hair Care',
-    description: 'Discover how ancient Ayurvedic principles combined with modern science create powerful hair care solutions.',
-    image: 'https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?w=1080&h=1080&fit=crop',
-    author: 'Dr. Priya Sharma',
-    date: '2024-01-15',
-    readTime: '5 min read',
-    category: 'Science'
-  },
-  {
-    id: '2',
-    title: '5 Natural Ingredients for Healthy Hair',
-    description: 'Learn about powerful natural ingredients that can transform your hair health naturally.',
-    image: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=1080&h=1080&fit=crop',
-    author: 'Wellness Team',
-    date: '2024-01-12',
-    readTime: '7 min read',
-    category: 'Ingredients'
-  },
-  {
-    id: '3',
-    title: 'Hair Care Routine for Different Hair Types',
-    description: 'Customize your hair care routine based on your unique hair type and concerns.',
-    image: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=1080&h=1080&fit=crop',
-    author: 'Hair Expert',
-    date: '2024-01-10',
-    readTime: '6 min read',
-    category: 'Tips'
-  },
-  {
-    id: '4',
-    title: 'Benefits of Organic Hair Oil',
-    description: 'Understanding why organic hair oils are superior for long-term hair health.',
-    image: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=1080&h=1080&fit=crop',
-    author: 'Organic Team',
-    date: '2024-01-08',
-    readTime: '4 min read',
-    category: 'Organic'
-  }
-];
+
 
 const BlogSection = () => {
+
+  const { toast } = useToast();
+  const [posts, setPosts] = useState<BlogPost[]>([]);
+
+  useEffect(() => {
+    getBlogs()
+  }, [])
+
+  const getBlogs = async () => {
+    try {
+      const res = await getAllBlogs({});
+      if (res?.status === "success") {
+        setPosts(res.blogs || []);
+
+      } else {
+        setPosts([]);
+        toast({
+          title: "No Blogs Found",
+          description: res?.message || "No blog posts available right now.",
+          variant: "default",
+          duration: 3000,
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching blogs:", error);
+      toast({
+        title: "🚫 Failed to Load Blogs",
+        description: "Something went wrong while fetching the blog posts. Please try again.",
+        variant: "destructive",
+        duration: 3000,
+      });
+    }
+  };
+
+  const filterPublishBlog = posts.filter(item => item?.isPublished)
+
+
+
   return (
     <section className="py-24 bg-gradient-to-br from-background via-accent/5 to-green-500/5">
       <div className="container mx-auto px-6">
@@ -80,10 +81,10 @@ const BlogSection = () => {
 
         <div className="overflow-x-auto pb-4">
           <div className="flex space-x-6 w-max">
-            {mockBlogPosts.map((post, index) => (
+            {filterPublishBlog.map((post, index) => (
               <Link
-                key={post.id}
-                to={`/blog/${post.id}`}
+                key={post._id}
+                to={`/blog/${post._id}`}
                 className="block w-80 flex-shrink-0"
               >
                 <Card className="h-full hover:shadow-2xl transition-all duration-500 hover:scale-105 border-2 border-transparent hover:border-accent/30 group">
@@ -95,32 +96,24 @@ const BlogSection = () => {
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                       />
                     </div>
-                    
+
                     <div className="p-6 space-y-4">
-                      <div className="flex items-center justify-between text-sm text-muted-foreground">
-                        <span className="bg-accent/10 text-accent px-3 py-1 rounded-full font-medium">
-                          {post.category}
-                        </span>
-                        <div className="flex items-center space-x-2">
-                          <Clock className="w-4 h-4" />
-                          <span>{post.readTime}</span>
-                        </div>
-                      </div>
-                      
                       <h3 className="text-xl font-bold text-foreground group-hover:text-accent transition-colors line-clamp-2">
                         {post.title}
                       </h3>
-                      
+
                       <p className="text-muted-foreground text-sm line-clamp-3">
                         {post.description}
                       </p>
-                      
+
                       <div className="flex items-center justify-between pt-4 border-t border-accent/10">
                         <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                           <User className="w-4 h-4" />
                           <span>{post.author}</span>
                         </div>
-                        <div className="flex items-center text-accent font-medium text-sm group-hover:translate-x-1 transition-transform">
+                        <div className="flex items-center text-accent font-medium text-sm group-hover:translate-x-1 transition-transform"  onClick={() =>
+                          window.open(`/blog/${post._id}`, "_blank")
+                        }>
                           Read More
                           <ArrowRight className="w-4 h-4 ml-1" />
                         </div>

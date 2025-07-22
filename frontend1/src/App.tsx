@@ -33,6 +33,7 @@ import TrackOrder from "./pages/TrackOrder";
 import AdminRoute from "@/routes/adminRoutes";
 import { getUserFromToken } from "./Utils/TokenData";
 import ScrollToTop from '@/components/ScrollToTop'
+import ViewBlogs from '@/pages/ViewBlogs'
 const queryClient = new QueryClient();
 
 const ProtectedRoute: React.FC = () =>
@@ -56,108 +57,23 @@ const AppRoutes: React.FC = () => {
   }, [isAuthenticated, user, navigate]);
 
   return (
-    <Routes>
-      <Route
-        path="/"
-        element={
-          <Layout>
-            <Index />{" "}
-          </Layout>
-        }
-      />
-      <Route
-        path="/products"
-        element={
-          <Layout>
-            <Products />
-          </Layout>
-        }
-      />
-      <Route
-        path="/contact"
-        element={
-          <Layout>
-            <Contact />
-          </Layout>
-        }
-      />
-      <Route
-        path="/about"
-        element={
-          <Layout>
-            <About />
-          </Layout>
-        }
-      />
-      <Route
-        path="/blog"
-        element={
-          <Layout>
-            <Blog />
-          </Layout>
-        }
-      />
-      <Route
-        path="/testimonials"
-        element={
-          <Layout>
-            <Testimonials />
-          </Layout>
-        }
-      />
-      <Route
-        path="/product/:id"
-        element={
-          <Layout>
-            <ProductDetail />
-          </Layout>
-        }
-      />
-      <Route
-        path="/cart"
-        element={
-          <Layout>
-            <Cart />
-          </Layout>
-        }
-      />
-      <Route
-        path="/checkout"
-        element={
-          <Layout>
-            <Checkout />
-          </Layout>
-        }
-      />
-      <Route
-        path="/orders"
-        element={
-          <Layout>
-            <Orders />
-          </Layout>
-        }
-      />
-      <Route
-        path="/profile"
-        element={
-          <Layout>
-            <Profile />
-          </Layout>
-        }
-      />
-      <Route
-        path="/track-order"
-        element={
-          <Layout>
-            <TrackOrder />
-          </Layout>
-        }
-      />
+    <Routes><Route path="/" element={<Layout><Index />{" "}</Layout>} />
+      <Route path="/products" element={<Layout><Products /></Layout>} />
+      <Route path="/contact" element={<Layout><Contact /></Layout>} />
+      <Route path="/about" element={<Layout><About /></Layout>} />
+      <Route path="/blog" element={<Layout><Blog /></Layout>} />
+      <Route path="/testimonials" element={<Layout> <Testimonials /></Layout>} />
+      <Route path="/product/:id" element={<Layout><ProductDetail /></Layout>} />
+      <Route path="/cart" element={<Layout><Cart /></Layout>} />
+      <Route path="/checkout" element={<Layout><Checkout /></Layout>} />
+      <Route path="/orders" element={<Layout><Orders /></Layout>} />
+      <Route path="/profile" element={<Layout><Profile /></Layout>} />
+      <Route path="/track-order" element={<Layout><TrackOrder /></Layout>} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/not-found" element={<NotFound />} />
-
+      <Route path="/blog/:id" element={<Layout><ViewBlogs/></Layout>} />
       <Route element={<ProtectedRoute />}>
         <Route path="/purchase/:productId" element={<Products />} />
       </Route>
@@ -177,7 +93,7 @@ const App: React.FC = () => {
         <CartProvider>
           <TooltipProvider>
             <BrowserRouter>
-            <ScrollToTop /> 
+              <ScrollToTop />
               <AppRoutes />
               <Toaster />
               <Sonner />

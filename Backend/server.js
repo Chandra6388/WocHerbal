@@ -24,17 +24,12 @@ const blogsRoutes = require('./routes/blogs');
 
 
 
-// Middleware
 app.use(helmet());
-
-// ✅ Allow multiple origins in development
-
 
 app.use(
   cors({
     origin: function (origin, callback) {
       console.log("origin", origin)
-      // Allow all origins (even undefined ones like Postman)
       callback(null, origin || '*');
     },
     credentials: true,
@@ -44,8 +39,7 @@ app.use(
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-
-// Database connection
+ 
 mongoose
   .connect(process.env.MONGODB_URI)
   .then(() => console.log('✅ MongoDB connected successfully'))

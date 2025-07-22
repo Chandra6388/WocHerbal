@@ -91,6 +91,7 @@ exports.getServiceability = async (req, res) => {
 exports.createOrder = async (req, res) => {
     try {
         const orderData = req.body;
+        console.log("orderData",req.body)
         const response = await shiprocket.post('/v1/external/orders/create/adhoc', orderData);
         const data = response.data;
         // Save to DB
