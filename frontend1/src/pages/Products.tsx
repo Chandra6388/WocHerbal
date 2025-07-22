@@ -14,6 +14,7 @@ import { getRocketShipmentsAvailabilty } from "@/services/admin/rocketShippment"
 import { Addfavorlist, getfavorlist, removeFavorlist, } from "@/services/productsServices";
 
 import { getCategory } from '@/services/admin/productService';
+
 interface Product {
   _id: string;
   name: string;
@@ -80,6 +81,7 @@ const Products = () => {
     getAllCategory();
   }, []);
 
+
   const filteredProducts =
     selectedCategory === "all"
       ? products
@@ -88,8 +90,6 @@ const Products = () => {
   const handleAddToCart = (product: Product) => {
     addToCart({ id: product._id, userId: userdata?.id as string });
   };
-
-
 
   useEffect(() => {
     getProducts();
@@ -403,7 +403,8 @@ const Products = () => {
                 >
                   <ShoppingCart className="w-4 h-4 mr-2" />
                   Go to Cart
-                </Button> : <Button
+                </Button> : 
+                <Button
                   onClick={() => handleAddToCart(product)}
                   className="w-full"
                   disabled={product.stock === 0}
@@ -411,8 +412,6 @@ const Products = () => {
                   <ShoppingCart className="w-4 h-4 mr-2" />
                   Add to Cart
                 </Button>}
-
-
               </CardFooter>
             </Card>
           ))}
