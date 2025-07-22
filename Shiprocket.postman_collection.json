@@ -1,0 +1,122 @@
+{
+  "info": {
+    "name": "Shiprocket API Integration",
+    "_postman_id": "shiprocket-collection-001",
+    "description": "All Shiprocket endpoints for Node.js backend integration",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Login (Get Shiprocket Token)",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": { "raw": "http://localhost:5000/api/shiprocket/login", "protocol": "http", "host": ["localhost"], "port": "5000", "path": ["api", "shiprocket", "login"] }
+      }
+    },
+    {
+      "name": "Check Serviceability",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"_id\": \"USER_ID\",\n  \"pickup_postcode\": \"110001\",\n  \"delivery_postcode\": \"400001\",\n  \"cod\": 0,\n  \"weight\": 0.5\n}"
+        },
+        "url": { "raw": "http://localhost:5000/api/shiprocket/getServiceability", "protocol": "http", "host": ["localhost"], "port": "5000", "path": ["api", "shiprocket", "getServiceability"] }
+      }
+    },
+    {
+      "name": "Create Order",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"order_id\": \"ORDER123\",\n  \"order_date\": \"2024-05-01\",\n  \"pickup_location\": \"Default\",\n  \"billing_customer_name\": \"John Doe\",\n  \"billing_last_name\": \"\",\n  \"billing_address\": \"123 Main St\",\n  \"billing_city\": \"Delhi\",\n  \"billing_pincode\": \"110001\",\n  \"billing_state\": \"Delhi\",\n  \"billing_country\": \"India\",\n  \"billing_email\": \"john@example.com\",\n  \"billing_phone\": \"9999999999\",\n  \"shipping_is_billing\": true,\n  \"order_items\": [\n    {\n      \"name\": \"Product 1\",\n      \"sku\": \"SKU001\",\n      \"units\": 1,\n      \"selling_price\": 100,\n      \"discount\": \"\",\n      \"tax\": \"\",\n      \"hsn\": \"\"\n    }\n  ],\n  \"payment_method\": \"Prepaid\",\n  \"sub_total\": 100,\n  \"length\": 10,\n  \"breadth\": 10,\n  \"height\": 10,\n  \"weight\": 0.5\n}"
+        },
+        "url": { "raw": "http://localhost:5000/api/shiprocket/createOrder", "protocol": "http", "host": ["localhost"], "port": "5000", "path": ["api", "shiprocket", "createOrder"] }
+      }
+    },
+    {
+      "name": "Assign AWB",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"shipment_id\": \"SHIPMENT_ID\",\n  \"courier_id\": \"COURIER_ID\"\n}"
+        },
+        "url": { "raw": "http://localhost:5000/api/shiprocket/assignAwb", "protocol": "http", "host": ["localhost"], "port": "5000", "path": ["api", "shiprocket", "assignAwb"] }
+      }
+    },
+    {
+      "name": "Generate Pickup",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"shipment_id\": \"SHIPMENT_ID\"\n}"
+        },
+        "url": { "raw": "http://localhost:5000/api/shiprocket/generatePickup", "protocol": "http", "host": ["localhost"], "port": "5000", "path": ["api", "shiprocket", "generatePickup"] }
+      }
+    },
+    {
+      "name": "Generate Manifest",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"shipment_id\": \"SHIPMENT_ID\"\n}"
+        },
+        "url": { "raw": "http://localhost:5000/api/shiprocket/generateManifest", "protocol": "http", "host": ["localhost"], "port": "5000", "path": ["api", "shiprocket", "generateManifest"] }
+      }
+    },
+    {
+      "name": "Print Manifest",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"shipment_id\": \"SHIPMENT_ID\"\n}"
+        },
+        "url": { "raw": "http://localhost:5000/api/shiprocket/printManifest", "protocol": "http", "host": ["localhost"], "port": "5000", "path": ["api", "shiprocket", "printManifest"] }
+      }
+    },
+    {
+      "name": "Generate Label",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"shipment_id\": \"SHIPMENT_ID\"\n}"
+        },
+        "url": { "raw": "http://localhost:5000/api/shiprocket/generateLabel", "protocol": "http", "host": ["localhost"], "port": "5000", "path": ["api", "shiprocket", "generateLabel"] }
+      }
+    },
+    {
+      "name": "Print Invoice",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"shipment_id\": \"SHIPMENT_ID\"\n}"
+        },
+        "url": { "raw": "http://localhost:5000/api/shiprocket/printInvoice", "protocol": "http", "host": ["localhost"], "port": "5000", "path": ["api", "shiprocket", "printInvoice"] }
+      }
+    },
+    {
+      "name": "Track Shipment",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": { "raw": "http://localhost:5000/api/shiprocket/trackShipment/{{awb_code}}", "protocol": "http", "host": ["localhost"], "port": "5000", "path": ["api", "shiprocket", "trackShipment", "{{awb_code}}"] }
+      }
+    }
+  ]
+} 
