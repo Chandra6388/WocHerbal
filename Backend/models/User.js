@@ -79,6 +79,10 @@ const userSchema = new mongoose.Schema({
     type: Number,
     default: null
   },
+  accessToken: {
+    type: String,
+    default: null
+  },
 }, {
   timestamps: true
 });

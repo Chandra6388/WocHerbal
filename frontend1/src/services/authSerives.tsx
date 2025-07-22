@@ -1,6 +1,6 @@
 import axios from "axios";
 import { API_URL } from "../Utils/config";
-// axios.defaults.withCredentials = true; // Enable sending cookies with requests
+axios.defaults.withCredentials = true; // Enable sending cookies with requests
 
 export const registerUser = async (userData) => {
   try {

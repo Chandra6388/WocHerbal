@@ -11,7 +11,8 @@ const {
   printManifest,
   generateLabel,
   printInvoice,
-  trackShipment
+  trackShipment,
+  getOrders
 } = require('../controllers/rocketShippment');
 
 router.post('/login', login);
@@ -24,5 +25,6 @@ router.post('/printManifest', printManifest);
 router.post('/generateLabel', generateLabel);
 router.post('/printInvoice', printInvoice);
 router.get('/trackShipment/:awb_code', trackShipment);
+router.get('/getOrders', getOrders);
 
 module.exports = router; 

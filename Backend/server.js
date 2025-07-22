@@ -28,24 +28,6 @@ const blogsRoutes = require('./routes/blogs');
 app.use(helmet());
 
 // ✅ Allow multiple origins in development
-const allowedOrigins =
-  process.env.NODE_ENV === 'production'
-    ? [process.env.FRONTEND_URL]
-    : ['http://localhost:3000', 'http://localhost:8080'];
-
-// app.use(
-//   cors({
-//     origin: function (origin, callback) {
-//       if (!origin || allowedOrigins.includes(origin)) {
-//         callback(null, true);
-//       } else {
-//         callback(new Error('Not allowed by CORS'));
-//       }
-//     },
-//     credentials: true,
-//   })
-// );
-
 
 app.use(
   cors({
@@ -78,7 +60,7 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/help', helpRoutes);
 app.use('/api/user', userRoutes);
-app.use('/api/shiprocket', shipmentRoutes);
+app.use('/api/shipment', shipmentRoutes);
 app.use('/api/blogs', blogsRoutes);
 
 

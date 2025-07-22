@@ -64,7 +64,6 @@ const Checkout = () => {
     paymentMethod: "razorpay",
   });
 
-
   useEffect(() => {
     if (items.length === 0) navigate("/cart");
     if (!isAuthenticated) navigate("/auth", { state: { from: "/checkout" } });
@@ -84,8 +83,6 @@ const Checkout = () => {
     price: item?.product?.price,
   }));
 
-
-
   const createOrderPayload = (paymentId: string | null = null) => ({
     user: user?._id,
     orderItems: formattedItems,
@@ -103,15 +100,7 @@ const Checkout = () => {
         formData.paymentMethod === "razorpay" ? "Razorpay" : "Cash on Delivery",
     },
     totalPrice: totalPrice,
-
   });
-
-
-  const productIds = items.map(item => ({
-    product: item.product._id,
-    quantity: item.quantity
-  }));
-
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -120,12 +109,12 @@ const Checkout = () => {
       try {
         const orderRes = await createOrder(createOrderPayload());
         if (orderRes.status === "success") {
-          const productIds = items.map(item => ({
+          const productIds = items.map((item) => ({
             product: item.product._id,
-            quantity: item.quantity
+            quantity: item.quantity,
           }));
 
-          console.log("psdsdsds", productIds)
+          console.log("psdsdsds", productIds);
 
           await updateStockAndSoldCount(productIds);
           toast.success("Order placed successfully!");
@@ -149,10 +138,12 @@ const Checkout = () => {
 
       const finalAmount = Math.round(totalPrice * 1.18);
       const { order } = await createOrderByrazorpay({ amount: finalAmount });
+      console.log("Razorpay Order Response:", order);
 
+      console.log("Razorpay Order:", finalAmount);
       const options: RazorpayOptions = {
         key: "rzp_test_Yg6vhSeAq4hucc",
-        amount: finalAmount,
+        amount: order.amount,
         currency: "INR",
         order_id: order._id,
         name: "My E-Commerce Store",
@@ -163,9 +154,9 @@ const Checkout = () => {
               createOrderPayload(response.razorpay_payment_id)
             );
             if (orderRes.status === "success") {
-              const productIds = items.map(item => ({
+              const productIds = items.map((item) => ({
                 product: item.product._id,
-                quantity: item.quantity
+                quantity: item.quantity,
               }));
               await updateStockAndSoldCount(productIds);
               toast.success("Order placed successfully!");

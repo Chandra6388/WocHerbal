@@ -1,17 +1,39 @@
-
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
-import { 
-  Search, Package, Truck, CheckCircle, Clock, MapPin, 
-  Eye, Edit, Download, Filter, AlertCircle, Phone, Mail
-} from 'lucide-react';
-import { toast } from 'sonner';
+import React, { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { getOrders } from "@/services/admin/rocketShippment";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Search,
+  Package,
+  Truck,
+  CheckCircle,
+  Clock,
+  MapPin,
+  Eye,
+  Download,
+  Filter,
+  AlertCircle,
+  Phone,
+  Mail,
+} from "lucide-react";
+import { toast } from "sonner";
 
 interface OrderTracking {
   id: string;
@@ -21,7 +43,13 @@ interface OrderTracking {
   customerPhone: string;
   product: string;
   amount: number;
-  status: 'confirmed' | 'processing' | 'shipped' | 'out-for-delivery' | 'delivered' | 'cancelled';
+  status:
+    | "confirmed"
+    | "processing"
+    | "shipped"
+    | "out-for-delivery"
+    | "delivered"
+    | "cancelled";
   trackingNumber: string;
   shippingAddress: string;
   orderDate: string;
@@ -40,98 +68,189 @@ interface OrderTracking {
 const OrderTracking = () => {
   const [orders, setOrders] = useState<OrderTracking[]>([
     {
-      id: '1',
-      orderId: 'ORD-2024-001',
-      customerName: 'Priya Sharma',
-      customerEmail: 'priya.sharma@gmail.com',
-      customerPhone: '+91 98765 43210',
-      product: 'WOC Panchgavya Ayurvedic Oil',
+      id: "1",
+      orderId: "ORD-2024-001",
+      customerName: "Priya Sharma",
+      customerEmail: "priya.sharma@gmail.com",
+      customerPhone: "+91 98765 43210",
+      product: "WOC Panchgavya Ayurvedic Oil",
       amount: 999,
-      status: 'shipped',
-      trackingNumber: 'TRK123456789',
-      shippingAddress: '123 MG Road, Mumbai, Maharashtra 400001',
-      orderDate: '2024-01-10',
-      estimatedDelivery: '2024-01-15',
-      carrier: 'BlueDart',
+      status: "shipped",
+      trackingNumber: "TRK123456789",
+      shippingAddress: "123 MG Road, Mumbai, Maharashtra 400001",
+      orderDate: "2024-01-10",
+      estimatedDelivery: "2024-01-15",
+      carrier: "BlueDart",
       timeline: [
-        { status: 'Order Confirmed', date: '2024-01-10', time: '10:30 AM', location: 'Mumbai Hub', description: 'Order received and confirmed' },
-        { status: 'Processing', date: '2024-01-10', time: '2:15 PM', location: 'Warehouse', description: 'Order being prepared for shipment' },
-        { status: 'Shipped', date: '2024-01-11', time: '11:00 AM', location: 'Mumbai Hub', description: 'Package dispatched for delivery' },
-        { status: 'In Transit', date: '2024-01-12', time: '9:45 AM', location: 'Delhi Hub', description: 'Package in transit to destination' }
-      ]
+        {
+          status: "Order Confirmed",
+          date: "2024-01-10",
+          time: "10:30 AM",
+          location: "Mumbai Hub",
+          description: "Order received and confirmed",
+        },
+        {
+          status: "Processing",
+          date: "2024-01-10",
+          time: "2:15 PM",
+          location: "Warehouse",
+          description: "Order being prepared for shipment",
+        },
+        {
+          status: "Shipped",
+          date: "2024-01-11",
+          time: "11:00 AM",
+          location: "Mumbai Hub",
+          description: "Package dispatched for delivery",
+        },
+        {
+          status: "In Transit",
+          date: "2024-01-12",
+          time: "9:45 AM",
+          location: "Delhi Hub",
+          description: "Package in transit to destination",
+        },
+      ],
     },
     {
-      id: '2',
-      orderId: 'ORD-2024-002',
-      customerName: 'Raj Kumar',
-      customerEmail: 'raj.kumar@yahoo.com',
-      customerPhone: '+91 87654 32109',
-      product: 'Ayurvedic Hair Oil Set',
+      id: "2",
+      orderId: "ORD-2024-002",
+      customerName: "Raj Kumar",
+      customerEmail: "raj.kumar@yahoo.com",
+      customerPhone: "+91 87654 32109",
+      product: "Ayurvedic Hair Oil Set",
       amount: 1299,
-      status: 'out-for-delivery',
-      trackingNumber: 'TRK987654321',
-      shippingAddress: '456 CP Avenue, Delhi 110001',
-      orderDate: '2024-01-08',
-      estimatedDelivery: '2024-01-13',
-      carrier: 'DTDC',
+      status: "out-for-delivery",
+      trackingNumber: "TRK987654321",
+      shippingAddress: "456 CP Avenue, Delhi 110001",
+      orderDate: "2024-01-08",
+      estimatedDelivery: "2024-01-13",
+      carrier: "DTDC",
       timeline: [
-        { status: 'Order Confirmed', date: '2024-01-08', time: '3:20 PM', location: 'Delhi Hub', description: 'Order received and confirmed' },
-        { status: 'Processing', date: '2024-01-09', time: '10:30 AM', location: 'Warehouse', description: 'Order being prepared for shipment' },
-        { status: 'Shipped', date: '2024-01-09', time: '4:45 PM', location: 'Delhi Hub', description: 'Package dispatched for delivery' },
-        { status: 'Out for Delivery', date: '2024-01-13', time: '8:00 AM', location: 'Local Facility', description: 'Package out for delivery' }
-      ]
+        {
+          status: "Order Confirmed",
+          date: "2024-01-08",
+          time: "3:20 PM",
+          location: "Delhi Hub",
+          description: "Order received and confirmed",
+        },
+        {
+          status: "Processing",
+          date: "2024-01-09",
+          time: "10:30 AM",
+          location: "Warehouse",
+          description: "Order being prepared for shipment",
+        },
+        {
+          status: "Shipped",
+          date: "2024-01-09",
+          time: "4:45 PM",
+          location: "Delhi Hub",
+          description: "Package dispatched for delivery",
+        },
+        {
+          status: "Out for Delivery",
+          date: "2024-01-13",
+          time: "8:00 AM",
+          location: "Local Facility",
+          description: "Package out for delivery",
+        },
+      ],
     },
     {
-      id: '3',
-      orderId: 'ORD-2024-003',
-      customerName: 'Anita Patel',
-      customerEmail: 'anita.patel@hotmail.com',
-      customerPhone: '+91 76543 21098',
-      product: 'Natural Hair Serum',
+      id: "3",
+      orderId: "ORD-2024-003",
+      customerName: "Anita Patel",
+      customerEmail: "anita.patel@hotmail.com",
+      customerPhone: "+91 76543 21098",
+      product: "Natural Hair Serum",
       amount: 599,
-      status: 'delivered',
-      trackingNumber: 'TRK456789123',
-      shippingAddress: '789 SG Highway, Ahmedabad, Gujarat 380001',
-      orderDate: '2024-01-05',
-      estimatedDelivery: '2024-01-10',
-      actualDelivery: '2024-01-09',
-      carrier: 'FedEx',
+      status: "delivered",
+      trackingNumber: "TRK456789123",
+      shippingAddress: "789 SG Highway, Ahmedabad, Gujarat 380001",
+      orderDate: "2024-01-05",
+      estimatedDelivery: "2024-01-10",
+      actualDelivery: "2024-01-09",
+      carrier: "FedEx",
       timeline: [
-        { status: 'Order Confirmed', date: '2024-01-05', time: '11:15 AM', location: 'Ahmedabad Hub', description: 'Order received and confirmed' },
-        { status: 'Processing', date: '2024-01-05', time: '3:30 PM', location: 'Warehouse', description: 'Order being prepared for shipment' },
-        { status: 'Shipped', date: '2024-01-06', time: '9:20 AM', location: 'Ahmedabad Hub', description: 'Package dispatched for delivery' },
-        { status: 'Out for Delivery', date: '2024-01-09', time: '7:30 AM', location: 'Local Facility', description: 'Package out for delivery' },
-        { status: 'Delivered', date: '2024-01-09', time: '6:15 PM', location: 'Customer Address', description: 'Package delivered successfully' }
-      ]
-    }
+        {
+          status: "Order Confirmed",
+          date: "2024-01-05",
+          time: "11:15 AM",
+          location: "Ahmedabad Hub",
+          description: "Order received and confirmed",
+        },
+        {
+          status: "Processing",
+          date: "2024-01-05",
+          time: "3:30 PM",
+          location: "Warehouse",
+          description: "Order being prepared for shipment",
+        },
+        {
+          status: "Shipped",
+          date: "2024-01-06",
+          time: "9:20 AM",
+          location: "Ahmedabad Hub",
+          description: "Package dispatched for delivery",
+        },
+        {
+          status: "Out for Delivery",
+          date: "2024-01-09",
+          time: "7:30 AM",
+          location: "Local Facility",
+          description: "Package out for delivery",
+        },
+        {
+          status: "Delivered",
+          date: "2024-01-09",
+          time: "6:15 PM",
+          location: "Customer Address",
+          description: "Package delivered successfully",
+        },
+      ],
+    },
   ]);
 
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [selectedOrder, setSelectedOrder] = useState<OrderTracking | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [selectedOrder, setSelectedOrder] = useState<OrderTracking | null>(
+    null
+  );
   const [isTrackingDialogOpen, setIsTrackingDialogOpen] = useState(false);
 
-  const filteredOrders = orders.filter(order => {
-    const matchesSearch = order.orderId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         order.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         order.trackingNumber.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
+  useEffect(() => {
+    GetOrders();
+  }, []);
+  const filteredOrders = orders.filter((order) => {
+    const matchesSearch =
+      order.orderId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      order.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      order.trackingNumber.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus =
+      statusFilter === "all" || order.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'confirmed':
+      case "confirmed":
         return <Badge className="bg-blue-100 text-blue-800">Confirmed</Badge>;
-      case 'processing':
-        return <Badge className="bg-yellow-100 text-yellow-800">Processing</Badge>;
-      case 'shipped':
+      case "processing":
+        return (
+          <Badge className="bg-yellow-100 text-yellow-800">Processing</Badge>
+        );
+      case "shipped":
         return <Badge className="bg-purple-100 text-purple-800">Shipped</Badge>;
-      case 'out-for-delivery':
-        return <Badge className="bg-orange-100 text-orange-800">Out for Delivery</Badge>;
-      case 'delivered':
+      case "out-for-delivery":
+        return (
+          <Badge className="bg-orange-100 text-orange-800">
+            Out for Delivery
+          </Badge>
+        );
+      case "delivered":
         return <Badge className="bg-green-100 text-green-800">Delivered</Badge>;
-      case 'cancelled':
+      case "cancelled":
         return <Badge className="bg-red-100 text-red-800">Cancelled</Badge>;
       default:
         return <Badge variant="secondary">{status}</Badge>;
@@ -140,15 +259,15 @@ const OrderTracking = () => {
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'confirmed':
-      case 'processing':
+      case "confirmed":
+      case "processing":
         return <Clock className="w-5 h-5 text-yellow-500" />;
-      case 'shipped':
-      case 'out-for-delivery':
+      case "shipped":
+      case "out-for-delivery":
         return <Truck className="w-5 h-5 text-blue-500" />;
-      case 'delivered':
+      case "delivered":
         return <CheckCircle className="w-5 h-5 text-green-500" />;
-      case 'cancelled':
+      case "cancelled":
         return <AlertCircle className="w-5 h-5 text-red-500" />;
       default:
         return <Package className="w-5 h-5 text-gray-500" />;
@@ -160,53 +279,77 @@ const OrderTracking = () => {
     setIsTrackingDialogOpen(true);
   };
 
-  const handleUpdateStatus = (orderId: string, newStatus: OrderTracking['status']) => {
-    setOrders(orders.map(order => 
-      order.id === orderId ? { ...order, status: newStatus } : order
-    ));
-    toast.success('Order status updated successfully!');
+  const handleUpdateStatus = (
+    orderId: string,
+    newStatus: OrderTracking["status"]
+  ) => {
+    setOrders(
+      orders.map((order) =>
+        order.id === orderId ? { ...order, status: newStatus } : order
+      )
+    );
+    toast.success("Order status updated successfully!");
   };
 
   const handleExportData = () => {
     const csvContent = [
-      ['Order ID', 'Customer', 'Product', 'Amount', 'Status', 'Tracking Number', 'Order Date', 'Estimated Delivery'].join(','),
-      ...filteredOrders.map(order => [
-        order.orderId,
-        order.customerName,
-        order.product,
-        order.amount,
-        order.status,
-        order.trackingNumber,
-        order.orderDate,
-        order.estimatedDelivery
-      ].join(','))
-    ].join('\n');
+      [
+        "Order ID",
+        "Customer",
+        "Product",
+        "Amount",
+        "Status",
+        "Tracking Number",
+        "Order Date",
+        "Estimated Delivery",
+      ].join(","),
+      ...filteredOrders.map((order) =>
+        [
+          order.orderId,
+          order.customerName,
+          order.product,
+          order.amount,
+          order.status,
+          order.trackingNumber,
+          order.orderDate,
+          order.estimatedDelivery,
+        ].join(",")
+      ),
+    ].join("\n");
 
-    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const blob = new Blob([csvContent], { type: "text/csv" });
     const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
-    a.download = 'order-tracking.csv';
+    a.download = "order-tracking.csv";
     a.click();
     window.URL.revokeObjectURL(url);
-    toast.success('Order tracking data exported successfully!');
+    toast.success("Order tracking data exported successfully!");
   };
 
   const statusCounts = {
     total: orders.length,
-    confirmed: orders.filter(o => o.status === 'confirmed').length,
-    processing: orders.filter(o => o.status === 'processing').length,
-    shipped: orders.filter(o => o.status === 'shipped').length,
-    delivered: orders.filter(o => o.status === 'delivered').length,
+    confirmed: orders.filter((o) => o.status === "confirmed").length,
+    processing: orders.filter((o) => o.status === "processing").length,
+    shipped: orders.filter((o) => o.status === "shipped").length,
+    delivered: orders.filter((o) => o.status === "delivered").length,
   };
 
+  const GetOrders = async () => {
+    try {
+      let getOrdersData = await getOrders({});
+      console.log(getOrdersData);
+    } catch (error) {}
+  };
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
         <div>
           <h1 className="text-3xl font-bold">Order Tracking</h1>
-          <p className="text-muted-foreground">Track and manage order deliveries</p>
+          <p className="text-muted-foreground">
+            Track and manage order deliveries
+          </p>
         </div>
         <Button onClick={handleExportData} variant="outline">
           <Download className="h-4 w-4 mr-2" />
@@ -326,13 +469,17 @@ const OrderTracking = () => {
                   <TableCell>
                     <div>
                       <p className="font-medium">{order.orderId}</p>
-                      <p className="text-sm text-muted-foreground">{new Date(order.orderDate).toLocaleDateString()}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {new Date(order.orderDate).toLocaleDateString()}
+                      </p>
                     </div>
                   </TableCell>
                   <TableCell>
                     <div>
                       <p className="font-medium">{order.customerName}</p>
-                      <p className="text-sm text-muted-foreground">{order.customerEmail}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {order.customerEmail}
+                      </p>
                     </div>
                   </TableCell>
                   <TableCell>
@@ -347,32 +494,53 @@ const OrderTracking = () => {
                   </TableCell>
                   <TableCell>
                     <div>
-                      <p className="font-mono text-sm">{order.trackingNumber}</p>
-                      <p className="text-sm text-muted-foreground">{order.carrier}</p>
+                      <p className="font-mono text-sm">
+                        {order.trackingNumber}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {order.carrier}
+                      </p>
                     </div>
                   </TableCell>
                   <TableCell>
                     <div>
-                      <p className="text-sm">Est: {new Date(order.estimatedDelivery).toLocaleDateString()}</p>
+                      <p className="text-sm">
+                        Est:{" "}
+                        {new Date(order.estimatedDelivery).toLocaleDateString()}
+                      </p>
                       {order.actualDelivery && (
-                        <p className="text-sm text-green-600">Delivered: {new Date(order.actualDelivery).toLocaleDateString()}</p>
+                        <p className="text-sm text-green-600">
+                          Delivered:{" "}
+                          {new Date(order.actualDelivery).toLocaleDateString()}
+                        </p>
                       )}
                     </div>
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-2">
-                      <Button variant="outline" size="sm" onClick={() => handleViewTracking(order)}>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleViewTracking(order)}
+                      >
                         <Eye className="h-4 w-4" />
                       </Button>
                       <select
                         value={order.status}
-                        onChange={(e) => handleUpdateStatus(order.id, e.target.value as OrderTracking['status'])}
+                        onChange={(e) =>
+                          handleUpdateStatus(
+                            order.id,
+                            e.target.value as OrderTracking["status"]
+                          )
+                        }
                         className="px-2 py-1 text-xs border rounded"
                       >
                         <option value="confirmed">Confirmed</option>
                         <option value="processing">Processing</option>
                         <option value="shipped">Shipped</option>
-                        <option value="out-for-delivery">Out for Delivery</option>
+                        <option value="out-for-delivery">
+                          Out for Delivery
+                        </option>
                         <option value="delivered">Delivered</option>
                         <option value="cancelled">Cancelled</option>
                       </select>
@@ -386,11 +554,16 @@ const OrderTracking = () => {
       </Card>
 
       {/* Tracking Details Dialog */}
-      <Dialog open={isTrackingDialogOpen} onOpenChange={setIsTrackingDialogOpen}>
+      <Dialog
+        open={isTrackingDialogOpen}
+        onOpenChange={setIsTrackingDialogOpen}
+      >
         <DialogContent className="max-w-4xl">
           <DialogHeader>
             <DialogTitle>Order Tracking Details</DialogTitle>
-            <DialogDescription>Complete tracking information for {selectedOrder?.orderId}</DialogDescription>
+            <DialogDescription>
+              Complete tracking information for {selectedOrder?.orderId}
+            </DialogDescription>
           </DialogHeader>
           {selectedOrder && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -403,15 +576,23 @@ const OrderTracking = () => {
                   <CardContent className="space-y-3">
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Order ID:</span>
-                      <span className="font-medium">{selectedOrder.orderId}</span>
+                      <span className="font-medium">
+                        {selectedOrder.orderId}
+                      </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Tracking Number:</span>
-                      <span className="font-mono text-sm">{selectedOrder.trackingNumber}</span>
+                      <span className="text-muted-foreground">
+                        Tracking Number:
+                      </span>
+                      <span className="font-mono text-sm">
+                        {selectedOrder.trackingNumber}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Carrier:</span>
-                      <span className="font-medium">{selectedOrder.carrier}</span>
+                      <span className="font-medium">
+                        {selectedOrder.carrier}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Status:</span>
@@ -419,7 +600,9 @@ const OrderTracking = () => {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Amount:</span>
-                      <span className="font-medium">₹{selectedOrder.amount}</span>
+                      <span className="font-medium">
+                        ₹{selectedOrder.amount}
+                      </span>
                     </div>
                   </CardContent>
                 </Card>
@@ -431,7 +614,9 @@ const OrderTracking = () => {
                   <CardContent className="space-y-3">
                     <div className="flex items-center space-x-3">
                       <div className="w-full">
-                        <p className="font-medium">{selectedOrder.customerName}</p>
+                        <p className="font-medium">
+                          {selectedOrder.customerName}
+                        </p>
                         <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                           <Mail className="w-4 h-4" />
                           <span>{selectedOrder.customerEmail}</span>
@@ -465,11 +650,19 @@ const OrderTracking = () => {
                           </div>
                           <div className="flex-1">
                             <div className="flex items-center justify-between mb-1">
-                              <h4 className="font-semibold text-foreground">{event.status}</h4>
-                              <span className="text-sm text-muted-foreground">{event.date} at {event.time}</span>
+                              <h4 className="font-semibold text-foreground">
+                                {event.status}
+                              </h4>
+                              <span className="text-sm text-muted-foreground">
+                                {event.date} at {event.time}
+                              </span>
                             </div>
-                            <p className="text-sm text-muted-foreground">{event.description}</p>
-                            <p className="text-xs text-muted-foreground mt-1">📍 {event.location}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {event.description}
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              📍 {event.location}
+                            </p>
                           </div>
                         </div>
                       ))}
