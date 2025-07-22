@@ -29,9 +29,11 @@ app.use(helmet());
 
 // ✅ Allow multiple origins in development
 
+
 app.use(
   cors({
     origin: function (origin, callback) {
+      console.log("origin", origin)
       // Allow all origins (even undefined ones like Postman)
       callback(null, origin || '*');
     },

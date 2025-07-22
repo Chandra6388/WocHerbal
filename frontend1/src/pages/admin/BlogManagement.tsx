@@ -1,15 +1,38 @@
-import React, { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
-import { Button } from '../../components/ui/button';
-import { Input } from '../../components/ui/input';
-import { Textarea } from '../../components/ui/textarea';
-import { Badge } from '../../components/ui/badge';
-import { Plus, Edit, Trash2, Upload, Eye, Globe, FileText, Calendar, User } from 'lucide-react';
+import React, { useEffect, useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../../components/ui/card";
+import { Button } from "../../components/ui/button";
+import { Input } from "../../components/ui/input";
+import { Textarea } from "../../components/ui/textarea";
+import { Badge } from "../../components/ui/badge";
+import {
+  Plus,
+  Edit,
+  Trash2,
+  Upload,
+  Eye,
+  Globe,
+  FileText,
+  Calendar,
+  User,
+} from "lucide-react";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 
-import { useToast } from '../../hooks/use-toast';
-import { updateBlog, publishBlog, deleteBlog, getBlogById, getAllBlogs, addBlog } from '@/services/admin/blogsService'
+import { useToast } from "../../hooks/use-toast";
+import {
+  updateBlog,
+  publishBlog,
+  deleteBlog,
+  getBlogById,
+  getAllBlogs,
+  addBlog,
+} from "@/services/admin/blogsService";
+import axios from "axios";
 interface BlogPost {
   _id?: string;
   title: string;
@@ -19,7 +42,7 @@ interface BlogPost {
   author: string;
   isPublished?: boolean;
 }
- 
+
 const BlogManagement = () => {
   const MySwal = withReactContent(Swal);
   const [posts, setPosts] = useState<BlogPost[]>([]);
@@ -28,15 +51,14 @@ const BlogManagement = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    getBlogs()
-  }, [])
+    getBlogs();
+  }, []);
 
   const getBlogs = async () => {
     try {
       const res = await getAllBlogs({});
       if (res?.status === "success") {
         setPosts(res.blogs || []);
-
       } else {
         setPosts([]);
         toast({
@@ -50,7 +72,8 @@ const BlogManagement = () => {
       console.error("Error fetching blogs:", error);
       toast({
         title: "🚫 Failed to Load Blogs",
-        description: "Something went wrong while fetching the blog posts. Please try again.",
+        description:
+          "Something went wrong while fetching the blog posts. Please try again.",
         variant: "destructive",
         duration: 3000,
       });
@@ -58,10 +81,14 @@ const BlogManagement = () => {
   };
 
   const handleSave = async () => {
-    if (!editingPost.title || !editingPost.description || !editingPost.content) {
+    if (
+      !editingPost.title ||
+      !editingPost.description ||
+      !editingPost.content
+    ) {
       toast({
         title: "Please fill all required fields",
-        variant: "destructive"
+        variant: "destructive",
       });
       return;
     }
@@ -70,18 +97,19 @@ const BlogManagement = () => {
       await updateBlog(editingPost)
         .then((res) => {
           if (res?.status == "success") {
-            getBlogs()
+            getBlogs();
             toast({
               title: "🎉 Blog Updated!",
               description: "Your blog post has been updated successfully.",
               variant: "success",
               duration: 3000,
             });
-          }
-          else {
+          } else {
             toast({
               title: "⚠️ Couldn't Updated Blog",
-              description: res?.message || "Something went wrong while update your blog post. Please try again.",
+              description:
+                res?.message ||
+                "Something went wrong while update your blog post. Please try again.",
               variant: "destructive",
               duration: 3000,
             });
@@ -91,7 +119,8 @@ const BlogManagement = () => {
           console.error("error", error);
           toast({
             title: "🚫 Blog updation Failed",
-            description: "Oops! Something went wrong while update your blog. Please try again later.",
+            description:
+              "Oops! Something went wrong while update your blog. Please try again later.",
             variant: "destructive",
             duration: 3000,
           });
@@ -101,24 +130,29 @@ const BlogManagement = () => {
         title: editingPost.title!,
         description: editingPost.description!,
         content: editingPost.content!,
-        image: editingPost.image || 'https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?w=1080&h=1080&fit=crop',
-        author: editingPost.author || 'Admin',
+        image:
+          editingPost.image ||
+          "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?w=1080&h=1080&fit=crop",
+        author: editingPost.author || "Admin",
       };
 
       await addBlog(newPost)
         .then((res) => {
           if (res?.status === "success") {
-            getBlogs()
+            getBlogs();
             toast({
               title: "🎉 Blog Published!",
-              description: "Your blog post has been saved and published successfully.",
+              description:
+                "Your blog post has been saved and published successfully.",
               variant: "success",
               duration: 3000,
             });
           } else {
             toast({
               title: "⚠️ Couldn't Save Blog",
-              description: res?.message || "Something went wrong while saving your blog post. Please try again.",
+              description:
+                res?.message ||
+                "Something went wrong while saving your blog post. Please try again.",
               variant: "destructive",
               duration: 3000,
             });
@@ -128,7 +162,8 @@ const BlogManagement = () => {
           console.error("error", error);
           toast({
             title: "🚫 Blog Submission Failed",
-            description: "Oops! Something went wrong while submitting your blog. Please try again later.",
+            description:
+              "Oops! Something went wrong while submitting your blog. Please try again later.",
             variant: "destructive",
             duration: 3000,
           });
@@ -137,7 +172,6 @@ const BlogManagement = () => {
 
     setIsEditing(false);
     setEditingPost({});
-
   };
 
   const handlePublish = async (id: string, isPublishing: boolean) => {
@@ -155,7 +189,9 @@ const BlogManagement = () => {
     if (!confirm.isConfirmed) {
       toast({
         title: "Cancelled",
-        description: `Blog post was not ${!isPublishing ? "published" : "unpublished"}.`,
+        description: `Blog post was not ${
+          !isPublishing ? "published" : "unpublished"
+        }.`,
         variant: "default",
         duration: 3000,
       });
@@ -169,7 +205,9 @@ const BlogManagement = () => {
       if (res?.status === "success") {
         toast({
           title: `✅ Blog ${!isPublishing ? "Published" : "Unpublished"}`,
-          description: `The blog has been successfully ${!isPublishing ? "published" : "unpublished"}.`,
+          description: `The blog has been successfully ${
+            !isPublishing ? "published" : "unpublished"
+          }.`,
           variant: "success",
           duration: 3000,
         });
@@ -179,7 +217,9 @@ const BlogManagement = () => {
       } else {
         toast({
           title: "⚠️ Action Failed",
-          description: res?.message || `Could not ${actionText} the blog. Please try again.`,
+          description:
+            res?.message ||
+            `Could not ${actionText} the blog. Please try again.`,
           variant: "destructive",
           duration: 3000,
         });
@@ -188,7 +228,9 @@ const BlogManagement = () => {
       console.error("Publish/Unpublish Error:", error);
       toast({
         title: "🚫 Server Error",
-        description: error?.response?.data?.message || `Error while trying to ${actionText} the blog.`,
+        description:
+          error?.response?.data?.message ||
+          `Error while trying to ${actionText} the blog.`,
         variant: "destructive",
         duration: 3000,
       });
@@ -218,11 +260,11 @@ const BlogManagement = () => {
     }
 
     try {
-      const req = { id: id }
-      console.log("SS", req)
+      const req = { id: id };
+      console.log("SS", req);
       const res = await deleteBlog(req);
       if (res?.status === "success") {
-        getBlogs()
+        getBlogs();
         toast({
           title: "🗑️ Blog Deleted",
           description: "The blog post has been deleted successfully.",
@@ -232,7 +274,9 @@ const BlogManagement = () => {
       } else {
         toast({
           title: "⚠️ Delete Failed",
-          description: res?.message || "Something went wrong while deleting the blog post.",
+          description:
+            res?.message ||
+            "Something went wrong while deleting the blog post.",
           variant: "destructive",
           duration: 3000,
         });
@@ -241,19 +285,38 @@ const BlogManagement = () => {
       console.error("Delete error:", error);
       toast({
         title: "🚫 Server Error",
-        description: error?.response?.data?.message || "An unexpected error occurred. Please try again.",
+        description:
+          error?.response?.data?.message ||
+          "An unexpected error occurred. Please try again.",
         variant: "destructive",
         duration: 3000,
       });
     }
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      // In a real app, you'd upload to a server and get a URL
-      const imageUrl = URL.createObjectURL(file);
-      setEditingPost(prev => ({ ...prev, image: imageUrl }));
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", "my_unsigned_preset"); // change this if needed
+
+    try {
+      const response = await axios.post(
+        "https://api.cloudinary.com/v1_1/dlpeqbowx/image/upload",
+        formData
+      );
+
+      const imageUrl = response.data.secure_url;
+      console.log("Uploaded Image URL:", imageUrl);
+
+      setEditingPost(imageUrl); // Update state with image URL
+    } catch (error: any) {
+      console.error(
+        "Image upload failed:",
+        error?.response?.data || error.message
+      );
     }
   };
 
@@ -262,8 +325,12 @@ const BlogManagement = () => {
       <div className="bg-gradient-to-r from-forest-50 to-accent/5 rounded-2xl p-8 border border-accent/10">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
-            <h1 className="text-4xl font-playfair font-bold text-forest-700 mb-2">Blog Management</h1>
-            <p className="text-forest-600">Create, edit, and publish engaging blog content for your audience</p>
+            <h1 className="text-4xl font-playfair font-bold text-forest-700 mb-2">
+              Blog Management
+            </h1>
+            <p className="text-forest-600">
+              Create, edit, and publish engaging blog content for your audience
+            </p>
           </div>
           <Button
             onClick={() => setIsEditing(true)}
@@ -281,7 +348,7 @@ const BlogManagement = () => {
           <CardHeader className="bg-gradient-to-r from-forest-50 to-accent/5 border-b border-accent/10">
             <CardTitle className="text-2xl font-playfair text-forest-700 flex items-center gap-2">
               <FileText className="w-6 h-6" />
-              {editingPost._id ? 'Edit Blog Post' : 'Create New Blog Post'}
+              {editingPost._id ? "Edit Blog Post" : "Create New Blog Post"}
             </CardTitle>
           </CardHeader>
           <CardContent className="p-8 space-y-8">
@@ -292,8 +359,13 @@ const BlogManagement = () => {
                   Title *
                 </label>
                 <Input
-                  value={editingPost.title || ''}
-                  onChange={(e) => setEditingPost(prev => ({ ...prev, title: e.target.value }))}
+                  value={editingPost.title || ""}
+                  onChange={(e) =>
+                    setEditingPost((prev) => ({
+                      ...prev,
+                      title: e.target.value,
+                    }))
+                  }
                   placeholder="Enter an engaging blog title"
                   className="border-accent/30 focus:border-accent focus:ring-accent/20"
                 />
@@ -304,8 +376,13 @@ const BlogManagement = () => {
                   Author
                 </label>
                 <Input
-                  value={editingPost.author || ''}
-                  onChange={(e) => setEditingPost(prev => ({ ...prev, author: e.target.value }))}
+                  value={editingPost.author || ""}
+                  onChange={(e) =>
+                    setEditingPost((prev) => ({
+                      ...prev,
+                      author: e.target.value,
+                    }))
+                  }
                   placeholder="Author name"
                   className="border-accent/30 focus:border-accent focus:ring-accent/20"
                 />
@@ -313,10 +390,17 @@ const BlogManagement = () => {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-forest-700">Description *</label>
+              <label className="text-sm font-semibold text-forest-700">
+                Description *
+              </label>
               <Textarea
-                value={editingPost.description || ''}
-                onChange={(e) => setEditingPost(prev => ({ ...prev, description: e.target.value }))}
+                value={editingPost.description || ""}
+                onChange={(e) =>
+                  setEditingPost((prev) => ({
+                    ...prev,
+                    description: e.target.value,
+                  }))
+                }
                 placeholder="Write a compelling description that will entice readers"
                 rows={3}
                 className="border-accent/30 focus:border-accent focus:ring-accent/20"
@@ -324,7 +408,9 @@ const BlogManagement = () => {
             </div>
 
             <div className="space-y-4">
-              <label className="text-sm font-semibold text-forest-700">Featured Image</label>
+              <label className="text-sm font-semibold text-forest-700">
+                Featured Image
+              </label>
               <div className="border-2 border-dashed border-accent/30 rounded-xl p-6 hover:border-accent/50 transition-colors">
                 <div className="flex flex-col md:flex-row items-center gap-6">
                   <input
@@ -351,21 +437,31 @@ const BlogManagement = () => {
                     </div>
                   )}
                 </div>
-                <p className="text-sm text-muted-foreground mt-2">Recommended: 1080x1080px for best results</p>
+                <p className="text-sm text-muted-foreground mt-2">
+                  Recommended: 1080x1080px for best results
+                </p>
               </div>
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-forest-700">Content *</label>
+              <label className="text-sm font-semibold text-forest-700">
+                Content *
+              </label>
               <Textarea
-                value={editingPost.content || ''}
-                onChange={(e) => setEditingPost(prev => ({ ...prev, content: e.target.value }))}
+                value={editingPost.content || ""}
+                onChange={(e) =>
+                  setEditingPost((prev) => ({
+                    ...prev,
+                    content: e.target.value,
+                  }))
+                }
                 placeholder="Write your full blog content here. HTML tags are supported for formatting."
                 rows={12}
                 className="border-accent/30 focus:border-accent focus:ring-accent/20 font-mono text-sm"
               />
               <p className="text-sm text-muted-foreground">
-                You can use HTML tags like &lt;h2&gt;, &lt;p&gt;, &lt;ul&gt;, &lt;strong&gt; for formatting
+                You can use HTML tags like &lt;h2&gt;, &lt;p&gt;, &lt;ul&gt;,
+                &lt;strong&gt; for formatting
               </p>
             </div>
 
@@ -395,20 +491,25 @@ const BlogManagement = () => {
       {/* Blog Posts List */}
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-playfair font-bold text-forest-700">All Blog Posts</h2>
+          <h2 className="text-2xl font-playfair font-bold text-forest-700">
+            All Blog Posts
+          </h2>
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
-              {posts.filter(p => p.isPublished === true).length} Published
+              {posts.filter((p) => p.isPublished === true).length} Published
             </span>
             <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">
-              {posts.filter(p => p.isPublished === false).length} Drafts
+              {posts.filter((p) => p.isPublished === false).length} Drafts
             </span>
           </div>
         </div>
 
         <div className="grid gap-6">
           {posts.map((post) => (
-            <Card key={post._id} className="border-2 border-accent/10 hover:border-accent/30 transition-all shadow-lg hover:shadow-xl">
+            <Card
+              key={post._id}
+              className="border-2 border-accent/10 hover:border-accent/30 transition-all shadow-lg hover:shadow-xl"
+            >
               <CardContent className="p-6">
                 <div className="flex flex-col lg:flex-row gap-6">
                   <div className="w-full lg:w-48 h-32 lg:h-32 rounded-xl overflow-hidden bg-gradient-to-br from-forest-100 to-accent/20 flex-shrink-0">
@@ -427,13 +528,18 @@ const BlogManagement = () => {
                             {post.title}
                           </h3>
                           <Badge
-                            variant={post.isPublished === true ? 'default' : 'secondary'}
-                            className={post.isPublished === true
-                              ? 'bg-green-100 text-green-800 border-green-200'
-                              : 'bg-yellow-100 text-yellow-800 border-yellow-200'
+                            variant={
+                              post.isPublished === true
+                                ? "default"
+                                : "secondary"
+                            }
+                            className={
+                              post.isPublished === true
+                                ? "bg-green-100 text-green-800 border-green-200"
+                                : "bg-yellow-100 text-yellow-800 border-yellow-200"
                             }
                           >
-                            {post.isPublished === true ? 'Published' : 'Draft'}
+                            {post.isPublished === true ? "Published" : "Draft"}
                           </Badge>
                         </div>
                         <div className="flex items-center gap-4 text-sm text-muted-foreground">
@@ -449,7 +555,9 @@ const BlogManagement = () => {
                       </div>
                     </div>
 
-                    <p className="text-muted-foreground line-clamp-2">{post.description}</p>
+                    <p className="text-muted-foreground line-clamp-2">
+                      {post.description}
+                    </p>
 
                     <div className="flex flex-wrap gap-3 pt-2">
                       <Button
@@ -467,19 +575,24 @@ const BlogManagement = () => {
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => handlePublish(post._id, post.isPublished)}
-                        className={post.isPublished !== true
-                          ? 'border-yellow-300 hover:bg-yellow-50 text-yellow-700 hover:border-yellow-400'
-                          : 'border-green-300 hover:bg-green-50 text-green-700 hover:border-green-400'
+                        onClick={() =>
+                          handlePublish(post._id, post.isPublished)
+                        }
+                        className={
+                          post.isPublished !== true
+                            ? "border-yellow-300 hover:bg-yellow-50 text-yellow-700 hover:border-yellow-400"
+                            : "border-green-300 hover:bg-green-50 text-green-700 hover:border-green-400"
                         }
                       >
                         <Globe className="w-4 h-4 mr-1" />
-                        {post.isPublished === true ? 'Publish' : 'Unpublish'}
+                        {post.isPublished === true ? "Publish" : "Unpublish"}
                       </Button>
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => window.open(`/admin/blog/${post._id}`, '_blank')}
+                        onClick={() =>
+                          window.open(`/admin/blog/${post._id}`, "_blank")
+                        }
                         className="border-blue-300 hover:bg-blue-50 text-blue-700 hover:border-blue-400"
                       >
                         <Eye className="w-4 h-4 mr-1" />
@@ -506,8 +619,12 @@ const BlogManagement = () => {
           <Card className="border-2 border-dashed border-accent/30">
             <CardContent className="p-12 text-center">
               <FileText className="w-16 h-16 mx-auto text-accent/50 mb-4" />
-              <h3 className="text-xl font-playfair font-bold text-forest-700 mb-2">No blog posts yet</h3>
-              <p className="text-muted-foreground mb-6">Start creating engaging content for your audience</p>
+              <h3 className="text-xl font-playfair font-bold text-forest-700 mb-2">
+                No blog posts yet
+              </h3>
+              <p className="text-muted-foreground mb-6">
+                Start creating engaging content for your audience
+              </p>
               <Button
                 onClick={() => setIsEditing(true)}
                 className="bg-gradient-to-r from-accent to-forest-600 hover:from-accent/90 hover:to-forest-700 text-white px-6 py-2 rounded-xl font-medium"
