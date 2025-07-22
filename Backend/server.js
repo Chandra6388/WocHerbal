@@ -69,7 +69,7 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/help', helpRoutes);
 app.use('/api/user', userRoutes);
-app.use('/api/shipment', shipmentRoutes);
+app.use('/api/shiprocket', shipmentRoutes);
 app.use('/api/blogs', blogsRoutes);
 
 
