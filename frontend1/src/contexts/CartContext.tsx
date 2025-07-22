@@ -81,7 +81,6 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-
   const getAddToCart = async (userId: string) => {
     const req = { userId: userId };
     try {
@@ -108,9 +107,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-
   const isInCart = (id: string): boolean => {
-    return items.some(item => item.id === id);
+    return items.some(item => item?.product?._id === id);
   };
 
   const removeFromCart = async (id: string, userId: string) => {
@@ -149,7 +147,6 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
     }
   };
-
 
   const updateQuantity = async (id: string, quantity: number, userId: string) => {
     const req = { productId: id, quantity, userId };
@@ -190,7 +187,6 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
     }
   };
-
 
   const clearCart = () => {
     setItems([]);

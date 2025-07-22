@@ -4,23 +4,14 @@ import { Link, useNavigate } from "react-router-dom";
 import { Star, ShoppingCart, Heart } from "lucide-react";
 import { useCart } from "../contexts/CartContext";
 import { Button } from "../components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-} from "../components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader, } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
 import { getUserProducts } from "@/services/admin/productService";
 import { useToast } from "../hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { getUserFromToken } from '@/Utils/TokenData';
 import { getRocketShipmentsAvailabilty } from "@/services/admin/rocketShippment";
-import {
-  Addfavorlist,
-  getfavorlist,
-  removeFavorlist,
-} from "@/services/productsServices";
+import { Addfavorlist, getfavorlist, removeFavorlist, } from "@/services/productsServices";
 
 import { getCategory } from '@/services/admin/productService';
 interface Product {
@@ -61,9 +52,7 @@ const Products = () => {
   const [favorList, setFavorList] = useState<Product[]>([]);
   const [category, setCategory] = useState<Category[]>([]);
   const userdata = getUserFromToken() as { id: string };
-  const [pincodeInputs, setPincodeInputs] = useState<{ [key: string]: string }>(
-    {}
-  );
+  const [pincodeInputs, setPincodeInputs] = useState<{ [key: string]: string }>({});
 
   const getAllCategory = () => {
     getCategory()

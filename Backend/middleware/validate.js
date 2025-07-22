@@ -24,6 +24,7 @@ const schemas = {
   updateProfile: Joi.object({
     name: Joi.string().min(2).max(50).optional(),
     phone: Joi.string().max(15).optional(),
+    id:Joi.string(),
     address: Joi.object({
       street: Joi.string().optional(),
       city: Joi.string().optional(),

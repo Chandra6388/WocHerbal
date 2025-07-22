@@ -21,7 +21,7 @@ export const products: Product[] = [
     name: 'WOC Panchgavya Ayurvedic Herbal Hair Oil',
     price: 999,
     originalPrice: 1299,
-    image: '/lovable-uploads/4654272e-82ea-4eff-8386-6d9f4a2fcced.png',
+    image: '/uploads/4654272e-82ea-4eff-8386-6d9f4a2fcced.png',
     category: 'ayurvedic',
     volume: '100ml',
     description: 'Discover why WOC is a game-changer you\'ll love. Our premium Ayurvedic herbal hair oil combines traditional Panchgavya with powerful natural ingredients for healthy, beautiful hair.',
