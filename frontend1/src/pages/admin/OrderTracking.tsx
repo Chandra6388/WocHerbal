@@ -42,6 +42,14 @@ interface OrderTracking {
   customerEmail: string;
   customerPhone: string;
   product: string;
+  customer_name:string;
+  products: { name: string }[];
+  shipments: {
+    awb: string;
+    delivered_date: string;
+  }[];
+  channel_created_at: string;
+  total:number;
   amount: number;
   status:
     | "confirmed"
@@ -169,7 +177,7 @@ const OrderTracking = () => {
         "Order Date",
         "Estimated Delivery",
       ].join(","),
-      ...filteredOrders.map((order) =>
+      ...orders.map((order) =>
         [
           order.orderId,
           order.customerName,
