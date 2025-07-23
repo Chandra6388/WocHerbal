@@ -19,8 +19,10 @@ const {
 
 // All routes require authentication
 router.use(protect);
- 
+
 router.post('/new', validate('createOrder'), newOrder);
+// router.post('/new', newOrder);
+
 router.get('/me', myOrders);
 router.get('/:id', getSingleOrder);
 router.delete('/:id', deleteOrder);

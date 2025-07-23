@@ -55,7 +55,6 @@ const Checkout = () => {
   const userdata = getUserFromToken() as { id: string };
   const [profiledata, setProfiledata] = useState(null);
 
-  console.log("profiledata", profiledata);
   const addressString = user?.address
     ? typeof user.address === "string"
       ? user.address
@@ -137,6 +136,9 @@ const Checkout = () => {
       postalCode: formData.pincode,
       country: "India",
       phoneNo: formData.phone,
+      name: formData.name,
+      email: formData.email,
+      state: formData.state,
     },
     paymentInfo: {
       id: paymentId || "COD",
@@ -248,7 +250,7 @@ const Checkout = () => {
             const orderRes = await createOrder(
               createOrderPayload(response.razorpay_payment_id)
             );
-            if (orderRes.status === "success") {
+            if (orderRes.success) {
               const productIds = items.map((item) => ({
                 product: item.product._id,
                 quantity: item.quantity,

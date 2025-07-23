@@ -24,7 +24,7 @@ const schemas = {
   updateProfile: Joi.object({
     name: Joi.string().min(2).max(50).optional(),
     phone: Joi.string().max(15).optional(),
-    id:Joi.string(),
+    id: Joi.string(),
     address: Joi.object({
       street: Joi.string().optional(),
       city: Joi.string().optional(),
@@ -105,11 +105,16 @@ const schemas = {
 
   createOrder: Joi.object({
     shippingInfo: Joi.object({
+      name: Joi.string().required(),
       address: Joi.string().required(),
+      address2: Joi.string().optional(),
       city: Joi.string().required(),
-      phoneNo: Joi.string().required(),
       postalCode: Joi.string().required(),
+      state: Joi.string().required(),
       country: Joi.string().required(),
+      email: Joi.string().email().required(),
+      phoneNo: Joi.string().required()
+
     }).required(),
 
     orderItems: Joi.array().items(

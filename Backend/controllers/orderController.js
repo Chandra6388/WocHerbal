@@ -1,8 +1,66 @@
+const axios = require('axios');
 const Order = require('../models/Order');
 const Product = require('../models/Product');
 const Cart = require('../models/Cart');
 const { createOrder: createRazorpayOrder, verifyPayment } = require('../utils/razorpay');
 const ErrorHandler = require('../utils/errorHandler');
+const User = require("../models/User");
+const ShiprocketOrder = require('../models/shiprocketOrder');
+
+let shiprocketToken = null;
+let tokenExpiry = null;
+
+async function getShiprocketToken() {
+
+  if (shiprocketToken && tokenExpiry && Date.now() < tokenExpiry) {
+    return shiprocketToken;
+  }
+  let user = await User.findOne({ role: "admin" }).select('accessToken');
+
+  if (user && user.accessToken) {
+    shiprocketToken = user.accessToken;
+    return shiprocketToken;
+  }
+  console.log("Genrate new token");
+
+
+  const loginRes = await axios.post('https://apiv2.shiprocket.in/v1/external/auth/login', {
+    email: process.env.SHIPROCKET_EMAIL,
+    password: process.env.SHIPROCKET_PASSWORD
+  });
+  shiprocketToken = loginRes?.data?.token;
+  await User.updateOne({ role: "admin" }, { accessToken: shiprocketToken });
+  // 10 days expiry
+  tokenExpiry = Date.now() + 10 * 24 * 60 * 60 * 1000;
+  return shiprocketToken;
+}
+
+function getAxiosInstance() {
+  const instance = axios.create({
+    baseURL: 'https://apiv2.shiprocket.in',
+  });
+  instance.interceptors.request.use(async (config) => {
+    const token = await getShiprocketToken();
+
+    config.headers['Authorization'] = `Bearer ${token}`;
+    return config;
+  });
+  return instance;
+}
+
+function UpdateUserAccessToken() {
+  User.findOneAndUpdate({ role: "admin" }, { accessToken: null })
+    .then(() => {
+      console.log("User access token updated successfully");
+      shiprocketToken = null; // Reset token in memory
+      tokenExpiry = null; // Reset token expiry
+
+    })
+    .catch((error) => {
+      console.error("Error updating user access token:", error);
+    });
+}
+const shiprocket = getAxiosInstance();
 
 exports.newOrder = async (req, res, next) => {
   try {
@@ -16,6 +74,7 @@ exports.newOrder = async (req, res, next) => {
       paymentInfo
     } = req.body;
 
+    // 1️⃣ Create order in DB
     const order = await Order.create({
       orderItems,
       shippingInfo,
@@ -25,17 +84,118 @@ exports.newOrder = async (req, res, next) => {
       totalPrice,
       paymentInfo,
       paidAt: Date.now(),
-      user: req.user._id
+      user: req.user?._id || null
     });
 
-    res.status(200).json({
-      status: 'success',
-      order
+    // 2️⃣ Map order items for Shiprocket
+    const orderItemsReq = orderItems.map(item => ({
+      name: item?.name || "Unnamed Item",
+      units: item?.quantity || 1,
+      sku: item?.sku || "SKU13",
+      selling_price: item?.price || 0,
+      discount: "",
+      tax: "",
+      hsn: item?.hsn || "441122"
+    }));
+
+    // 3️⃣ Calculate subtotal
+    const sub_total = orderItems.reduce(
+      (acc, item) => acc + ((item?.price || 0) * (item?.quantity || 0)),
+      0
+    );
+
+    // 4️⃣ Get Shiprocket access token
+    const admin = await User.findOne({ role: "admin" }).select("accessToken");
+    const accessToken = admin?.accessToken;
+    if (!accessToken) {
+      return res.status(500).json({ success: false, message: "Missing Shiprocket access token." });
+    }
+
+    // 5️⃣ Prepare shipment data
+    const shipmentData = {
+      order_id: order?._id?.toString(),
+      order_date: new Date().toISOString().slice(0, 10),
+      pickup_location: "home",
+      channel_id: "",
+      billing_customer_name: shippingInfo?.name || "Customer",
+      billing_last_name: shippingInfo?.name || "Customer",
+      billing_address: shippingInfo?.address || "",
+      billing_address_2: shippingInfo?.address2 || "",
+      billing_city: shippingInfo?.city || "",
+      billing_pincode: shippingInfo?.postalCode || "",
+      billing_state: shippingInfo?.state || "MP",
+      billing_country: shippingInfo?.country || "India",
+      billing_email: shippingInfo?.email || "noemail@example.com",
+      billing_phone: shippingInfo?.phoneNo || "0000000000",
+      shipping_is_billing: true,
+      order_items: orderItemsReq,
+      payment_method: paymentInfo?.method === "COD" ? "COD" : "Prepaid",
+      sub_total,
+      length: 10,
+      breadth: 15,
+      height: 20,
+      weight: 2
+    }
+
+
+    const shiprocketRes = await shiprocket.post('/v1/external/orders/create/adhoc', shipmentData);
+    // const data = response.data;
+
+    console.log("shiprocketRes", shiprocketRes.data)
+
+
+
+    if (!shiprocketRes.data || !shiprocketRes.data.shipment_id) {
+      return res.status(500).json({ success: false, message: "Shiprocket order creation failed." });
+    }
+
+    const sr = shiprocketRes?.data;
+
+
+    // 7️⃣ Save Shiprocket response
+    const savedShiprocketOrder = await ShiprocketOrder.create({
+      orderId: sr?.order_id,
+      shipmentId: sr?.shipment_id,
+      awbCode: sr?.awb_code,
+      courierName: sr?.courier_name,
+      pickupInfo: {
+        address: shipmentData?.billing_address,
+        city: shipmentData?.billing_city,
+        state: shipmentData?.billing_state,
+        country: shipmentData?.billing_country,
+        postalCode: shipmentData?.billing_pincode,
+        phone: shipmentData?.billing_phone
+      },
+      manifestLink: sr?.manifest_link,
+      labelPdfLink: sr?.label_url,
+      invoicePdfLink: sr?.invoice_url,
+      trackingStatus: sr?.status,
+      createdAt: new Date(),
+      updatedAt: new Date()
     });
+
+    // 8️⃣ Update order with tracking info
+    order.trackingNumber = sr?.awb_code || "";
+    await order.save();
+
+    // 9️⃣ Respond success
+    return res.status(200).json({
+      success: true,
+      message: "Order placed successfully.",
+      order,
+      shiprocketOrder: savedShiprocketOrder
+    });
+
   } catch (error) {
-    next(error);
+    console.error("❌ Order creation error:", error?.response?.data || error.message);
+    return res.status(500).json({
+      success: false,
+      message: error?.response?.data?.message || error.message || "Internal server error"
+    });
   }
 };
+
+
 
 exports.getSingleOrder = async (req, res, next) => {
   try {
