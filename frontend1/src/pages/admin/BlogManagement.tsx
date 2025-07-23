@@ -22,7 +22,7 @@ import {
 } from "lucide-react";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import { uploadToCloudinary } from '@/services/admin/blogsService'
+import { uploadToCloudinary } from "@/services/admin/blogsService";
 import { useToast } from "../../hooks/use-toast";
 import {
   updateBlog,
@@ -189,8 +189,9 @@ const BlogManagement = () => {
     if (!confirm.isConfirmed) {
       toast({
         title: "Cancelled",
-        description: `Blog post was not ${!isPublishing ? "published" : "unpublished"
-          }.`,
+        description: `Blog post was not ${
+          !isPublishing ? "published" : "unpublished"
+        }.`,
         variant: "default",
         duration: 3000,
       });
@@ -204,8 +205,9 @@ const BlogManagement = () => {
       if (res?.status === "success") {
         toast({
           title: `✅ Blog ${!isPublishing ? "Published" : "Unpublished"}`,
-          description: `The blog has been successfully ${!isPublishing ? "published" : "unpublished"
-            }.`,
+          description: `The blog has been successfully ${
+            !isPublishing ? "published" : "unpublished"
+          }.`,
           variant: "success",
           duration: 3000,
         });
@@ -296,11 +298,11 @@ const BlogManagement = () => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const uploadedImageUrls = await uploadToCloudinary(file)
+    const uploadedImageUrls = await uploadToCloudinary(file);
     setEditingPost((prev) => ({
       ...prev,
       image: uploadedImageUrls,
-    }))
+    }));
   };
 
   return (

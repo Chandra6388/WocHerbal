@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import axios from "axios";
+import { uploadToCloudinary } from "@/services/admin/blogsService";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -200,39 +202,14 @@ const Products = () => {
     return matchesSearch && matchesStatus;
   });
 
-  // const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   const file = e.target.files?.[0];
-  //   if (file) {
-  //     const reader = new FileReader();
-  //     reader.onload = (e) => {
-  //       const imageUrl = e.target?.result as string;
-  //       setImagePreview(imageUrl);
-  //       setSelectedImage(imageUrl);
-  //     };
-  //     reader.readAsDataURL(file);
-  //   }
-  // };
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("upload_preset", "my_unsigned_preset"); // Your actual unsigned preset name
+    const uploadedImageUrls = await uploadToCloudinary(file);
 
-    try {
-      const response = await axios.post(
-        "https://api.cloudinary.com/v1_1/dlpeqbowx/image/upload",
-        formData
-      );
-
-      const imageUrl = response.data.secure_url;
-      console.log("Uploaded Image URL:", imageUrl);
-      setImagePreview(imageUrl);
-      setSelectedImage(imageUrl);
-    } catch (error) {
-      console.error("Image upload failed:", error);
-    }
+    setImagePreview(uploadedImageUrls);
+    setSelectedImage(uploadedImageUrls);
   };
 
   const handleAddProduct = () => {
@@ -392,21 +369,6 @@ const Products = () => {
         variant: "destructive",
         duration: 4000,
       });
-    }
-  };
-
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "active":
-        return <Badge className="bg-green-100 text-green-800">Active</Badge>;
-      case "inactive":
-        return (
-          <Badge className="bg-yellow-100 text-yellow-800">Inactive</Badge>
-        );
-      case "out-of-stock":
-        return <Badge className="bg-red-100 text-red-800">Out of Stock</Badge>;
-      default:
-        return <Badge variant="secondary">{status}</Badge>;
     }
   };
 
