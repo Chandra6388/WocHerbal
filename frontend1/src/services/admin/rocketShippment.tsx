@@ -24,3 +24,13 @@ export const getOrders = async (data) => {
     throw error.response.data;
   }
 };
+
+// Update order Shiping status
+export const UpdateOrderStatus = async (data) => {
+  try {
+    const response = await axios.post(`${API_URL}/shipment/assignAwb`, data);
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
