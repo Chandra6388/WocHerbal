@@ -222,11 +222,12 @@ const OrderTracking = () => {
   useEffect(() => {
     GetOrders();
   }, []);
+
   const filteredOrders = orders.filter((order) => {
     const matchesSearch =
-      order.orderId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.trackingNumber.toLowerCase().includes(searchTerm.toLowerCase());
+      order?.orderId?.toLowerCase()?.includes(searchTerm.toLowerCase()) ||
+      order?.customerName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      order?.trackingNumber?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus =
       statusFilter === "all" || order.status === statusFilter;
     return matchesSearch && matchesStatus;
@@ -338,7 +339,8 @@ const OrderTracking = () => {
   const GetOrders = async () => {
     try {
       let getOrdersData = await getOrders({});
-      console.log(getOrdersData);
+      console.log(getOrdersData.data.data);
+      setOrders(getOrdersData.data.data);
     } catch (error) {}
   };
   return (
