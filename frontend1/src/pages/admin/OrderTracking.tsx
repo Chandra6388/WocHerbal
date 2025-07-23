@@ -63,154 +63,16 @@ interface OrderTracking {
     location: string;
     description: string;
   }[];
+  channel_created_at: string; // Added property
+  shipments: {
+    awb?: string;
+    delivered_date?: string;
+    // add other shipment properties if needed
+  }[];
 }
 
 const OrderTracking = () => {
-  const [orders, setOrders] = useState<OrderTracking[]>([
-    {
-      id: "1",
-      orderId: "ORD-2024-001",
-      customerName: "Priya Sharma",
-      customerEmail: "priya.sharma@gmail.com",
-      customerPhone: "+91 98765 43210",
-      product: "WOC Panchgavya Ayurvedic Oil",
-      amount: 999,
-      status: "shipped",
-      trackingNumber: "TRK123456789",
-      shippingAddress: "123 MG Road, Mumbai, Maharashtra 400001",
-      orderDate: "2024-01-10",
-      estimatedDelivery: "2024-01-15",
-      carrier: "BlueDart",
-      timeline: [
-        {
-          status: "Order Confirmed",
-          date: "2024-01-10",
-          time: "10:30 AM",
-          location: "Mumbai Hub",
-          description: "Order received and confirmed",
-        },
-        {
-          status: "Processing",
-          date: "2024-01-10",
-          time: "2:15 PM",
-          location: "Warehouse",
-          description: "Order being prepared for shipment",
-        },
-        {
-          status: "Shipped",
-          date: "2024-01-11",
-          time: "11:00 AM",
-          location: "Mumbai Hub",
-          description: "Package dispatched for delivery",
-        },
-        {
-          status: "In Transit",
-          date: "2024-01-12",
-          time: "9:45 AM",
-          location: "Delhi Hub",
-          description: "Package in transit to destination",
-        },
-      ],
-    },
-    {
-      id: "2",
-      orderId: "ORD-2024-002",
-      customerName: "Raj Kumar",
-      customerEmail: "raj.kumar@yahoo.com",
-      customerPhone: "+91 87654 32109",
-      product: "Ayurvedic Hair Oil Set",
-      amount: 1299,
-      status: "out-for-delivery",
-      trackingNumber: "TRK987654321",
-      shippingAddress: "456 CP Avenue, Delhi 110001",
-      orderDate: "2024-01-08",
-      estimatedDelivery: "2024-01-13",
-      carrier: "DTDC",
-      timeline: [
-        {
-          status: "Order Confirmed",
-          date: "2024-01-08",
-          time: "3:20 PM",
-          location: "Delhi Hub",
-          description: "Order received and confirmed",
-        },
-        {
-          status: "Processing",
-          date: "2024-01-09",
-          time: "10:30 AM",
-          location: "Warehouse",
-          description: "Order being prepared for shipment",
-        },
-        {
-          status: "Shipped",
-          date: "2024-01-09",
-          time: "4:45 PM",
-          location: "Delhi Hub",
-          description: "Package dispatched for delivery",
-        },
-        {
-          status: "Out for Delivery",
-          date: "2024-01-13",
-          time: "8:00 AM",
-          location: "Local Facility",
-          description: "Package out for delivery",
-        },
-      ],
-    },
-    {
-      id: "3",
-      orderId: "ORD-2024-003",
-      customerName: "Anita Patel",
-      customerEmail: "anita.patel@hotmail.com",
-      customerPhone: "+91 76543 21098",
-      product: "Natural Hair Serum",
-      amount: 599,
-      status: "delivered",
-      trackingNumber: "TRK456789123",
-      shippingAddress: "789 SG Highway, Ahmedabad, Gujarat 380001",
-      orderDate: "2024-01-05",
-      estimatedDelivery: "2024-01-10",
-      actualDelivery: "2024-01-09",
-      carrier: "FedEx",
-      timeline: [
-        {
-          status: "Order Confirmed",
-          date: "2024-01-05",
-          time: "11:15 AM",
-          location: "Ahmedabad Hub",
-          description: "Order received and confirmed",
-        },
-        {
-          status: "Processing",
-          date: "2024-01-05",
-          time: "3:30 PM",
-          location: "Warehouse",
-          description: "Order being prepared for shipment",
-        },
-        {
-          status: "Shipped",
-          date: "2024-01-06",
-          time: "9:20 AM",
-          location: "Ahmedabad Hub",
-          description: "Package dispatched for delivery",
-        },
-        {
-          status: "Out for Delivery",
-          date: "2024-01-09",
-          time: "7:30 AM",
-          location: "Local Facility",
-          description: "Package out for delivery",
-        },
-        {
-          status: "Delivered",
-          date: "2024-01-09",
-          time: "6:15 PM",
-          location: "Customer Address",
-          description: "Package delivered successfully",
-        },
-      ],
-    },
-  ]);
+  const [orders, setOrders] = useState<OrderTracking[]>([]);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -223,15 +85,24 @@ const OrderTracking = () => {
     GetOrders();
   }, []);
 
-  const filteredOrders = orders.filter((order) => {
-    const matchesSearch =
-      order?.orderId?.toLowerCase()?.includes(searchTerm.toLowerCase()) ||
-      order?.customerName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order?.trackingNumber?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus =
-      statusFilter === "all" || order.status === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
+
+  
+
+// const filteredOrders = orders?.filter((order) => {
+//   const search = searchTerm.toLowerCase();
+
+//   const matchesSearch =
+//     order?.id?.toString().includes(search) ||
+//     order?.pickup_address_detail?.name?.toLowerCase().includes(search) ||
+//     // order?.orderId?.toLowerCase().includes(search) ||
+//     // order?.trackingNumber?.toLowerCase().includes(search);
+
+//   const matchesStatus =
+//     statusFilter === "all" || order.status === statusFilter;
+
+//   return matchesSearch && matchesStatus;
+// });
+
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -466,13 +337,13 @@ const OrderTracking = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredOrders.map((order) => (
+              {orders?.map((order) => (
                 <TableRow key={order.id}>
                   <TableCell>
                     <div>
-                      <p className="font-medium">{order.orderId}</p>
+                      <p className="font-medium">{order.id}</p>
                       <p className="text-sm text-muted-foreground">
-                        {new Date(order.orderDate).toLocaleDateString()}
+                        {new Date(order.channel_created_at).toLocaleDateString()}
                       </p>
                     </div>
                   </TableCell>
@@ -497,7 +368,7 @@ const OrderTracking = () => {
                   <TableCell>
                     <div>
                       <p className="font-mono text-sm">
-                        {order.trackingNumber}
+                        {order.shipments[0].awb || "--"}
                       </p>
                       <p className="text-sm text-muted-foreground">
                         {order.carrier}
@@ -508,7 +379,7 @@ const OrderTracking = () => {
                     <div>
                       <p className="text-sm">
                         Est:{" "}
-                        {new Date(order.estimatedDelivery).toLocaleDateString()}
+                        {new Date(order.shipments?.[0]?.delivered_date).toLocaleDateString()}
                       </p>
                       {order.actualDelivery && (
                         <p className="text-sm text-green-600">
