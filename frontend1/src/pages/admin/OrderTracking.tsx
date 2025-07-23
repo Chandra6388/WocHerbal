@@ -63,12 +63,6 @@ interface OrderTracking {
     location: string;
     description: string;
   }[];
-  channel_created_at: string; // Added property
-  shipments: {
-    awb?: string;
-    delivered_date?: string;
-    // add other shipment properties if needed
-  }[];
 }
 
 const OrderTracking = () => {
@@ -86,7 +80,7 @@ const OrderTracking = () => {
   }, []);
 
 
-  
+  console.log("orders", orders)
 
 // const filteredOrders = orders?.filter((order) => {
 //   const search = searchTerm.toLowerCase();
@@ -349,16 +343,16 @@ const OrderTracking = () => {
                   </TableCell>
                   <TableCell>
                     <div>
-                      <p className="font-medium">{order.customerName}</p>
+                      <p className="font-medium">{order.customer_name}</p>
                       <p className="text-sm text-muted-foreground">
                         {order.customerEmail}
                       </p>
                     </div>
                   </TableCell>
                   <TableCell>
-                    <p className="font-medium">{order.product}</p>
+                    <p className="font-medium">{order.products?.[0]?.name}</p>
                   </TableCell>
-                  <TableCell>₹{order.amount}</TableCell>
+                  <TableCell>₹{order.total}</TableCell>
                   <TableCell>
                     <div className="flex items-center space-x-2">
                       {getStatusIcon(order.status)}
