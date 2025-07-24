@@ -73,14 +73,6 @@ interface orderItems {
   _id: string;
 }
 
-type OrderStatus =
-  | "confirmed"
-  | "processing"
-  | "shipped"
-  | "out-for-delivery"
-  | "delivered"
-  | "cancelled";
-
 const Orders = () => {
   const { toast } = useToast();
   const [orders, setOrders] = useState<Order[]>([]);
@@ -221,20 +213,6 @@ const Orders = () => {
     });
   };
 
-  const handleUpdateStatus = async (
-    _id: string,
-    value: OrderStatus
-  ): Promise<void> => {
-    console.log("->", _id, value);
-
-    let req = {
-      shipment_id: "899981858",
-      courier_id: 10,
-    };
-
-    let UpdateData = await UpdateOrderStatus(req);
-    console.log("UpdateData", UpdateData);
-  };
   return (
     <div className="p-6 space-y-6">
       <div className="flex justify-between items-center">
@@ -295,30 +273,6 @@ const Orders = () => {
                       >
                         <Edit className="h-4 w-4" />
                       </Button>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex gap-2">
-                      <select
-                        // value={order.status}
-                        onChange={
-                          (e) =>
-                            handleUpdateStatus(
-                              order._id,
-                              e.target.value as OrderStatus
-                            ) // ✅ Correct
-                        }
-                        className="px-2 py-1 text-xs border rounded"
-                      >
-                        <option value="confirmed">Confirmed</option>
-                        <option value="processing">Processing</option>
-                        <option value="shipped">Shipped</option>
-                        <option value="out-for-delivery">
-                          Out for Delivery
-                        </option>
-                        <option value="delivered">Delivered</option>
-                        <option value="cancelled">Cancelled</option>
-                      </select>
                     </div>
                   </TableCell>
                 </TableRow>

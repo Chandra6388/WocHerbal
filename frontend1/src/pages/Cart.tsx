@@ -1,21 +1,29 @@
-
-import { Link, useNavigate } from 'react-router-dom';
-import { Plus, Minus, Trash2, ShoppingBag } from 'lucide-react';
-import { useCart } from '../contexts/CartContext';
-import { Button } from '../components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { getUserFromToken } from '@/Utils/TokenData';
-import { useEffect, useState } from 'react';
+import { Link, useNavigate } from "react-router-dom";
+import { Plus, Minus, Trash2, ShoppingBag } from "lucide-react";
+import { useCart } from "../contexts/CartContext";
+import { Button } from "../components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
+import { getUserFromToken } from "@/Utils/TokenData";
+import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 
 const Cart = () => {
   const { toast } = useToast();
   const userdata = getUserFromToken() as { id: string };
-  const { getAddToCart,items, updateQuantity, removeFromCart, totalPrice, totalItems } = useCart();
-  const navigate = useNavigate(); 
-
- 
-
+  const {
+    getAddToCart,
+    items,
+    updateQuantity,
+    removeFromCart,
+    totalPrice,
+    totalItems,
+  } = useCart();
+  const navigate = useNavigate();
 
   if (items.length === 0) {
     return (
@@ -23,7 +31,9 @@ const Cart = () => {
         <div className="text-center">
           <ShoppingBag className="w-24 h-24 text-muted-foreground mx-auto mb-4" />
           <h2 className="text-2xl font-bold mb-4">Your cart is empty</h2>
-          <p className="text-muted-foreground mb-6">Add some products to get started</p>
+          <p className="text-muted-foreground mb-6">
+            Add some products to get started
+          </p>
           <Link to="/products">
             <Button size="lg">Shop Now</Button>
           </Link>
@@ -51,37 +61,59 @@ const Cart = () => {
                       alt={item?.product?.name}
                       className="w-20 h-20 object-cover rounded-lg"
                     />
-                    
+
                     <div className="flex-1">
-                      <h3 className="font-semibold text-lg mb-2">{item?.product?.name}</h3>
-                      <p className="text-primary font-bold">₹{item?.product?.price}</p>
+                      <h3 className="font-semibold text-lg mb-2">
+                        {item?.product?.name}
+                      </h3>
+                      <p className="text-primary font-bold">
+                        ₹{item?.product?.price}
+                      </p>
                     </div>
-                    
+
                     <div className="flex items-center gap-2">
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => updateQuantity(item?.product?._id, item?.quantity - 1 , userdata.id)}
+                        onClick={() =>
+                          updateQuantity(
+                            item?.product?._id,
+                            item?.quantity - 1,
+                            userdata.id
+                          )
+                        }
                         disabled={item?.quantity <= 1}
                       >
                         <Minus className="w-4 h-4" />
                       </Button>
-                      <span className="w-8 text-center font-semibold">{item?.quantity}</span>
+                      <span className="w-8 text-center font-semibold">
+                        {item?.quantity}
+                      </span>
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => updateQuantity(item?.product?._id, item?.quantity + 1, userdata.id)}
+                        onClick={() =>
+                          updateQuantity(
+                            item?.product?._id,
+                            item?.quantity + 1,
+                            userdata.id
+                          )
+                        }
                       >
                         <Plus className="w-4 h-4" />
                       </Button>
                     </div>
-                    
+
                     <div className="text-right">
-                      <p className="font-bold text-lg">₹{item?.product?.price * item?.quantity}</p>
+                      <p className="font-bold text-lg">
+                        ₹{item?.product?.price * item?.quantity}
+                      </p>
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => removeFromCart(item?.product?._id, userdata.id)}
+                        onClick={() =>
+                          removeFromCart(item?.product?._id, userdata.id)
+                        }
                         className="text-destructive hover:text-destructive"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -108,20 +140,20 @@ const Cart = () => {
                   <span>Shipping</span>
                   <span className="text-green-600">Free</span>
                 </div>
-                <div className="flex justify-between">
+                {/* <div className="flex justify-between">
                   <span>Tax</span>
                   <span>₹{Math.round(totalPrice * 0.18)}</span>
-                </div>
+                </div> */}
                 <hr />
                 <div className="flex justify-between font-bold text-lg">
                   <span>Total</span>
-                  <span>₹{Math.round(totalPrice * 1.18)}</span>
+                  <span>₹{Math.round(totalPrice)}</span>
                 </div>
 
                 <Button
                   size="lg"
                   className="w-full"
-                  onClick={() => navigate('/checkout')}
+                  onClick={() => navigate("/checkout")}
                 >
                   Proceed to Checkout
                 </Button>
