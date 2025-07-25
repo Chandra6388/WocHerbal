@@ -54,9 +54,10 @@ const Products = () => {
     if (!isInCart(product.id)) {
       addToCart({
         id: product.id,
-        name: product.name,
-        price: product.price,
-        image: product.image,
+        // name: product.name,
+        // price: product.price,
+        // image: product.image,
+        userId: "someUserId", // Replace with actual userId if needed
       });
       setSelectedProduct(product);
       setShowPopup(true);
