@@ -8,10 +8,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Star } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import ReviewModal from "@/components/reviewModal";
 
 const Orderhistory = () => {
   const [myAllOrder, setMyAllOrder] = useState([]);
+  const [open, setOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -26,7 +30,6 @@ const Orderhistory = () => {
     fetchOrders();
   }, []);
 
-  // Utility function for status color
   const getStatusColor = (status: string) => {
     switch (status?.toLowerCase()) {
       case "delivered":
@@ -40,6 +43,13 @@ const Orderhistory = () => {
         return "bg-blue-100 text-blue-700";
     }
   };
+
+  const rating = 0
+
+  const product = {
+    title: "Sample Product",
+    rating: 4,
+  }
 
   return (
     <div className="p-6">
@@ -59,6 +69,8 @@ const Orderhistory = () => {
               </TableHead>
               <TableHead className="text-sm font-semibold text-gray-700">
                 Status
+              </TableHead>
+              <TableHead className="text-sm font-semibold text-gray-700">
               </TableHead>
             </TableRow>
           </TableHeader>
@@ -105,12 +117,30 @@ const Orderhistory = () => {
                       {order.orderStatus || "Unknown"}
                     </span>
                   </TableCell>
+                  <TableCell>
+                    <div className="flex items-center cursor-pointer" onClick={() => {
+                      setOpen(true);
+                      setSelectedProduct(item);
+                    }}>
+                      {[...Array(1)].map((_, i) => (
+                        <Star
+                          key={i}
+                          className={`w-6 h-6 ${i < rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"
+                            }`}
+                        />
+                      ))}
+                      <Badge className="ml-2">
+                        {rating ? rating : "Rate & Review Product"}
+                      </Badge>
+                    </div>
+                  </TableCell>
                 </TableRow>
               ))
             )}
           </TableBody>
         </Table>
       </div>
+      <ReviewModal product={selectedProduct} open={open} setModal={setOpen} />
     </div>
   );
 };

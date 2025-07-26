@@ -58,3 +58,16 @@ export const cancelShipment = async (data) => {
     throw error.response.data;
   }
 };
+
+
+export const cancelorder = async (data) => {
+  try {
+    const response = await axios.post(
+      `${API_URL}/shipment/cancelorder`,
+      data
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
