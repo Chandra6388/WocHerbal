@@ -47,14 +47,14 @@ exports.getProducts = async (req, res, next) => {
 exports.getSingleProduct = async (req, res, next) => {
   try {
     const product = await Product.findById(req.params.id)
-      .populate('user', 'name email')
-      .populate({
-        path: 'reviews',
-        populate: {
-          path: 'user',
-          select: 'name avatar'
-        }
-      });
+      // .populate('user', 'name email')
+      // .populate({
+      //   path: 'reviews',
+      //   populate: {
+      //     path: 'user',
+      //     select: 'name avatar'
+      //   }
+      // });
 
     if (!product) {
       return res.status(404).json({
@@ -411,7 +411,6 @@ exports.updateStockAndSoldCount = async (req, res, next) => {
   try {
     const ids = req.body;
 
-    console.log("ids", ids)
     if (!Array.isArray(ids) || ids.length === 0) {
       return res.status(400).json({ status: 'error', message: 'No product ids provided' });
     }

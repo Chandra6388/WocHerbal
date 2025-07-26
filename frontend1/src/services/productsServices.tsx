@@ -1,6 +1,5 @@
 import axios from "axios";
 import { API_URL } from "../Utils/config";
-// axios.defaults.withCredentials = true;
 
 export const getAllProducts = async (data) => {
   try {
@@ -35,6 +34,15 @@ export const removeFavorlist = async (data) => {
       `${API_URL}/user/favorites/remove/${data.productId}`,
       data
     );
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+export const getProductById = async (data) => {
+  try {
+    const response = await axios.get(`${API_URL}/products/${data.productId}`);
     return response.data;
   } catch (error) {
     throw error.response.data;

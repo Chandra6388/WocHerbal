@@ -1,21 +1,68 @@
 
 import { useParams, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ArrowLeft, Star, ShoppingCart, Heart, Share2, Shield, Truck, Award } from 'lucide-react';
-import { products } from '../data/products';
 import { useCart } from '../contexts/CartContext';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
+import { getProductById } from '../services/productsServices';
+type Product = {
+  _id: string;
+  name: string;
+  price: number;
+  images: string;
+  ratings: number;
+  reviews: Review[];
+  stock: number;
+  originalPrice?: number;
+  description: string;
+  benefits: string[];
+  ingredients: string[];
+};
+
+interface Review {
+  user: {
+    name: string;
+    avatar: string;
+  };
+  rating: number;
+  comment: string;
+  createdAt: string;
+};
 
 const ProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { addToCart } = useCart();
-  const [quantity, setQuantity] = useState(1);
 
-  const product = products.find(p => p.id === id);
+  const [quantity, setQuantity] = useState<number>(1);
+  const [product, setProduct] = useState<Product | null>(null);
+
+  console.log("Product ID:", product);
+
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const response = await getProductById({ productId: id });
+        if(response?.status === 'error') {
+          navigate('/products');
+          return;
+        }
+        setProduct(response?.product);
+      } catch (error) {
+        console.error("Error fetching product:", error);
+        // navigate('/products');
+      }
+    };
+    if (id) {
+      fetchProduct();
+    }
+  }, [id, navigate]);
+ 
+
+
 
   if (!product) {
     return (
@@ -29,14 +76,7 @@ const ProductDetail = () => {
   }
 
   const handleAddToCart = () => {
-    for (let i = 0; i < quantity; i++) {
-      addToCart({
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        image: product.image
-      });
-    }
+    
   };
 
   const handleBuyNow = () => {
@@ -44,10 +84,10 @@ const ProductDetail = () => {
     navigate('/cart');
   };
 
+
   return (
     <div className="min-h-screen pt-20 bg-background">
       <div className="container mx-auto px-6 py-8">
-        {/* Back Button */}
         <Button
           variant="ghost"
           onClick={() => navigate(-1)}
@@ -58,54 +98,51 @@ const ProductDetail = () => {
         </Button>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Product Images */}
           <div className="space-y-4">
             <div className="aspect-square overflow-hidden rounded-lg">
               <img
-                src={product.image}
-                alt={product.name}
+                src={product?.images}
+                alt={product?.name}
                 className="w-full h-full object-cover"
               />
             </div>
           </div>
 
-          {/* Product Info */}
           <div className="space-y-6">
             <div>
               <h1 className="text-3xl font-playfair font-bold text-foreground mb-2">
-                {product.name}
+                {product?.name}
               </h1>
-              
               <div className="flex items-center gap-4 mb-4">
                 <div className="flex items-center">
                   <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-                  <span className="text-lg font-semibold ml-1">{product.rating}</span>
-                  <span className="text-muted-foreground ml-1">({product.reviews} reviews)</span>
+                  <span className="text-lg font-semibold ml-1">{product?.ratings || 0}</span>
+                  <span className="text-muted-foreground ml-1">({product?.reviews?.length || 0} reviews)</span>
                 </div>
-                {product.inStock && (
+                {product?.stock > 0 && (
                   <Badge variant="secondary">In Stock</Badge>
                 )}
               </div>
               
               <div className="flex items-center gap-4 mb-6">
                 <span className="text-3xl font-bold text-primary">
-                  ₹{product.price}
+                  ₹{product?.price}
                 </span>
-                {product.originalPrice && (
+                {product?.originalPrice && (
                   <span className="text-xl text-muted-foreground line-through">
-                    ₹{product.originalPrice}
+                    ₹{product?.originalPrice}
                   </span>
                 )}
-                {product.originalPrice && (
+                {product?.originalPrice && (
                   <Badge variant="destructive">
-                    {Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% OFF
+                    {Math.round(((product?.originalPrice - product?.price) / product?.originalPrice) * 100)}% OFF
                   </Badge>
                 )}
               </div>
             </div>
 
             <p className="text-muted-foreground text-lg">
-              {product.description}
+              {product?.description}
             </p>
 
             {/* Quantity and Actions */}
@@ -137,7 +174,7 @@ const ProductDetail = () => {
                   size="lg"
                   onClick={handleAddToCart}
                   className="flex-1"
-                  disabled={!product.inStock}
+                  disabled={!product.stock}
                 >
                   <ShoppingCart className="w-5 h-5 mr-2" />
                   Add to Cart
@@ -147,7 +184,7 @@ const ProductDetail = () => {
                   variant="outline"
                   onClick={handleBuyNow}
                   className="flex-1"
-                  disabled={!product.inStock}
+                  disabled={!product.stock}
                 >
                   Buy Now
                 </Button>
@@ -197,23 +234,23 @@ const ProductDetail = () => {
                 <CardContent className="p-6">
                   <h3 className="text-xl font-semibold mb-4">Key Benefits</h3>
                   <ul className="space-y-2">
-                    {product.benefits.map((benefit, index) => (
-                      <li key={index} className="flex items-start">
+                   
+                      <li className="flex items-start">
                         <span className="w-2 h-2 bg-primary rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                        <span>{benefit}</span>
+                        <span>{product?.benefits}</span>
                       </li>
-                    ))}
+                  
                   </ul>
                 </CardContent>
               </Card>
             </TabsContent>
             
-            <TabsContent value="ingredients" className="mt-6">
+            {/* <TabsContent value="ingredients" className="mt-6">
               <Card>
                 <CardContent className="p-6">
                   <h3 className="text-xl font-semibold mb-4">Natural Ingredients</h3>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {product.ingredients.map((ingredient, index) => (
+                    {product?.ingredients?.map((ingredient, index) => (
                       <div key={index} className="bg-secondary p-3 rounded-lg text-center">
                         <span className="font-medium">{ingredient}</span>
                       </div>
@@ -221,14 +258,13 @@ const ProductDetail = () => {
                   </div>
                 </CardContent>
               </Card>
-            </TabsContent>
+            </TabsContent> */}
             
-            <TabsContent value="reviews" className="mt-6">
+            {/* <TabsContent value="reviews" className="mt-6">
               <Card>
                 <CardContent className="p-6">
                   <h3 className="text-xl font-semibold mb-4">Customer Reviews</h3>
                   <div className="space-y-4">
-                    {/* Sample reviews */}
                     <div className="border-b pb-4">
                       <div className="flex items-center mb-2">
                         <div className="flex items-center">
@@ -258,7 +294,7 @@ const ProductDetail = () => {
                   </div>
                 </CardContent>
               </Card>
-            </TabsContent>
+            </TabsContent> */}
           </Tabs>
         </div>
       </div>
