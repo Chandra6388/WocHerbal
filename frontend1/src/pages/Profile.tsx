@@ -1,14 +1,22 @@
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { User, Image, Phone, MapPin, Edit3, Save, X } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
-import { Button } from '../components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { Input } from '../components/ui/input';
-import { Label } from '../components/ui/label';
-import { useToast } from '../hooks/use-toast';
-import { getUserProfile, updateProfile as updateProfileAPI } from '@/services/authSerives';
-import { getmyOrder } from '@/services/user/orderService';
+import { useEffect, useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { User, Image, Phone, MapPin, Edit3, Save, X } from "lucide-react";
+import { useAuth } from "../contexts/AuthContext";
+import { Button } from "../components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
+import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
+import { useToast } from "../hooks/use-toast";
+import {
+  getUserProfile,
+  updateProfile as updateProfileAPI,
+} from "@/services/authSerives";
+import { getmyOrder } from "@/services/user/orderService";
 import {
   Table,
   TableBody,
@@ -17,14 +25,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getUserFromToken } from '@/Utils/TokenData';
+import { getUserFromToken } from "@/Utils/TokenData";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from '@/components/ui/dialog';
+} from "@/components/ui/dialog";
 
 interface Address {
   street: string;
@@ -56,57 +64,57 @@ const Profile = () => {
   const [myAllOrder, setMyAllOrder] = useState([]);
 
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
+    name: "",
+    email: "",
+    phone: "",
     address: {
-      street: '',
-      city: '',
-      state: '',
-      zipCode: '',
-      country: '',
+      street: "",
+      city: "",
+      state: "",
+      zipCode: "",
+      country: "",
     },
   });
 
   useEffect(() => {
     if (!isAuthenticated) {
-      navigate('/auth');
+      navigate("/auth");
     } else {
       getProfiledata();
-      myOrder()
+      myOrder();
     }
   }, [isAuthenticated]);
 
   const getProfiledata = () => {
     getUserProfile({ id: userdata?.id })
       .then((res) => {
-        if (res?.status === 'success') {
+        if (res?.status === "success") {
           setProfiledata(res?.user);
 
           const addr =
-            typeof res.user.address === 'object' && res.user.address !== null
+            typeof res.user.address === "object" && res.user.address !== null
               ? res.user.address
               : {
-                street: '',
-                city: '',
-                state: '',
-                zipCode: '',
-                country: '',
-              };
+                  street: "",
+                  city: "",
+                  state: "",
+                  zipCode: "",
+                  country: "",
+                };
 
           setFormData({
-            name: res.user.name || '',
-            email: res.user.email || '',
-            phone: res.user.phone || '',
+            name: res.user.name || "",
+            email: res.user.email || "",
+            phone: res.user.phone || "",
             address: addr,
           });
         }
       })
       .catch(() => {
         toast({
-          title: 'Error',
-          description: 'Failed to fetch profile data.',
-          variant: 'destructive',
+          title: "Error",
+          description: "Failed to fetch profile data.",
+          variant: "destructive",
         });
       });
   };
@@ -114,15 +122,15 @@ const Profile = () => {
   const myOrder = () => {
     getmyOrder({ id: userdata?.id })
       .then((res) => {
-        if (res?.status === 'success') {
-          setMyAllOrder(res?.orders)
+        if (res?.status === "success") {
+          setMyAllOrder(res?.orders);
         }
       })
       .catch(() => {
         toast({
-          title: 'Error',
-          description: 'Failed to fetch profile data.',
-          variant: 'destructive',
+          title: "Error",
+          description: "Failed to fetch profile data.",
+          variant: "destructive",
         });
       });
   };
@@ -152,28 +160,28 @@ const Profile = () => {
         name: formData.name,
         phone: formData.phone,
         address: formData.address,
-        id:userdata?.id
+        id: userdata?.id,
       });
 
       if (success) {
         toast({
-          title: 'Profile Updated',
-          description: 'Your profile has been updated successfully.',
+          title: "Profile Updated",
+          description: "Your profile has been updated successfully.",
         });
         setIsModalOpen(false);
         getProfiledata();
       } else {
         toast({
-          title: 'Update Failed',
-          description: 'Something went wrong while updating your profile.',
-          variant: 'destructive',
+          title: "Update Failed",
+          description: "Something went wrong while updating your profile.",
+          variant: "destructive",
         });
       }
     } catch (error) {
       toast({
-        title: 'Error',
-        description: 'Failed to update profile.',
-        variant: 'destructive',
+        title: "Error",
+        description: "Failed to update profile.",
+        variant: "destructive",
       });
     }
   };
@@ -183,7 +191,9 @@ const Profile = () => {
       <div className="container mx-auto px-6 py-8">
         <div className="max-w-2xl mx-auto">
           <div className="flex items-center justify-between mb-8">
-            <h1 className="text-3xl font-playfair font-bold text-foreground">My Profile</h1>
+            <h1 className="text-3xl font-playfair font-bold text-foreground">
+              My Profile
+            </h1>
             <Button onClick={() => setIsModalOpen(true)}>
               <Edit3 className="w-4 h-4 mr-2" />
               Edit Profile
@@ -220,14 +230,17 @@ const Profile = () => {
               </div>
               <div>
                 <Label>Phone Number</Label>
-                <p className="mt-1 text-lg">{profiledata?.phone || 'Not provided'}</p>
+                <p className="mt-1 text-lg">
+                  {profiledata?.phone || "Not provided"}
+                </p>
               </div>
               <div>
                 <Label>Address</Label>
                 <p className="mt-1 text-lg">
-                  {profiledata?.address && typeof profiledata.address === 'object'
+                  {profiledata?.address &&
+                  typeof profiledata.address === "object"
                     ? `${profiledata.address.street}, ${profiledata.address.city}, ${profiledata.address.state} ${profiledata.address.zipCode}, ${profiledata.address.country}`
-                    : 'Not provided'}
+                    : "Not provided"}
                 </p>
               </div>
             </CardContent>
@@ -238,14 +251,20 @@ const Profile = () => {
               <CardTitle>Order History</CardTitle>
             </CardHeader>
             <CardContent>
-              {myAllOrder?.length == 0 ? <div className="text-center py-8">
-                <p className="text-muted-foreground">
-                  Your order history will appear here once you make your first purchase.
-                </p>
-                <Button className="mt-4" onClick={() => navigate('/products')}>
-                  Shop Now
-                </Button>
-              </div> :
+              {myAllOrder?.length == 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-muted-foreground">
+                    Your order history will appear here once you make your first
+                    purchase.
+                  </p>
+                  <Button
+                    className="mt-4"
+                    onClick={() => navigate("/products")}
+                  >
+                    Shop Now
+                  </Button>
+                </div>
+              ) : (
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -291,12 +310,14 @@ const Profile = () => {
                       ))
                     )}
                   </TableBody>
+                  <Link to="/orderhistory">
+                    <Button>
+                      <Edit3 className="w-4 h-4 mr-2" />
+                      View More
+                    </Button>
+                  </Link>
                 </Table>
-
-              }
-
-
-
+              )}
             </CardContent>
           </Card>
         </div>
@@ -309,7 +330,8 @@ const Profile = () => {
               Edit Your Profile
             </DialogTitle>
             <p className="text-sm text-muted-foreground">
-              Make changes to your personal information. Click save when you're done.
+              Make changes to your personal information. Click save when you're
+              done.
             </p>
           </DialogHeader>
 
