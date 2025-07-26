@@ -35,7 +35,7 @@ router.put('/:id/status', updateProductStatus);
 router.post('/stock-sold', updateStockAndSoldCount);
 
 
-router.post('/review', validate('createReview'), createProductReview);
+router.post('/review', createProductReview);
 router.delete('/reviews', deleteReview);
 
 

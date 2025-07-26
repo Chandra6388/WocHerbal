@@ -47,14 +47,14 @@ exports.getProducts = async (req, res, next) => {
 exports.getSingleProduct = async (req, res, next) => {
   try {
     const product = await Product.findById(req.params.id)
-      // .populate('user', 'name email')
-      // .populate({
-      //   path: 'reviews',
-      //   populate: {
-      //     path: 'user',
-      //     select: 'name avatar'
-      //   }
-      // });
+    // .populate('user', 'name email')
+    .populate({
+      path: 'reviews',
+      populate: {
+        path: 'user',
+        select: 'name avatar'
+      }
+    });
 
     if (!product) {
       return res.status(404).json({
@@ -126,12 +126,10 @@ exports.deleteProduct = async (req, res, next) => {
 
 exports.createProductReview = async (req, res, next) => {
   try {
-    const { rating, title, comment, productId } = req.body;
+    const { rating, comment, productId, userId } = req.body;
     const review = {
-      user: req.user._id,
-      name: req.user.name,
+      user: userId,
       rating: Number(rating),
-      title,
       comment
     };
 
@@ -144,15 +142,15 @@ exports.createProductReview = async (req, res, next) => {
       });
     }
 
-    const isReviewed = product.reviews.find(
-      r => r.user.toString() === req.user._id.toString()
+
+    const existingReview = product.reviews.find(
+      review => review.user && review.user.toString() === userId.toString()
     );
 
-    if (isReviewed) {
+    if (existingReview) {
       product.reviews.forEach(review => {
-        if (review.user.toString() === req.user._id.toString()) {
+        if (review?.user?.toString() === userId?.toString()) {
           review.rating = Number(rating);
-          review.title = title;
           review.comment = comment;
         }
       });
@@ -162,7 +160,6 @@ exports.createProductReview = async (req, res, next) => {
     }
 
     product.ratings = product.reviews.reduce((acc, item) => item.rating + acc, 0) / product.reviews.length;
-
     await product.save({ validateBeforeSave: false });
 
     res.status(200).json({
@@ -287,7 +284,7 @@ exports.approveProduct = async (req, res, next) => {
     next(error);
   }
 };
- 
+
 exports.getProductStats = async (req, res, next) => {
   try {
     const stats = await Product.aggregate([

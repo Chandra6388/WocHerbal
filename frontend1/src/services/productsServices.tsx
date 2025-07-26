@@ -48,3 +48,15 @@ export const getProductById = async (data) => {
     throw error.response.data;
   }
 };
+
+export const createProductReview = async (data) => {
+  try {
+    const response = await axios.post(`${API_URL}/products/review`, data);
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+
+

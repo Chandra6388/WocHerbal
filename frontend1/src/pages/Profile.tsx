@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { User, Image, Phone, MapPin, Edit3, Save, X } from "lucide-react";
+import { User, Image, Phone, Star, Edit3, Save, X } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import { Button } from "../components/ui/button";
 import {
@@ -17,6 +17,8 @@ import {
   updateProfile as updateProfileAPI,
 } from "@/services/authSerives";
 import { getmyOrder } from "@/services/user/orderService";
+import { Badge } from "@/components/ui/badge";
+
 import {
   Table,
   TableBody,
@@ -26,6 +28,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { getUserFromToken } from "@/Utils/TokenData";
+import ReviewModal from "@/components/reviewModal";
+
 import {
   Dialog,
   DialogContent,
@@ -62,6 +66,8 @@ const Profile = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [profiledata, setProfiledata] = useState<UserProfile | null>(null);
   const [myAllOrder, setMyAllOrder] = useState([]);
+  const [open, setOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -75,6 +81,7 @@ const Profile = () => {
       country: "",
     },
   });
+  const rating = 0
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -95,12 +102,12 @@ const Profile = () => {
             typeof res.user.address === "object" && res.user.address !== null
               ? res.user.address
               : {
-                  street: "",
-                  city: "",
-                  state: "",
-                  zipCode: "",
-                  country: "",
-                };
+                street: "",
+                city: "",
+                state: "",
+                zipCode: "",
+                country: "",
+              };
 
           setFormData({
             name: res.user.name || "",
@@ -186,10 +193,24 @@ const Profile = () => {
     }
   };
 
+  const getStatusColor = (status: string) => {
+    switch (status?.toLowerCase()) {
+      case "delivered":
+        return "bg-green-100 text-green-700";
+      case "pending":
+      case "processing":
+        return "bg-yellow-100 text-yellow-700";
+      case "cancelled":
+        return "bg-red-100 text-red-700";
+      default:
+        return "bg-blue-100 text-blue-700";
+    }
+  };
+
   return (
     <div className="min-h-screen pt-20 bg-background">
       <div className="container mx-auto px-6 py-8">
-        <div className="max-w-2xl mx-auto">
+        <div className="max-w-6xl mx-auto">
           <div className="flex items-center justify-between mb-8">
             <h1 className="text-3xl font-playfair font-bold text-foreground">
               My Profile
@@ -238,7 +259,7 @@ const Profile = () => {
                 <Label>Address</Label>
                 <p className="mt-1 text-lg">
                   {profiledata?.address &&
-                  typeof profiledata.address === "object"
+                    typeof profiledata.address === "object"
                     ? `${profiledata.address.street}, ${profiledata.address.city}, ${profiledata.address.state} ${profiledata.address.zipCode}, ${profiledata.address.country}`
                     : "Not provided"}
                 </p>
@@ -248,7 +269,7 @@ const Profile = () => {
 
           <Card className="mt-8">
             <CardHeader>
-              <CardTitle>Order History</CardTitle>
+              <CardTitle>My Orders</CardTitle>
             </CardHeader>
             <CardContent>
               {myAllOrder?.length == 0 ? (
@@ -265,58 +286,88 @@ const Profile = () => {
                   </Button>
                 </div>
               ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Product</TableHead>
-                      <TableHead>Quantity</TableHead>
-                      <TableHead>Price</TableHead>
-                      <TableHead>Status</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {myAllOrder?.map((order) =>
-                      order.orderItems.map((item, index) => (
-                        <TableRow key={`${order._id}-${index}`}>
-                          <TableCell>
-                            <div className="flex items-center space-x-3">
-                              <div className="w-12 h-12 bg-muted rounded-lg flex items-center justify-center overflow-hidden">
-                                {item.image ? (
-                                  <img
-                                    src={item.image}
-                                    alt={item.name}
-                                    className="w-full h-full object-cover"
-                                  />
-                                ) : (
-                                  <Image className="h-6 w-6 text-muted-foreground" />
-                                )}
+                <div className="w-full overflow-x-auto">
+                  <Table className="min-w-[600px]">
+                    <TableHeader>
+                      <TableRow className="bg-gray-100">
+                        <TableHead className="text-sm font-semibold text-gray-700">Product</TableHead>
+                        <TableHead className="text-sm font-semibold text-gray-700">Quantity</TableHead>
+                        <TableHead className="text-sm font-semibold text-gray-700">Price</TableHead>
+                        <TableHead className="text-sm font-semibold text-gray-700">Status</TableHead>
+                        <TableHead className="text-sm font-semibold text-gray-700"></TableHead>
+                      </TableRow>
+                    </TableHeader>
+
+                    <TableBody>
+                      {myAllOrder?.map((order) =>
+                        order.orderItems.map((item, index) => (
+                          <TableRow key={`${order._id}-${index}`} className="hover:bg-gray-50">
+                            <TableCell>
+                              <div className="flex items-center space-x-3">
+                                <div className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 bg-gray-200 rounded-lg overflow-hidden flex items-center justify-center">
+                                  {item.image ? (
+                                    <img
+                                      src={item.image}
+                                      alt={item.name}
+                                      className="w-full h-full object-cover"
+                                    />
+                                  ) : (
+                                    <span className="text-xs sm:text-sm text-gray-500 text-center px-1">
+                                      No Image
+                                    </span>
+                                  )}
+                                </div>
+                                <div>
+                                  <p className="font-medium text-gray-900">{item.name}</p>
+                                </div>
                               </div>
-                              <div>
-                                <p className="font-medium">{item.name}</p>
-                              </div>
-                            </div>
-                          </TableCell>
+                            </TableCell>
 
-                          <TableCell>{item.quantity}</TableCell>
-
-                          <TableCell>₹{item.price}</TableCell>
-
-                          <TableCell>
-                            <span className="text-blue-600 font-medium">
-                              {order.orderStatus}
-                            </span>
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    )}
-                  </TableBody>
-                  <Link to="/orderhistory">
+                            <TableCell className="text-gray-700">{item.quantity}</TableCell>
+                            <TableCell className="text-gray-700">₹{item.price}</TableCell>
+                            <TableCell>
+                              <span
+                                className={`text-xs font-medium px-2 py-1 rounded-full ${getStatusColor(
+                                  order.orderStatus
+                                )}`}
+                              >
+                                {order.orderStatus || "Unknown"}
+                              </span>
+                            </TableCell>
+                            <TableCell>
+                              {order.orderStatus == "Delivered" && (
+                                <div
+                                  className="flex w-48 items-center cursor-pointer"
+                                  onClick={() => {
+                                    setOpen(true);
+                                    setSelectedProduct(item);
+                                  }}
+                                >
+                                  {[...Array(1)].map((_, i) => (
+                                    <Star
+                                      key={i}
+                                      className={`w-6 h-6 ${i < rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"
+                                        }`}
+                                    />
+                                  ))}
+                                  <Badge className="ml-2">
+                                    {rating ? rating : "Rate & Review Product"}
+                                  </Badge>
+                                </div>
+                              )}
+                            </TableCell>
+                          </TableRow>
+                        ))
+                      )}
+                    </TableBody>
+                    <Link to="/orderhistory">
                     <Button>
                       <Edit3 className="w-4 h-4 mr-2" />
                       View More
                     </Button>
                   </Link>
-                </Table>
+                  </Table>
+                </div>
               )}
             </CardContent>
           </Card>
@@ -441,7 +492,8 @@ const Profile = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      {/* ---------------- MODAL END ---------------- */}
+      <ReviewModal product={selectedProduct} open={open} setModal={setOpen} />
+
     </div>
   );
 };

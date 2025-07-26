@@ -87,12 +87,6 @@ const schemas = {
     ).optional()
   }),
 
-  // Review validation
-  createReview: Joi.object({
-    rating: Joi.number().min(1).max(5).required(),
-    title: Joi.string().min(2).max(100).required(),
-    comment: Joi.string().min(10).max(500).required()
-  }),
 
   updateReview: Joi.object({
     rating: Joi.number().min(1).max(5).optional(),

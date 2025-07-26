@@ -245,12 +245,12 @@ const ProductDetail = () => {
               </Card>
             </TabsContent>
             
-            {/* <TabsContent value="ingredients" className="mt-6">
+            <TabsContent value="ingredients" className="mt-6">
               <Card>
                 <CardContent className="p-6">
                   <h3 className="text-xl font-semibold mb-4">Natural Ingredients</h3>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {product?.ingredients?.map((ingredient, index) => (
+                    {[]?.map((ingredient, index) => (
                       <div key={index} className="bg-secondary p-3 rounded-lg text-center">
                         <span className="font-medium">{ingredient}</span>
                       </div>
@@ -258,43 +258,38 @@ const ProductDetail = () => {
                   </div>
                 </CardContent>
               </Card>
-            </TabsContent> */}
+            </TabsContent>
             
-            {/* <TabsContent value="reviews" className="mt-6">
+            <TabsContent value="reviews" className="mt-6">
               <Card>
                 <CardContent className="p-6">
                   <h3 className="text-xl font-semibold mb-4">Customer Reviews</h3>
                   <div className="space-y-4">
-                    <div className="border-b pb-4">
-                      <div className="flex items-center mb-2">
-                        <div className="flex items-center">
-                          {[...Array(5)].map((_, i) => (
-                            <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                          ))}
+                    {product?.reviews?.length > 0 ? (
+                      product.reviews.map((review, index) => (
+                        <div key={index} className="border-b pb-4">
+                          <div className="flex items-center mb-2">
+                            <div className="flex items-center">
+                              {[...Array(5)].map((_, i) => (
+                                <Star
+                                  key={i}
+                                  className={`w-4 h-4 ${i < review.rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`}
+                                />
+                              ))}
+                            </div>
+                            <span className="ml-2 font-semibold">{review.user.name}</span>
+                          </div>
+                          <p className="text-muted-foreground">{review.comment}</p>
                         </div>
-                        <span className="ml-2 font-semibold">Priya S.</span>
-                      </div>
-                      <p className="text-muted-foreground">
-                        "Amazing results! My hair fall reduced significantly after using this oil for 2 months. Highly recommended!"
-                      </p>
-                    </div>
-                    <div className="border-b pb-4">
-                      <div className="flex items-center mb-2">
-                        <div className="flex items-center">
-                          {[...Array(5)].map((_, i) => (
-                            <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                          ))}
-                        </div>
-                        <span className="ml-2 font-semibold">Rajesh K.</span>
-                      </div>
-                      <p className="text-muted-foreground">
-                        "Natural ingredients and effective results. My hair feels stronger and healthier now."
-                      </p>
-                    </div>
+                      ))
+                    ) : (
+                      <p className="text-muted-foreground">No reviews yet.</p>
+                    )}
+                  
                   </div>
                 </CardContent>
               </Card>
-            </TabsContent> */}
+            </TabsContent>
           </Tabs>
         </div>
       </div>
