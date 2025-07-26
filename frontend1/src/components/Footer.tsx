@@ -1,4 +1,3 @@
-
 import { Link } from 'react-router-dom';
 import { Leaf, Mail, Phone, MapPin, Facebook, Twitter, Instagram } from 'lucide-react';
 
@@ -10,19 +9,32 @@ const Footer = () => {
           {/* Brand */}
           <div className="space-y-4">
             <Link to="/" className="flex items-center space-x-2">
-              <img
-                src="/uploads/WOChairOil_2.png"
-                alt=""
-                className="w-28"
+              <img 
+              src="/uploads/WOChairOil_2.png"
+                alt="WocHerbal" 
+                className="h-8 w-auto sm:h-10 object-contain"
               />
             </Link>
             <p className="text-muted-foreground">
               Natural wellness reimagined with the power of Ayurveda and Panchgavya.
             </p>
             <div className="flex space-x-4">
-              <Facebook className="w-5 h-5 text-muted-foreground hover:text-accent cursor-pointer" />
-              <Twitter className="w-5 h-5 text-muted-foreground hover:text-accent cursor-pointer" />
-              <Instagram className="w-5 h-5 text-muted-foreground hover:text-accent cursor-pointer" />
+              <a 
+                href="https://facebook.com" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="group"
+              >
+                <Facebook className="w-5 h-5 text-muted-foreground hover:text-accent-soft cursor-pointer transition-all duration-300 group-hover:scale-110" />
+              </a>
+              <a 
+                href="https://instagram.com" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="group"
+              >
+                <Instagram className="w-5 h-5 text-muted-foreground hover:text-accent-soft cursor-pointer transition-all duration-300 group-hover:scale-110" />
+              </a>
             </div>
           </div>
 
@@ -80,6 +92,33 @@ const Footer = () => {
             </ul>
           </div>
 
+          {/* Policies */}
+          <div>
+            <h3 className="font-semibold mb-4">Policies</h3>
+            <ul className="space-y-2">
+              <li>
+                <Link to="/terms-of-service" className="text-muted-foreground hover:text-accent transition-colors">
+                  Terms & Conditions
+                </Link>
+              </li>
+              <li>
+                <Link to="/privacy-policy" className="text-muted-foreground hover:text-accent transition-colors">
+                  Privacy Policy
+                </Link>
+              </li>
+              <li>
+                <Link to="/shipping-policy" className="text-muted-foreground hover:text-accent transition-colors">
+                  Shipping Policy
+                </Link>
+              </li>
+              <li>
+                <Link to="/refund-policy" className="text-muted-foreground hover:text-accent transition-colors">
+                  Refund Policy
+                </Link>
+              </li>
+            </ul>
+          </div>
+
           {/* Contact */}
           <div>
             <h3 className="font-semibold mb-4">Contact Us</h3>
@@ -87,16 +126,16 @@ const Footer = () => {
               <div className="flex items-start space-x-3">
                 <MapPin className="w-5 h-5 text-accent mt-0.5 flex-shrink-0" />
                 <span className="text-muted-foreground">
-                  123 Ayurveda Street, Wellness City, India 110001
+                  33A, Jaiswal Innovations, MPIDC Badiyakhedi, Sehore (466001), MP, India
                 </span>
               </div>
               <div className="flex items-center space-x-3">
                 <Phone className="w-5 h-5 text-accent" />
-                <span className="text-muted-foreground">+91 9876543210</span>
+                <span className="text-muted-foreground">08878875006</span>
               </div>
               <div className="flex items-center space-x-3">
                 <Mail className="w-5 h-5 text-accent" />
-                <span className="text-muted-foreground">info@wocherbal.com</span>
+                <span className="text-muted-foreground">care@wocherbal.com</span>
               </div>
             </div>
           </div>

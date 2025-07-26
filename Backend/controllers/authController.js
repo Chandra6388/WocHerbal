@@ -91,8 +91,6 @@ exports.getUserProfile = async (req, res, next) => {
   }
 };
 
-
-
 exports.updatePassword = async (req, res, next) => {
   try {
     const user = await User.findById(req.user.id).select('+password');

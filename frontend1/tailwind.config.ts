@@ -24,75 +24,53 @@ export default {
 				'inter': ['Inter', 'sans-serif'],
 			},
 			colors: {
-				border: 'hsl(var(--border))',
-				input: 'hsl(var(--input))',
-				ring: 'hsl(var(--ring))',
-				background: 'hsl(var(--background))',
-				foreground: 'hsl(var(--foreground))',
+				border: 'rgb(var(--border))',
+				input: 'rgb(var(--input))',
+				ring: 'rgb(var(--ring))',
+				background: 'rgb(var(--background))',
+				foreground: 'rgb(var(--foreground))',
 				primary: {
-					DEFAULT: 'hsl(var(--primary))',
-					foreground: 'hsl(var(--primary-foreground))'
+					DEFAULT: 'rgb(var(--primary))',
+					foreground: 'rgb(var(--primary-foreground))'
 				},
 				secondary: {
-					DEFAULT: 'hsl(var(--secondary))',
-					foreground: 'hsl(var(--secondary-foreground))'
+					DEFAULT: 'rgb(var(--secondary))',
+					foreground: 'rgb(var(--secondary-foreground))'
 				},
 				destructive: {
-					DEFAULT: 'hsl(var(--destructive))',
-					foreground: 'hsl(var(--destructive-foreground))'
+					DEFAULT: 'rgb(var(--destructive))',
+					foreground: 'rgb(var(--destructive-foreground))'
 				},
 				muted: {
-					DEFAULT: 'hsl(var(--muted))',
-					foreground: 'hsl(var(--muted-foreground))'
+					DEFAULT: 'rgb(var(--muted))',
+					foreground: 'rgb(var(--muted-foreground))'
 				},
 				accent: {
-					DEFAULT: 'hsl(var(--accent))',
-					foreground: 'hsl(var(--accent-foreground))'
+					DEFAULT: 'rgb(var(--accent))',
+					foreground: 'rgb(var(--accent-foreground))',
+					soft: 'rgb(var(--accent-soft))',
+					light: 'rgb(var(--accent-light))'
 				},
 				popover: {
-					DEFAULT: 'hsl(var(--popover))',
-					foreground: 'hsl(var(--popover-foreground))'
+					DEFAULT: 'rgb(var(--popover))',
+					foreground: 'rgb(var(--popover-foreground))'
 				},
 				card: {
-					DEFAULT: 'hsl(var(--card))',
-					foreground: 'hsl(var(--card-foreground))'
+					DEFAULT: 'rgb(var(--card))',
+					foreground: 'rgb(var(--card-foreground))'
 				},
-				// Nature-inspired custom colors
-				forest: {
-					50: '#f0f9f0',
-					100: '#dcf0dc',
-					200: '#bce0bc',
-					300: '#8dcb8d',
-					400: '#5bb05b',
-					500: '#3d8b3d',
-					600: '#2d6f2d',
-					700: '#245724',
-					800: '#1f471f',
-					900: '#1a3a1a',
-				},
-				earth: {
-					50: '#faf8f3',
-					100: '#f3ede0',
-					200: '#e6d8c0',
-					300: '#d4bb95',
-					400: '#c49967',
-					500: '#b87d47',
-					600: '#a9673b',
-					700: '#8d5232',
-					800: '#72442d',
-					900: '#5d3926',
-				},
-				cream: {
-					50: '#fffef7',
-					100: '#fffbeb',
-					200: '#fef5d3',
-					300: '#fdeaab',
-					400: '#fbdb7a',
-					500: '#f8c947',
-					600: '#e9b022',
-					700: '#c4911a',
-					800: '#9e701b',
-					900: '#805b1c',
+				// Grayscale theme colors
+				gray: {
+					50: '#f9f9f9',
+					100: '#f3f3f3',
+					200: '#e8e8e8',
+					300: '#d0d0d0',
+					400: '#a8a8a8',
+					500: '#808080',
+					600: '#606060',
+					700: '#404040',
+					800: '#2a2a2a',
+					900: '#181818',
 				}
 			},
 			borderRadius: {

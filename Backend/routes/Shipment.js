@@ -12,7 +12,9 @@ const {
   generateLabel,
   printInvoice,
   trackShipment,
-  getOrders
+  getOrders,
+  cancelShipment,
+  cancelorder
 } = require('../controllers/rocketShippment');
 
 router.post('/login', login);
@@ -26,5 +28,7 @@ router.post('/generateLabel', generateLabel);
 router.post('/printInvoice', printInvoice);
 router.get('/trackShipment/:awb_code', trackShipment);
 router.get('/getOrders', getOrders);
+router.post('/cancelShipment', cancelShipment);
+router.post('/cancelorder', cancelorder);
 
 module.exports = router; 

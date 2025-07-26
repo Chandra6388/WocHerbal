@@ -214,3 +214,34 @@ exports.getOrders = async (req, res) => {
         res.status(error.response?.status || 500).json({ status: 'error', message: error.response?.data?.message || 'Internal Server Error' });
     }
 }
+
+
+
+exports.cancelShipment = async (req, res) => {
+    try {
+        const { awbs } = req.body;
+        const response = await shiprocket.post('/v1/external/orders/cancel/shipment/awbs', { awbs });
+        res.status(200).json({ status: 'success', data: response.data });
+    } catch (error) {
+        console.error('Error in cancelShipment:', error.message);
+        res.status(error.response?.status || 500).json({ status: 'error', message: error.response?.data?.message || 'Internal Server Error' });
+    }
+}
+
+// curl --location 'https://apiv2.shiprocket.in/v1/external/orders/cancel' \
+// --header 'Content-Type: application/json' \
+// --header 'Authorization: Bearer {{token}}' \
+// --data '{
+//   "ids": [16168898,16167171]
+// }'
+
+exports.cancelorder=async (req, res) => {
+    try {
+        const { ids } = req.body;
+        const response = await shiprocket.post('/v1/external/orders/cancel', { ids });
+        res.status(200).json({ status: 'success', data: response.data });
+    } catch (error) {
+        console.error('Error in cancelorder:', error.message);
+        res.status(error.response?.status || 500).json({ status: 'error', message: error.response?.data?.message || 'Internal Server Error' });
+    }
+}

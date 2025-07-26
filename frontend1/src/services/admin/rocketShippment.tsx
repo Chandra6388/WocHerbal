@@ -24,3 +24,40 @@ export const getOrders = async (data) => {
     throw error.response.data;
   }
 };
+//api/shipment/assignAwb
+export const assignAwb = async (data) => {
+  try {
+    const response = await axios.post(
+      `${API_URL}/shipment/assignAwb`,
+      data
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+// cancelShipment
+export const cancelShipment = async (data) => {
+  try {
+    const response = await axios.post(
+      `${API_URL}/shipment/cancelShipment`,
+      data
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+// cancelorder
+export const cancelorder = async (data) => {
+  try {
+    const response = await axios.post(
+      `${API_URL}/shipment/cancelorder`,
+      data
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};

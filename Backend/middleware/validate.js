@@ -1,6 +1,5 @@
 const Joi = require('joi');
 
-// Validation schemas
 const schemas = {
   register: Joi.object({
     name: Joi.string().min(2).max(50).required(),
@@ -101,8 +100,6 @@ const schemas = {
     comment: Joi.string().min(10).max(500).optional()
   }),
 
-
-
   createOrder: Joi.object({
     shippingInfo: Joi.object({
       name: Joi.string().required(),
@@ -139,7 +136,6 @@ const schemas = {
     totalPrice: Joi.number().min(0).optional(),
     user: Joi.string().optional()
   }),
-
 
   // Help request validation
   createHelpRequest: Joi.object({

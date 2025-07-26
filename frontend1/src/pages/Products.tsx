@@ -240,7 +240,7 @@ const Products = () => {
       };
 
       const response = await getRocketShipmentsAvailabilty(payload);
-      console.log("res", response);
+
       if (response?.available) {
         toast({
           title: "Pincode Verified",
