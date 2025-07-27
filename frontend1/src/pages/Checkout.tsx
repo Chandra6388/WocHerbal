@@ -373,6 +373,7 @@ const Checkout = () => {
                   <div>
                     <Label htmlFor="phone">Phone Number</Label>
                     <Input
+                    
                       id="phone"
                       name="phone"
                       value={formData.phone}

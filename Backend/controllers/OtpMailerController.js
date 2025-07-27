@@ -4,17 +4,17 @@ const sendToken = require('../utils/sendToken');
 const otpStore = {};
 
 function generateOTP() {
-    return Math.floor(100000 + Math.random() * 900000).toString();
+  return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
 
 
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-    },
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
 });
 
 
@@ -148,7 +148,7 @@ exports.verifyOTP = async (req, res) => {
     }
 
     if (otpStore[email] === otp) {
-      delete otpStore[email]; 
+      delete otpStore[email];
       return sendToken(user, 201, res);
     } else {
       return res.json({ status: false, message: 'Invalid OTP' });
