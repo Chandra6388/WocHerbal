@@ -77,8 +77,9 @@ exports.DislikeReview = async (req, res, next) => {
 };
 
 exports.deleteReview = async (req, res, next) => {
+  
   try {
-    const review = await Review.findById(req.params.id);
+    const review = await Review.findById(req.body.reviewId);
 
     if (!review) {
       return res.status(404).json({
@@ -87,15 +88,13 @@ exports.deleteReview = async (req, res, next) => {
       });
     }
 
-    // Check if user owns this review or is admin
-    if (review.user.toString() !== req.user.id && req.user.role !== 'admin') {
-      return res.status(403).json({
+    const deletedReview = await Review.findByIdAndDelete(req.body.reviewId);
+    if (!deletedReview) {
+      return res.status(404).json({
         status: 'error',
-        message: 'Not authorized to delete this review'
+        message: 'Review not found'
       });
     }
-
-    await review.remove();
 
     res.status(200).json({
       status: 'success',
@@ -146,5 +145,27 @@ exports.getAllUserReview = async (req, res, next) => {
       message: 'Something went wrong while fetching user reviews',
       error: error.message
     });
+  }
+};
+
+exports.approveReview = async (req, res, next) => {
+  try {
+    const { reviewId } = req.body;
+    const review = await Review.findById(reviewId);
+    if (!review) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'Review not found'
+      });
+    }
+    review.status = 'approved';
+    await review.save();
+    res.status(200).json({
+      status: 'success',
+      message: 'Review approved successfully',
+      review
+    });
+  } catch (error) {
+    next(error);
   }
 };

@@ -5,12 +5,13 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Star, Check, Trash2, Plus } from 'lucide-react';
-import { toast } from 'sonner';
+import Swal from 'sweetalert2';
 import AddReviewModal from './addReviewModal';
-import { getAllReview } from '@/services/admin/reviewsServices';
+import { useToast } from '@/components/ui/use-toast';
+import { getAllReview, deleteReview, approveReview } from '@/services/admin/reviewsServices';
 interface Review {
-  id: string;
-  user  : string;
+  _id: string;
+  user: string;
   rating: number;
   comment: string;
   product: string;
@@ -24,19 +25,27 @@ interface Review {
 const Reviews = () => {
   const [open, setOpen] = useState(false);
   const [reviews, setReviews] = useState<Review[]>([]);
+  const { toast } = useToast();
 
 
   const fetchReviews = async () => {
     try {
       const response = await getAllReview();
-      if(response?.status !== 'success') {
+      if (response?.status !== 'success') {
         throw new Error('Failed to fetch reviews');
       }
       setReviews(response.reviews);
     } catch (error) {
-      toast.error('Failed to fetch reviews');
+      toast({
+        title: "Error",
+        description: "Failed to fetch reviews.",
+        variant: "destructive",
+      });
+      console.error('Failed to fetch reviews:', error);
+      setReviews([]); // Clear reviews on error
     }
   };
+
   useEffect(() => {
     fetchReviews();
   }, []);
@@ -54,16 +63,79 @@ const Reviews = () => {
     );
   };
 
-  const handleApproveReview = (id: string) => {
-    setReviews(reviews.map(review =>
-      review.id === id ? { ...review, status: 'approved' as const } : review
-    ));
-    toast.success('Review approved successfully!');
+  const handleApproveReview = async (id: string) => {
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to approve this review?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, approve it!',
+      cancelButtonText: 'Cancel',
+    });
+
+    if (result.isConfirmed) {
+      try {
+        const response = await approveReview(id);
+
+        if (response.status !== 'success') {
+          throw new Error('Failed to approve review');
+        }
+
+        Swal.fire({
+          title: 'Approved!',
+          text: 'The review has been approved successfully.',
+          icon: 'success',
+          timer: 2000,
+          showConfirmButton: false,
+        });
+
+        setReviews((prevReviews) =>
+          prevReviews.map((review) =>
+            review._id === id ? { ...review, status: 'approved' } : review
+          )
+        );
+      } catch (error) {
+        Swal.fire({
+          title: 'Error!',
+          text: 'Failed to approve the review.',
+          icon: 'error',
+        });
+        console.error('Failed to approve review:', error);
+      }
+    }
   };
 
-  const handleDeleteReview = (id: string) => {
-    setReviews(reviews.filter(review => review.id !== id));
-    toast.success('Review deleted successfully!');
+  const handleDeleteReview = async (id: string) => {
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you really want to delete this review?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'Cancel',
+    });
+
+    if (result.isConfirmed) {
+      try {
+        await deleteReview(id);
+        fetchReviews();
+
+        Swal.fire({
+          title: 'Deleted!',
+          text: 'The review has been deleted successfully.',
+          icon: 'success',
+          timer: 2000,
+          showConfirmButton: false,
+        });
+      } catch (error) {
+        Swal.fire({
+          title: 'Error!',
+          text: 'Failed to delete the review.',
+          icon: 'error',
+        });
+        console.error('Failed to delete review:', error);
+      }
+    }
   };
 
   const getStatusBadge = (status: string) => {
@@ -109,7 +181,7 @@ const Reviews = () => {
             </TableHeader>
             <TableBody>
               {reviews.map((review) => (
-                <TableRow key={review.id}>
+                <TableRow key={review._id}>
                   <TableCell className="font-medium">{review.user}</TableCell>
                   <TableCell>{renderStars(review.rating)}</TableCell>
                   <TableCell>
@@ -126,7 +198,7 @@ const Reviews = () => {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => handleApproveReview(review.id)}
+                          onClick={() => handleApproveReview(review._id)}
                         >
                           <Check className="h-4 w-4" />
                         </Button>
@@ -134,7 +206,7 @@ const Reviews = () => {
                       <Button
                         variant="destructive"
                         size="sm"
-                        onClick={() => handleDeleteReview(review.id)}
+                        onClick={() => handleDeleteReview(review._id)}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>

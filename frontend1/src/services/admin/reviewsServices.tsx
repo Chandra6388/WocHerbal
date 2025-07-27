@@ -11,4 +11,23 @@ export const getAllReview = async () => {
   }
 };
 
+export const deleteReview = async (reviewId) => {
+  try {
+    const response = await axios.post(`${API_URL}/reviews/delete`, { reviewId });
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+export const approveReview = async (reviewId) => {
+  try {
+    const response = await axios.post(`${API_URL}/reviews/approve`, { reviewId });
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+
 

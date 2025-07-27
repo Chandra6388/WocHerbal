@@ -9,7 +9,8 @@ const {
   LikeReview,
   DislikeReview,
   deleteReview,
-  createReview
+  createReview,
+  approveReview
 } = require('../controllers/reviewController');
 
 
@@ -19,7 +20,8 @@ router.get('/all', getAllReview);
 router.get('/', getAllUserReview);
 router.post('/like', LikeReview);
 router.post('/dislike', DislikeReview);
-router.delete('/delete', deleteReview);
+router.post('/delete', deleteReview);
+router.post('/approve', approveReview);
 
 
 module.exports = router; 
