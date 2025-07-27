@@ -7,3 +7,6 @@
 export const API_URL = window.location.origin.includes("localhost")
   ? "http://localhost:5000/api"
   : `${window.location.origin}/backend/api`;
+
+
+

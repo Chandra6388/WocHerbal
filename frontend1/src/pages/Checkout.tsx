@@ -48,7 +48,6 @@ declare global {
 
 const Checkout = () => {
   const { toast } = useToast();
-
   const { items, totalPrice, clearCart } = useCart();
   const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
@@ -230,14 +229,9 @@ const Checkout = () => {
 
     // Handle Razorpay
     try {
-      const isLoaded = await loadRazorpayScript(
-        "https://checkout.razorpay.com/v1/checkout.js"
-      );
-
+      const isLoaded = await loadRazorpayScript("https://checkout.razorpay.com/v1/checkout.js");
       const finalAmount = Math.round(totalPrice * 1.18);
-
       const { order } = await createOrderByrazorpay({ amount: finalAmount });
-
       const options: RazorpayOptions = {
         key: "rzp_test_Yg6vhSeAq4hucc",
         amount: order.amount,
@@ -300,9 +294,7 @@ const Checkout = () => {
       });
     }
   };
-
   if (items.length === 0 || !isAuthenticated) return null;
-
   return (
     <div className="min-h-screen pt-20 bg-background">
       <div className="container mx-auto px-6 py-8">
