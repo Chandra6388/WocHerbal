@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Plus, Minus, Trash2, ShoppingBag } from "lucide-react";
 import { useCart } from "../contexts/CartContext";
 import { Button } from "../components/ui/button";
@@ -24,6 +24,12 @@ const Cart = () => {
     totalItems,
   } = useCart();
   const navigate = useNavigate();
+
+  const [quantity, setQuantity] = useState<number>(1);
+
+  const location = useLocation();
+  const productdata = location?.state?.product;
+  console.log("location?.state?.product", location?.state?.product);
 
   if (items.length === 0) {
     return (
@@ -52,77 +58,64 @@ const Cart = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Cart Items */}
           <div className="lg:col-span-2 space-y-4">
-            {items?.map((item) => (
-              <Card key={item?.product?._id}>
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-4">
-                    <img
-                      src={item?.product?.images}
-                      alt={item?.product?.name}
-                      className="w-20 h-20 object-cover rounded-lg"
-                    />
+            {/* {items?.map((item) => ( */}
+            <Card key={productdata?._id}>
+              <CardContent className="p-6">
+                <div className="flex items-center gap-4">
+                  <img
+                    src={productdata?.images}
+                    alt={productdata?.name}
+                    className="w-20 h-20 object-cover rounded-lg"
+                  />
 
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-lg mb-2">
-                        {item?.product?.name}
-                      </h3>
-                      <p className="text-primary font-bold">
-                        ₹{item?.product?.price}
-                      </p>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() =>
-                          updateQuantity(
-                            item?.product?._id,
-                            item?.quantity - 1,
-                            userdata.id
-                          )
-                        }
-                        disabled={item?.quantity <= 1}
-                      >
-                        <Minus className="w-4 h-4" />
-                      </Button>
-                      <span className="w-8 text-center font-semibold">
-                        {item?.quantity}
-                      </span>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() =>
-                          updateQuantity(
-                            item?.product?._id,
-                            item?.quantity + 1,
-                            userdata.id
-                          )
-                        }
-                      >
-                        <Plus className="w-4 h-4" />
-                      </Button>
-                    </div>
-
-                    <div className="text-right">
-                      <p className="font-bold text-lg">
-                        ₹{item?.product?.price * item?.quantity}
-                      </p>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() =>
-                          removeFromCart(item?.product?._id, userdata.id)
-                        }
-                        className="text-destructive hover:text-destructive"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-lg mb-2">
+                      {productdata?.name}
+                    </h3>
+                    <p className="text-primary font-bold">
+                      ₹{productdata?.price}
+                    </p>
                   </div>
-                </CardContent>
-              </Card>
-            ))}
+
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setQuantity(quantity - 1)}
+                    >
+                      <Minus className="w-4 h-4" />
+                    </Button>
+                    <span className="w-8 text-center font-semibold">
+                      {quantity}
+                    </span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setQuantity(quantity + 1)}
+                    >
+                      <Plus className="w-4 h-4" />
+                    </Button>
+                  </div>
+
+                  <div className="text-right">
+                    <p className="font-bold text-lg">
+                      ₹{productdata?.price * quantity}
+                    </p>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() =>
+                        removeFromCart(productdata?._id, userdata.id)
+                      }
+                      className="text-destructive hover:text-destructive"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            {/* ))} */}
           </div>
 
           {/* Order Summary */}
@@ -134,7 +127,7 @@ const Cart = () => {
               <CardContent className="space-y-4">
                 <div className="flex justify-between">
                   <span>Subtotal</span>
-                  <span>₹{totalPrice}</span>
+                  <span>₹{productdata?.price * quantity}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Shipping</span>
@@ -147,13 +140,15 @@ const Cart = () => {
                 <hr />
                 <div className="flex justify-between font-bold text-lg">
                   <span>Total</span>
-                  <span>₹{Math.round(totalPrice)}</span>
+                  <span>₹{Math.round(productdata?.price * quantity)}</span>
                 </div>
 
                 <Button
                   size="lg"
                   className="w-full"
-                  onClick={() => navigate("/checkout")}
+                  onClick={() =>
+                    navigate("/checkout", { state: { productdata } })
+                  }
                 >
                   Proceed to Checkout
                 </Button>

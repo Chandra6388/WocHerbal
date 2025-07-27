@@ -14,7 +14,7 @@ const {
 } = require('../controllers/cartController');
 
 // All routes require authentication
-router.use(protect);
+// router.use(protect);
 
 // Cart routes
 router.post('/', getCart);

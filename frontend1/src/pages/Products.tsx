@@ -105,7 +105,7 @@ const Products = () => {
       navigate("/login");
       return;
     }
-    addToCart({ id: product._id, userId: userdata?.id as string });
+    // addToCart({ id: product._id, userId: userdata?.id as string });
   };
 
   const getProducts = async () => {
@@ -389,7 +389,7 @@ const Products = () => {
                 </div>
               </CardContent>
 
-              <div className="flex items-center gap-2 mb-3 px-4">
+              {/* <div className="flex items-center gap-2 mb-3 px-4">
                 <input
                   type="number"
                   placeholder="Enter pincode"
@@ -409,10 +409,10 @@ const Products = () => {
                 >
                   Verify Pincode
                 </Button>
-              </div>
+              </div> */}
 
               <CardFooter className="p-4 pt-0">
-                {isInCart(product?._id) ? (
+                {/* {isInCart(product?._id) ? (
                   <Button
                     onClick={() => navigate("/cart")}
                     className="w-full"
@@ -430,7 +430,15 @@ const Products = () => {
                     <ShoppingCart className="w-4 h-4 mr-2" />
                     Add to Cart
                   </Button>
-                )}
+                )} */}
+                <Button
+                  onClick={() => navigate(`/product/${product._id}`)}
+                  className="w-full"
+                  disabled={product.stock === 0}
+                >
+                  <ShoppingCart className="w-4 h-4 mr-2" />
+                  BUY
+                </Button>
               </CardFooter>
             </Card>
           ))}

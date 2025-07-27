@@ -1,13 +1,28 @@
+import { useParams, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import {
+  ArrowLeft,
+  Star,
+  ShoppingCart,
+  Heart,
+  Share2,
+  Shield,
+  Truck,
+  Award,
+} from "lucide-react";
+import { useCart } from "../contexts/CartContext";
+import { Button } from "../components/ui/button";
+import { Card, CardContent } from "../components/ui/card";
+import { Badge } from "../components/ui/badge";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "../components/ui/tabs";
+import { getProductById } from "../services/productsServices";
+import { getUserFromToken } from "@/Utils/TokenData";
 
-import { useParams, useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
-import { ArrowLeft, Star, ShoppingCart, Heart, Share2, Shield, Truck, Award } from 'lucide-react';
-import { useCart } from '../contexts/CartContext';
-import { Button } from '../components/ui/button';
-import { Card, CardContent } from '../components/ui/card';
-import { Badge } from '../components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
-import { getProductById } from '../services/productsServices';
 type Product = {
   _id: string;
   name: string;
@@ -30,24 +45,23 @@ interface Review {
   rating: number;
   comment: string;
   createdAt: string;
-};
+}
 
 const ProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { addToCart } = useCart();
+  const { addToCart, isInCart } = useCart();
 
   const [quantity, setQuantity] = useState<number>(1);
   const [product, setProduct] = useState<Product | null>(null);
-
-  console.log("Product ID:", product);
+  const userdata = getUserFromToken() as { id: string };
 
   useEffect(() => {
     const fetchProduct = async () => {
       try {
         const response = await getProductById({ productId: id });
-        if(response?.status === 'error') {
-          navigate('/products');
+        if (response?.status === "error") {
+          navigate("/products");
           return;
         }
         setProduct(response?.product);
@@ -60,39 +74,41 @@ const ProductDetail = () => {
       fetchProduct();
     }
   }, [id, navigate]);
- 
-
-
 
   if (!product) {
     return (
       <div className="min-h-screen pt-20 flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-2xl font-bold mb-4">Product Not Found</h2>
-          <Button onClick={() => navigate('/products')}>Back to Products</Button>
+          <Button onClick={() => navigate("/products")}>
+            Back to Products
+          </Button>
         </div>
       </div>
     );
   }
 
-  const handleAddToCart = () => {
-    
+  const handleAddToCart = (product: Product) => {
+    navigate("/cart", {
+      state: {
+        product,
+      },
+    });
+    // addToCart({
+    //   id: product._id,
+    //   userId: userdata?.id as string,
+    //   quantity: quantity,
+    // });
   };
 
   const handleBuyNow = () => {
-    handleAddToCart();
-    navigate('/cart');
+    navigate("/cart");
   };
-
 
   return (
     <div className="min-h-screen pt-20 bg-background">
       <div className="container mx-auto px-6 py-8">
-        <Button
-          variant="ghost"
-          onClick={() => navigate(-1)}
-          className="mb-6"
-        >
+        <Button variant="ghost" onClick={() => navigate(-1)} className="mb-6">
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back
         </Button>
@@ -116,14 +132,18 @@ const ProductDetail = () => {
               <div className="flex items-center gap-4 mb-4">
                 <div className="flex items-center">
                   <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-                  <span className="text-lg font-semibold ml-1">{product?.ratings || 0}</span>
-                  <span className="text-muted-foreground ml-1">({product?.reviews?.length || 0} reviews)</span>
+                  <span className="text-lg font-semibold ml-1">
+                    {product?.ratings || 0}
+                  </span>
+                  <span className="text-muted-foreground ml-1">
+                    ({product?.reviews?.length || 0} reviews)
+                  </span>
                 </div>
                 {product?.stock > 0 && (
                   <Badge variant="secondary">In Stock</Badge>
                 )}
               </div>
-              
+
               <div className="flex items-center gap-4 mb-6">
                 <span className="text-3xl font-bold text-primary">
                   ₹{product?.price}
@@ -135,7 +155,12 @@ const ProductDetail = () => {
                 )}
                 {product?.originalPrice && (
                   <Badge variant="destructive">
-                    {Math.round(((product?.originalPrice - product?.price) / product?.originalPrice) * 100)}% OFF
+                    {Math.round(
+                      ((product?.originalPrice - product?.price) /
+                        product?.originalPrice) *
+                        100
+                    )}
+                    % OFF
                   </Badge>
                 )}
               </div>
@@ -147,7 +172,7 @@ const ProductDetail = () => {
 
             {/* Quantity and Actions */}
             <div className="space-y-4">
-              <div className="flex items-center gap-4">
+              {/* <div className="flex items-center gap-4">
                 <span className="font-semibold">Quantity:</span>
                 <div className="flex items-center border rounded-lg">
                   <Button
@@ -167,19 +192,28 @@ const ProductDetail = () => {
                     +
                   </Button>
                 </div>
-              </div>
-
+              </div> */}
               <div className="flex gap-4">
-                <Button
-                  size="lg"
-                  onClick={handleAddToCart}
-                  className="flex-1"
-                  disabled={!product.stock}
-                >
-                  <ShoppingCart className="w-5 h-5 mr-2" />
-                  Add to Cart
-                </Button>
-                <Button
+                {isInCart(product?._id) ? (
+                  <Button
+                    onClick={() => navigate("/cart")}
+                    className="w-full"
+                    disabled={product.stock === 0}
+                  >
+                    <ShoppingCart className="w-4 h-4 mr-2" />
+                    Go to Cart
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={() => handleAddToCart(product)}
+                    className="w-full"
+                    disabled={product.stock === 0}
+                  >
+                    <ShoppingCart className="w-4 h-4 mr-2" />
+                    Add to Cart
+                  </Button>
+                )}
+                {/* <Button
                   size="lg"
                   variant="outline"
                   onClick={handleBuyNow}
@@ -187,7 +221,7 @@ const ProductDetail = () => {
                   disabled={!product.stock}
                 >
                   Buy Now
-                </Button>
+                </Button> */}
               </div>
 
               <div className="flex gap-2">
@@ -228,30 +262,33 @@ const ProductDetail = () => {
               <TabsTrigger value="ingredients">Ingredients</TabsTrigger>
               <TabsTrigger value="reviews">Reviews</TabsTrigger>
             </TabsList>
-            
+
             <TabsContent value="benefits" className="mt-6">
               <Card>
                 <CardContent className="p-6">
                   <h3 className="text-xl font-semibold mb-4">Key Benefits</h3>
                   <ul className="space-y-2">
-                   
-                      <li className="flex items-start">
-                        <span className="w-2 h-2 bg-primary rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                        <span>{product?.benefits}</span>
-                      </li>
-                  
+                    <li className="flex items-start">
+                      <span className="w-2 h-2 bg-primary rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                      <span>{product?.benefits}</span>
+                    </li>
                   </ul>
                 </CardContent>
               </Card>
             </TabsContent>
-            
+
             <TabsContent value="ingredients" className="mt-6">
               <Card>
                 <CardContent className="p-6">
-                  <h3 className="text-xl font-semibold mb-4">Natural Ingredients</h3>
+                  <h3 className="text-xl font-semibold mb-4">
+                    Natural Ingredients
+                  </h3>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                     {[]?.map((ingredient, index) => (
-                      <div key={index} className="bg-secondary p-3 rounded-lg text-center">
+                      <div
+                        key={index}
+                        className="bg-secondary p-3 rounded-lg text-center"
+                      >
                         <span className="font-medium">{ingredient}</span>
                       </div>
                     ))}
@@ -259,11 +296,13 @@ const ProductDetail = () => {
                 </CardContent>
               </Card>
             </TabsContent>
-            
+
             <TabsContent value="reviews" className="mt-6">
               <Card>
                 <CardContent className="p-6">
-                  <h3 className="text-xl font-semibold mb-4">Customer Reviews</h3>
+                  <h3 className="text-xl font-semibold mb-4">
+                    Customer Reviews
+                  </h3>
                   <div className="space-y-4">
                     {product?.reviews?.length > 0 ? (
                       product.reviews.map((review, index) => (
@@ -273,19 +312,26 @@ const ProductDetail = () => {
                               {[...Array(5)].map((_, i) => (
                                 <Star
                                   key={i}
-                                  className={`w-4 h-4 ${i < review.rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`}
+                                  className={`w-4 h-4 ${
+                                    i < review.rating
+                                      ? "fill-yellow-400 text-yellow-400"
+                                      : "text-gray-300"
+                                  }`}
                                 />
                               ))}
                             </div>
-                            <span className="ml-2 font-semibold">{review.user.name}</span>
+                            <span className="ml-2 font-semibold">
+                              {review.user.name}
+                            </span>
                           </div>
-                          <p className="text-muted-foreground">{review.comment}</p>
+                          <p className="text-muted-foreground">
+                            {review.comment}
+                          </p>
                         </div>
                       ))
                     ) : (
                       <p className="text-muted-foreground">No reviews yet.</p>
                     )}
-                  
                   </div>
                 </CardContent>
               </Card>
