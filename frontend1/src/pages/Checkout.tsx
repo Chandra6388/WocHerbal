@@ -1,31 +1,19 @@
 import { useState, useEffect } from "react";
-import { useCart } from "../contexts/CartContext";
+// import { useCart } from "../contexts/CartContext";
 import { useAuth } from "../contexts/AuthContext";
 import { Button } from "../components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "../components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, } from "../components/ui/card";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { Textarea } from "../components/ui/textarea";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "../components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, } from "../components/ui/dialog";
 import { createOrder, createOrderByrazorpay } from "@/services/admin/User";
 import { useToast } from "../hooks/use-toast";
 import { RAZORPAY_KEY_ID } from "@/Utils/privateKeys";
 import { loadRazorpayScript } from "@/Utils/RazorpayLoader";
 import { updateStockAndSoldCount } from "@/services/admin/productService";
 import { getRocketShipmentsAvailabilty } from "@/services/admin/rocketShippment";
-import { getUserProfile } from "@/services/authSerives";
-import { getUserFromToken } from "@/Utils/TokenData";
+
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { sendOTP, verifyOTP } from "@/services/authSerives";
 
@@ -58,7 +46,6 @@ const Checkout = () => {
   const location = useLocation();
   const productdata = location?.state?.product;
   const { toast } = useToast();
-  const { items, totalPrice, clearCart } = useCart();
   const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
@@ -91,13 +78,17 @@ const Checkout = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const formattedItems = items.map((item) => ({
-    product: item?.product?._id,
-    quantity: item?.quantity,
-    name: item?.product?.name,
-    image: item?.product?.images,
-    price: item?.product?.price,
-  }));
+   const getSubtotal = () => {
+    return Math.round(productdata?.price * location?.state?.quantity);
+  };
+
+  const formattedItems = {
+    product: productdata?._id,
+    quantity: location?.state?.quantity,
+    name: productdata?.name,
+    image: productdata?.images,
+    price: productdata?.price,
+  }
 
   const createOrderPayload = (paymentId: string | null = null) => ({
     user: user?._id,
@@ -118,19 +109,21 @@ const Checkout = () => {
       method:
         formData.paymentMethod === "razorpay" ? "Razorpay" : "Cash on Delivery",
     },
-    totalPrice: totalPrice,
+    totalPrice: getSubtotal(),
   });
 
   // Send OTP function
   const handleSendOTP = async () => {
     setIsOtpLoading(true);
     try {
-      const data = { email: formData.email, name: formData.name, phone: formData.phone, address: {
-        street: formData.address,
-        city: formData.city,
-        state: formData.state,
-        zipCode: formData.pincode,
-      } };
+      const data = {
+        email: formData.email, name: formData.name, phone: formData.phone, address: {
+          street: formData.address,
+          city: formData.city,
+          state: formData.state,
+          zipCode: formData.pincode,
+        }
+      };
       const otpResponse = await sendOTP(data);
       if (otpResponse.status) {
         setOtpSent(true);
@@ -158,7 +151,6 @@ const Checkout = () => {
     }
   };
 
-  // Verify OTP and proceed with order
   const handleVerifyOTP = async () => {
     if (!otp || otp.length !== 6) {
       toast({
@@ -171,12 +163,11 @@ const Checkout = () => {
 
     setIsVerifyingOtp(true);
     try {
-      const verifyResponse = await verifyOTP({ 
-        email: formData.email, 
-        otp: otp 
+      const verifyResponse = await verifyOTP({
+        email: formData.email,
+        otp: otp
       });
 
-      
       if (verifyResponse.status) {
         toast({
           title: "Success",
@@ -184,7 +175,6 @@ const Checkout = () => {
           variant: "success",
         });
         setIsOtpModalOpen(false);
-        // Proceed with order placement
         await proceedWithOrder();
       } else {
         toast({
@@ -205,7 +195,6 @@ const Checkout = () => {
     }
   };
 
-  // Proceed with order after OTP verification
   const proceedWithOrder = async () => {
     try {
       const isLoaded = await loadRazorpayScript(
@@ -213,7 +202,7 @@ const Checkout = () => {
       );
       const finalAmount = Math.round(getSubtotal() * 1.18);
       const { order } = await createOrderByrazorpay({ amount: finalAmount });
-      
+
       const options: RazorpayOptions = {
         key: RAZORPAY_KEY_ID,
         amount: order.amount,
@@ -237,7 +226,7 @@ const Checkout = () => {
                 description: "Order placed successfully!",
                 variant: "default",
               });
-              clearCart();
+              
               navigate("/orders");
             } else {
               toast({
@@ -281,7 +270,6 @@ const Checkout = () => {
 
     e.preventDefault();
 
-    // Form validation
     if (
       !formData.name ||
       !formData.email ||
@@ -334,15 +322,15 @@ const Checkout = () => {
       return;
     }
 
-    // Open OTP modal and send OTP
-    setIsOtpModalOpen(true);
-    await handleSendOTP();
+    if (!isAuthenticated) {
+      setIsOtpModalOpen(true);
+      await handleSendOTP();
+    } else {
+      await proceedWithOrder();
+    }
   };
 
-  const getSubtotal = () => {
-    return Math.round(productdata?.price * location?.state?.quantity);
-  };
-
+ 
   return (
     <div className="min-h-screen pt-20 bg-background">
       <div className="container mx-auto px-6 py-8">

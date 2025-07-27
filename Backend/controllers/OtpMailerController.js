@@ -23,8 +23,6 @@ const transporter = nodemailer.createTransport({
 exports.sendOTP = async (req, res) => {
   const { email, name, phone, address } = req.body;
 
-  console.log('Email:', email);
-
   if (!email) return res.json({ message: 'Email is required' });
 
   const otp = generateOTP();
@@ -125,9 +123,7 @@ exports.sendOTP = async (req, res) => {
         address,
       });
     }
-
-    // Send token (this should respond)
-    sendToken(user, 201, res);
+    return res.status(200).json({ status: true, message: 'OTP sent successfully' });
   } catch (error) {
     console.error('Email send error:', error);
     res.status(500).json({ status: false, message: 'Failed to send OTP' });
@@ -137,13 +133,29 @@ exports.sendOTP = async (req, res) => {
 
 
 // Verify OTP API
-exports.verifyOTP = (req, res) => {
-    const { email, otp } = req.body;
-    if (otpStore[email] === otp) {
-        delete otpStore[email];
-        return res.json({ status: true, message: 'OTP verified successfully' });
+exports.verifyOTP = async (req, res) => {
+  const { email, otp } = req.body;
+
+  if (!email || !otp) {
+    return res.json({ status: false, message: 'Email and OTP are required' });
+  }
+
+  try {
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ status: false, message: 'User not found' });
     }
 
-    res.status(400).json({ status: false, message: 'Invalid OTP' });
+    if (otpStore[email] === otp) {
+      delete otpStore[email]; 
+      return sendToken(user, 201, res);
+    } else {
+      return res.json({ status: false, message: 'Invalid OTP' });
+    }
+  } catch (error) {
+    console.error('OTP verification error:', error);
+    return res.status(500).json({ status: false, message: 'Server error during OTP verification' });
+  }
 };
 
