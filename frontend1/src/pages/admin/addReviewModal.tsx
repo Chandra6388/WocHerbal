@@ -34,12 +34,7 @@ export default function ReviewModal({open, setModal }) {
     const handleSubmit = async () => {
         if (rating === 0) return
         try {
-            await addProductReview({
-                rating,
-                comment: reviewText,
-                user: userName,
-                productId: selectedProduct
-            });
+            await addProductReview({rating, comment: reviewText, user: userName, productId: selectedProduct});
             setModal(false)
             setRating(0)
             setReviewText("")

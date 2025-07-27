@@ -14,6 +14,8 @@ import { createProductReview } from "@/services/productsServices"
 import { getUserFromToken } from "@/Utils/TokenData";
 import { getUserProfile } from "@/services/authSerives";
 import { useToast } from "../hooks/use-toast";
+import { addProductReview  } from "@/services/admin/productService";
+
 
 export default function ReviewModal({ product, open, setModal }) {
     const { toast } = useToast();
@@ -52,13 +54,12 @@ export default function ReviewModal({ product, open, setModal }) {
     const handleSubmit = async () => {
         if (!product?.product || rating === 0) return
         try {
-            await createProductReview({
+            await addProductReview({
                 productId: product.product,
                 rating,
                 comment: reviewText,
-                userName: userName,
+                user: userName,
             })
-
             setModal(false)
             setRating(0)
             setReviewText("")

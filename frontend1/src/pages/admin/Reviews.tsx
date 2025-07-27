@@ -26,9 +26,6 @@ const Reviews = () => {
   const [reviews, setReviews] = useState<Review[]>([]);
 
 
-  console.log("Initial Reviews:", reviews);
-
-  // Fetch reviews from the server
   const fetchReviews = async () => {
     try {
       const response = await getAllReview();
@@ -43,9 +40,6 @@ const Reviews = () => {
   useEffect(() => {
     fetchReviews();
   }, []);
-
-
-  console.log("Reviews:", reviews); 
 
   const renderStars = (rating: number) => {
     return (

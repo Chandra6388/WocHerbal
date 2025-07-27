@@ -16,8 +16,6 @@ import { getUserFromToken } from "@/Utils/TokenData";
 
 
 const Orderhistory = () => {
-  const userdata = getUserFromToken() as { id: string };
-
   const [myAllOrder, setMyAllOrder] = useState([]);
   const [open, setOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -51,8 +49,7 @@ const Orderhistory = () => {
   };
 
   const rating = 0
-
-  console.log("My All Orders:", myAllOrder);
+ 
 
   return (
     <div className="p-6">
@@ -94,7 +91,6 @@ const Orderhistory = () => {
                         </div>
                       </div>
                     </TableCell>
-
                     <TableCell className="text-gray-700">{item.quantity}</TableCell>
                     <TableCell className="text-gray-700">₹{item.price}</TableCell>
                     <TableCell>
