@@ -78,7 +78,7 @@ const Checkout = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-   const getSubtotal = () => {
+  const getSubtotal = () => {
     return Math.round(productdata?.price * location?.state?.quantity);
   };
 
@@ -226,7 +226,7 @@ const Checkout = () => {
                 description: "Order placed successfully!",
                 variant: "default",
               });
-              
+
               navigate("/orders");
             } else {
               toast({
@@ -311,16 +311,29 @@ const Checkout = () => {
       weight: Number(weightData.toFixed(2)),
     };
 
-    const response = await getRocketShipmentsAvailabilty(payload);
+    try {
+      const response = await getRocketShipmentsAvailabilty(payload);
+      console.log("Shipping Availability Response:", response);
 
-    if (!response?.available) {
+      if (response?.status !== "success" || !response?.available) {
+        toast({
+          title: "Error",
+          description: response?.message || "No courier service available for this pincode.",
+          variant: "destructive",
+        });
+        return; // ⛔️ STOP here if not available
+      }
+    } catch (error) {
+      console.error("Shipping Availability Error:", error);
       toast({
         title: "Error",
-        description: "No courier service available for the provided pincode.",
+        description: "Failed to check shipping availability.",
         variant: "destructive",
       });
-      return;
+      return; // ⛔️ STOP on failure
     }
+
+
 
     if (!isAuthenticated) {
       setIsOtpModalOpen(true);
@@ -330,7 +343,7 @@ const Checkout = () => {
     }
   };
 
- 
+
   return (
     <div className="min-h-screen pt-20 bg-background">
       <div className="container mx-auto px-6 py-8">
@@ -416,6 +429,7 @@ const Checkout = () => {
                     <div>
                       <Label htmlFor="pincode">Pincode</Label>
                       <Input
+                        type="number"
                         id="pincode"
                         name="pincode"
                         value={formData.pincode}
