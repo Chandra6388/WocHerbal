@@ -5,7 +5,8 @@ const ErrorHandler = require('../utils/errorHandler');
 
 exports.createReview = async (req, res, next) => {
   try {
-    const { productId,  rating, title, comment } = req.body;
+    const { productId,  rating,  comment , user } = req.body;
+   
 
     const product = await Product.findById(productId);
     if (!product) {
@@ -15,36 +16,14 @@ exports.createReview = async (req, res, next) => {
       });
     }
 
-    const order = await Order.findById(orderId);
-    if (!order || order.user.toString() !== req.user.id) {
-      return res.status(404).json({
-        status: 'error',
-        message: 'Order not found or not authorized'
-      });
-    }
-
-    const existingReview = await Review.findOne({
-      user: req.user.id,
-      product: productId
-    });
-
-    if (existingReview) {
-      return res.status(400).json({
-        status: 'error',
-        message: 'You have already reviewed this product'
-      });
-    }
-
     const review = await Review.create({
-      user: req.user.id,
-      product: productId,
-      order: orderId,
+      user: user,
+      productId,
       rating,
-      title,
       comment
     });
 
-    await review.populate('user', 'name avatar');
+    await review.populate('user', 'name avatar'); 
 
     res.status(201).json({
       status: 'success',

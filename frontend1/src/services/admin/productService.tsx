@@ -125,10 +125,7 @@ export const deleteCategory = async (productData) => {
 
 export const addProductReview = async (productData) => {
   try {
-    const response = await axios.post(
-      `${API_URL}/reviews/add`,
-      productData
-    );
+    const response = await axios.post(`${API_URL}/reviews/add`, productData);
     return response.data;
   } catch (error) {
     throw error.response.data;

@@ -51,7 +51,6 @@ export default function ReviewModal({ product, open, setModal }) {
 
     const handleSubmit = async () => {
         if (!product?.product || rating === 0) return
-
         try {
             await createProductReview({
                 productId: product.product,

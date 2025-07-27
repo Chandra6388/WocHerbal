@@ -18,20 +18,53 @@ exports.newProduct = async (req, res, next) => {
 exports.getProducts = async (req, res, next) => {
   try {
     const resPerPage = 8;
+    const page = Number(req.query.page) || 1;
 
-    // Count only active products
-    const productsCount = await Product.countDocuments({ status: 'active' });
+    const matchStage = {
+      status: 'active',
+    };
 
-    // Start with only active products in the query
-    const apiFeatures = new APIFeatures(Product.find({ status: 'active' }), req.query)
-      .search()
-      .filter();
+    // Total active products
+    const productsCount = await Product.countDocuments(matchStage);
 
-    let products = await apiFeatures.query;
-    let filteredProductsCount = products.length;
+    const skip = resPerPage * (page - 1);
 
-    apiFeatures.pagination(resPerPage);
-    products = await apiFeatures.query.clone();
+    const products = await Product.aggregate([
+      { $match: matchStage },
+
+      // Search by name if keyword passed
+      ...(req.query.keyword
+        ? [
+            {
+              $match: {
+                name: {
+                  $regex: req.query.keyword,
+                  $options: 'i',
+                },
+              },
+            },
+          ]
+        : []),
+
+      // Filter logic (if any additional filters are passed in req.query)
+      // Add here if needed
+
+      // Lookup Reviews
+      {
+        $lookup: {
+          from: 'reviews', // collection name in MongoDB (lowercase plural of model)
+          localField: '_id',
+          foreignField: 'productId',
+          as: 'productReviews',
+        },
+      },
+
+      // Pagination
+      { $skip: skip },
+      { $limit: resPerPage },
+    ]);
+
+    const filteredProductsCount = products.length;
 
     res.status(200).json({
       status: 'success',
@@ -125,8 +158,6 @@ exports.deleteProduct = async (req, res, next) => {
     next(error);
   }
 };
-
-
 
 exports.createProductReview = async (req, res, next) => {
    
