@@ -5,9 +5,7 @@ const ErrorHandler = require('../utils/errorHandler');
 
 exports.createReview = async (req, res, next) => {
   try {
-    const { productId,  rating,  comment , user } = req.body;
-   
-
+    const { productId, rating, comment, user } = req.body;
     const product = await Product.findById(productId);
     if (!product) {
       return res.status(404).json({
@@ -23,7 +21,7 @@ exports.createReview = async (req, res, next) => {
       comment
     });
 
-    await review.populate('user', 'name avatar'); 
+    await review.populate('user', 'name avatar');
 
     res.status(201).json({
       status: 'success',
@@ -34,126 +32,44 @@ exports.createReview = async (req, res, next) => {
   }
 };
 
-exports.getProductReviews = async (req, res, next) => {
+exports.LikeReview = async (req, res, next) => {
   try {
-    const { productId } = req.params;
-    const { page = 1, limit = 10, rating, sort = 'createdAt' } = req.query;
-
-    const query = { 
-      product: productId, 
-      status: 'approved' 
-    };
-    
-    if (rating) query.rating = rating;
-
-    let sortOption = {};
-    if (sort === 'rating') sortOption = { rating: -1 };
-    else if (sort === 'helpful') sortOption = { 'helpful.length': -1 };
-    else sortOption = { createdAt: -1 };
-
-    const reviews = await Review.find(query)
-      .populate('user', 'name avatar')
-      .sort(sortOption)
-      .limit(limit * 1)
-      .skip((page - 1) * limit);
-
-    const count = await Review.countDocuments(query);
-
-    // Calculate average rating
-    const ratingStats = await Review.aggregate([
-      { $match: { product: productId, status: 'approved' } },
-      {
-        $group: {
-          _id: null,
-          avgRating: { $avg: '$rating' },
-          totalReviews: { $sum: 1 },
-          ratingDistribution: {
-            $push: '$rating'
-          }
-        }
-      }
-    ]);
-
-    const ratingDistribution = {
-      5: 0, 4: 0, 3: 0, 2: 0, 1: 0
-    };
-
-    if (ratingStats[0]) {
-      ratingStats[0].ratingDistribution.forEach(rating => {
-        ratingDistribution[rating]++;
-      });
-    }
-
-    res.status(200).json({
-      status: 'success',
-      reviews,
-      totalPages: Math.ceil(count / limit),
-      currentPage: page,
-      totalReviews: count,
-      stats: {
-        averageRating: ratingStats[0]?.avgRating || 0,
-        totalReviews: ratingStats[0]?.totalReviews || 0,
-        ratingDistribution
-      }
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-exports.getReview = async (req, res, next) => {
-  try {
-    const review = await Review.findById(req.params.id)
-      .populate('user', 'name avatar')
-      .populate('product', 'name images');
-
+    const { reviewId } = req.body;
+    const review = await Review.findById(reviewId);
     if (!review) {
       return res.status(404).json({
         status: 'error',
         message: 'Review not found'
       });
     }
-
-    res.status(200).json({
-      status: 'success',
-      review
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-exports.updateReview = async (req, res, next) => {
-  try {
-    const { rating, title, comment } = req.body;
-
-    const review = await Review.findById(req.params.id);
-
-    if (!review) {
-      return res.status(404).json({
-        status: 'error',
-        message: 'Review not found'
-      });
-    }
-
-    // Check if user owns this review
-    if (review.user.toString() !== req.user.id) {
-      return res.status(403).json({
-        status: 'error',
-        message: 'Not authorized to update this review'
-      });
-    }
-
-    review.rating = rating;
-    review.title = title;
-    review.comment = comment;
-    review.status = 'pending'; // Reset approval status
-
+    review.likes += 1;
     await review.save();
-
     res.status(200).json({
       status: 'success',
-      review
+      message: 'Review liked successfully',
+      likes: review.likes
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.DislikeReview = async (req, res, next) => {
+  try {
+    const { reviewId } = req.body;
+    const review = await Review.findById(reviewId);
+    if (!review) {  
+      return res.status(404).json({
+        status: 'error',
+        message: 'Review not found'
+      });
+    }
+    review.dislikes += 1;
+    await review.save();    
+    res.status(200).json({
+      status: 'success',
+      message: 'Review disliked successfully',
+      dislikes: review.dislikes
     });
   } catch (error) {
     next(error);
@@ -190,124 +106,12 @@ exports.deleteReview = async (req, res, next) => {
   }
 };
 
-exports.markHelpful = async (req, res, next) => {
-  try {
-    const { helpful } = req.body; // true or false
-
-    const review = await Review.findById(req.params.id);
-
-    if (!review) {
-      return res.status(404).json({
-        status: 'error',
-        message: 'Review not found'
-      });
-    }
-
-    // Check if user has already marked this review
-    const existingHelpful = review.helpful.find(
-      h => h.user.toString() === req.user.id
-    );
-
-    if (existingHelpful) {
-      // Update existing helpful mark
-      existingHelpful.helpful = helpful;
-    } else {
-      // Add new helpful mark
-      review.helpful.push({
-        user: req.user.id,
-        helpful: helpful
-      });
-    }
-
-    await review.save();
-
-    res.status(200).json({
-      status: 'success',
-      message: `Review marked as ${helpful ? 'helpful' : 'not helpful'}`
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-exports.getMyReviews = async (req, res, next) => {
-  try {
-    const { page = 1, limit = 10, status } = req.query;
-
-    const query = { user: req.user.id };
-    if (status) query.status = status;
-
-    const reviews = await Review.find(query)
-      .populate('product', 'name images')
-      .sort('-createdAt')
-      .limit(limit * 1)
-      .skip((page - 1) * limit);
-
-    const count = await Review.countDocuments(query);
-
-    res.status(200).json({
-      status: 'success',
-      reviews,
-      totalPages: Math.ceil(count / limit),
-      currentPage: page,
-      totalReviews: count
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-exports.getReviewStats = async (req, res, next) => {
-  try {
-    const { productId } = req.query;
-
-    const query = { status: 'approved' };
-    if (productId) query.product = productId;
-
-    const stats = await Review.aggregate([
-      { $match: query },
-      {
-        $group: {
-          _id: null,
-          totalReviews: { $sum: 1 },
-          avgRating: { $avg: '$rating' },
-          ratingDistribution: {
-            $push: '$rating'
-          }
-        }
-      }
-    ]);
-
-    const ratingDistribution = {
-      5: 0, 4: 0, 3: 0, 2: 0, 1: 0
-    };
-
-    if (stats[0]) {
-      stats[0].ratingDistribution.forEach(rating => {
-        ratingDistribution[rating]++;
-      });
-    }
-
-    res.status(200).json({
-      status: 'success',
-      stats: {
-        totalReviews: stats[0]?.totalReviews || 0,
-        averageRating: stats[0]?.avgRating || 0,
-        ratingDistribution
-      }
-    });
-  } catch (error) {
-    next(error);
-  }
-}; 
-
-
 exports.getAllReview = async (req, res, next) => {
   try {
     const reviews = await Review.find()
       .sort('-createdAt')
       .populate('productId', 'name images')
-      .populate('user', 'name avatar');    
+      .populate('user', 'name avatar');
 
     res.status(200).json({
       status: 'success',
@@ -319,6 +123,27 @@ exports.getAllReview = async (req, res, next) => {
     res.status(500).json({
       status: 'error',
       message: 'Something went wrong while fetching reviews',
+      error: error.message
+    });
+  }
+};
+
+exports.getAllUserReview = async (req, res, next) => {
+  try {
+    const reviews = await Review.find({ status: 'approved' })
+      .sort('-createdAt')
+      .populate('productId', 'name images')
+
+    res.status(200).json({
+      status: 'success',
+      count: reviews.length,
+      reviews
+    });
+  } catch (error) {
+    console.error('Error fetching user reviews:', error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Something went wrong while fetching user reviews',
       error: error.message
     });
   }
