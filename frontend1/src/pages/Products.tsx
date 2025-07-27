@@ -4,7 +4,12 @@ import { Link, useNavigate } from "react-router-dom";
 import { Star, ShoppingCart, Heart } from "lucide-react";
 import { useCart } from "../contexts/CartContext";
 import { Button } from "../components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader,} from "../components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
 import { getUserProducts } from "@/services/admin/productService";
 import { useToast } from "../hooks/use-toast";
@@ -56,7 +61,9 @@ const Products = () => {
   const [favorList, setFavorList] = useState<Product[]>([]);
   const [category, setCategory] = useState<Category[]>([]);
   const userdata = getUserFromToken() as { id: string };
-  const [pincodeInputs, setPincodeInputs] = useState<{ [key: string]: string }>({});
+  const [pincodeInputs, setPincodeInputs] = useState<{ [key: string]: string }>(
+    {}
+  );
 
   useEffect(() => {
     getAllCategory();
@@ -263,7 +270,6 @@ const Products = () => {
     }
   };
 
-
   const getAvgRating = (reviews: { rating: number }[]) => {
     if (reviews.length === 0) return 0;
 
@@ -310,6 +316,7 @@ const Products = () => {
           {filteredProducts?.map((product) => (
             <Card
               key={product._id}
+              onClick={() => navigate(`/product/${product._id}`)}
               className="group hover:shadow-lg transition-shadow duration-300"
             >
               <CardHeader className="p-0">
@@ -367,12 +374,19 @@ const Products = () => {
                       {product.productReviews.length > 0
                         ? getAvgRating(
                             product.productReviews
-                              .filter((r) => r.rating !== undefined && r.rating !== null)
+                              .filter(
+                                (r) =>
+                                  r.rating !== undefined && r.rating !== null
+                              )
                               .map((r) => ({
-                                rating: typeof r.rating === "string" ? Number(r.rating) : (r.rating ?? 0),
+                                rating:
+                                  typeof r.rating === "string"
+                                    ? Number(r.rating)
+                                    : r.rating ?? 0,
                               }))
                           ).toFixed(1)
-                        : 0} ({product.productReviews.length})
+                        : 0}{" "}
+                      ({product.productReviews.length})
                     </span>
                   </div>
                   {product.stock > 0 && (

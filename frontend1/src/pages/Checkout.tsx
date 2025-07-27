@@ -61,7 +61,6 @@ interface UserData {
 
 const userdata = getUserFromToken() as UserData;
 
-
 const Checkout = () => {
   const location = useLocation();
   const productdata = location?.state?.product;
@@ -254,8 +253,10 @@ const Checkout = () => {
                 description: "Order placed successfully!",
                 variant: "default",
               });
-              navigate("/orders");
-        
+
+              navigate("/orders", { state: { orderId: order.id } });
+
+              window.location.reload();
             } else {
               toast({
                 title: "Error",
@@ -404,7 +405,11 @@ const Checkout = () => {
                         type="email"
                         value={formData?.email}
                         onChange={handleInputChange}
-                        disabled={userdata?.email == null || userdata?.email === "" ? false : true} // Disable if email is already set from token
+                        disabled={
+                          userdata?.email == null || userdata?.email === ""
+                            ? false
+                            : true
+                        } // Disable if email is already set from token
                         required
                       />
                     </div>
