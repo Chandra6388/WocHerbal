@@ -244,7 +244,7 @@ const Checkout = () => {
                 description: "Order placed successfully!",
                 variant: "default",
               });
-
+              console.log("ss");
               navigate("/orders");
             } else {
               toast({
