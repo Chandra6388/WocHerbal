@@ -233,7 +233,7 @@ const Checkout = () => {
       const finalAmount = Math.round(totalPrice * 1.18);
       const { order } = await createOrderByrazorpay({ amount: finalAmount });
       const options: RazorpayOptions = {
-        key: "rzp_test_Yg6vhSeAq4hucc",
+        key: "rzp_live_cAPEvAB15gLqcn",
         amount: order.amount,
         currency: "INR",
         order_id: order._id,

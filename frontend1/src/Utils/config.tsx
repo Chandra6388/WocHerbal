@@ -9,4 +9,3 @@ export const API_URL = window.location.origin.includes("localhost")
   : `${window.location.origin}/backend/api`;
 
 
-
