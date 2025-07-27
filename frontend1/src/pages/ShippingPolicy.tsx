@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 const ShippingPolicy = () => {
   return (
     <div className="min-h-screen bg-background py-12">
-      <div className="container mx-auto px-6 max-w-4xl">
+      <div className="container mx-auto px-6 py-12">
         <div className="mb-8">
           <Link to="/terms">
             <Button variant="outline" className="mb-4">

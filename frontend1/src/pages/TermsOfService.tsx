@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 const TermsOfService = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-accent-light/10 to-secondary/20 pt-20 lg:pt-24">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
+      <div className="container mx-auto px-6 py-12">
         <div className="mb-8 animate-fade-in-up">
           <Link to="/terms">
             <Button variant="outline" className="mb-6 hover-lift">

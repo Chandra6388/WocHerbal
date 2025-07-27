@@ -4,8 +4,8 @@ import { Button } from '@/components/ui/button';
 
 const RefundPolicy = () => {
   return (
-    <div className="min-h-screen bg-background py-12">
-      <div className="container mx-auto px-6 max-w-4xl">
+    <div className="min-h-screen bg-background py-12 mt-12">
+      <div className="container mx-auto px-6 ">
         <div className="mb-8">
           <Link to="/terms">
             <Button variant="outline" className="mb-4">
