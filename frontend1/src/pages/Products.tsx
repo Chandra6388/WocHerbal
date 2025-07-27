@@ -56,17 +56,10 @@ const Products = () => {
   const [favorList, setFavorList] = useState<Product[]>([]);
   const [category, setCategory] = useState<Category[]>([]);
   const userdata = getUserFromToken() as { id: string };
-  const [pincodeInputs, setPincodeInputs] = useState<{ [key: string]: string }>(
-    {}
-  );
-
-  console.log("Products:", products);
+  const [pincodeInputs, setPincodeInputs] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
     getAllCategory();
-  }, []);
-
-  useEffect(() => {
     getProducts();
     handleGetFavorites();
   }, []);
@@ -443,13 +436,22 @@ const Products = () => {
                     Add to Cart
                   </Button>
                 )} */}
+                {/* <Button
+                  onClick={() => navigate(`/product/${product._id}`)}
+                  className="w-full"
+                  disabled={product.stock === 0}
+                >
+                  <ShoppingCart className="w-4 h-4 mr-2" />
+                  Buy Now
+                </Button> */}
+
                 <Button
                   onClick={() => navigate(`/product/${product._id}`)}
                   className="w-full"
                   disabled={product.stock === 0}
                 >
                   <ShoppingCart className="w-4 h-4 mr-2" />
-                  BUY
+                  Buy Now
                 </Button>
               </CardFooter>
             </Card>

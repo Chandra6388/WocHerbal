@@ -181,7 +181,7 @@ const ProductDetail = () => {
 
             {/* Quantity and Actions */}
             <div className="space-y-4">
-              {/* <div className="flex items-center gap-4">
+              <div className="flex items-center gap-4">
                 <span className="font-semibold">Quantity:</span>
                 <div className="flex items-center border rounded-lg">
                   <Button
@@ -201,9 +201,9 @@ const ProductDetail = () => {
                     +
                   </Button>
                 </div>
-              </div> */}
+              </div>
               <div className="flex gap-4">
-                {isInCart(product?._id) ? (
+                {/* {isInCart(product?._id) ? (
                   <Button
                     onClick={() => navigate("/cart")}
                     className="w-full"
@@ -221,7 +221,7 @@ const ProductDetail = () => {
                     <ShoppingCart className="w-4 h-4 mr-2" />
                     Add to Cart
                   </Button>
-                )}
+                )} */}
                 {/* <Button
                   size="lg"
                   variant="outline"
@@ -231,6 +231,15 @@ const ProductDetail = () => {
                 >
                   Buy Now
                 </Button> */}
+
+                 <Button
+                    onClick={() =>navigate('/checkout' , {state: {product, quantity }})}
+                    className="w-full"
+                    disabled={product.stock === 0}
+                  >
+                    <ShoppingCart className="w-4 h-4 mr-2" />
+                    Buy Now
+                  </Button>
               </div>
 
               <div className="flex gap-2">
