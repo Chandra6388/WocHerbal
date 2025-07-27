@@ -58,6 +58,7 @@ const Products = () => {
         // price: product.price,
         // image: product.image,
         userId: "someUserId", // Replace with actual userId if needed
+        quantity: 1,
       });
       setSelectedProduct(product);
       setShowPopup(true);
