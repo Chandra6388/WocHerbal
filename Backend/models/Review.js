@@ -65,10 +65,8 @@ const reviewSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Ensure one review per user per product
 reviewSchema.index({ user: 1, product: 1 }, { unique: true });
 
-// Update product rating when review is saved
 reviewSchema.post('save', async function() {
   const Product = mongoose.model('Product');
   const product = await Product.findById(this.product);

@@ -335,7 +335,7 @@ const Profile = () => {
                               </span>
                             </TableCell>
                             <TableCell>
-                              {order.orderStatus == "Delivered" && (
+                              {order.orderStatus !== "Delivered" && (
                                 <div
                                   className="flex w-48 items-center cursor-pointer"
                                   onClick={() => {

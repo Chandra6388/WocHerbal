@@ -3,12 +3,10 @@ const Product = require('../models/Product');
 const Order = require('../models/Order');
 const ErrorHandler = require('../utils/errorHandler');
 
-// Create new review => /api/reviews
 exports.createReview = async (req, res, next) => {
   try {
-    const { productId, orderId, rating, title, comment } = req.body;
+    const { productId,  rating, title, comment } = req.body;
 
-    // Check if product exists
     const product = await Product.findById(productId);
     if (!product) {
       return res.status(404).json({
@@ -17,7 +15,6 @@ exports.createReview = async (req, res, next) => {
       });
     }
 
-    // Check if order exists and belongs to user
     const order = await Order.findById(orderId);
     if (!order || order.user.toString() !== req.user.id) {
       return res.status(404).json({
@@ -26,7 +23,6 @@ exports.createReview = async (req, res, next) => {
       });
     }
 
-    // Check if user has already reviewed this product
     const existingReview = await Review.findOne({
       user: req.user.id,
       product: productId
@@ -59,7 +55,6 @@ exports.createReview = async (req, res, next) => {
   }
 };
 
-// Get all reviews for a product => /api/reviews/product/:productId
 exports.getProductReviews = async (req, res, next) => {
   try {
     const { productId } = req.params;
@@ -127,7 +122,6 @@ exports.getProductReviews = async (req, res, next) => {
   }
 };
 
-// Get single review => /api/reviews/:id
 exports.getReview = async (req, res, next) => {
   try {
     const review = await Review.findById(req.params.id)
@@ -150,7 +144,6 @@ exports.getReview = async (req, res, next) => {
   }
 };
 
-// Update review => /api/reviews/:id
 exports.updateReview = async (req, res, next) => {
   try {
     const { rating, title, comment } = req.body;
@@ -188,7 +181,6 @@ exports.updateReview = async (req, res, next) => {
   }
 };
 
-// Delete review => /api/reviews/:id
 exports.deleteReview = async (req, res, next) => {
   try {
     const review = await Review.findById(req.params.id);
@@ -219,7 +211,6 @@ exports.deleteReview = async (req, res, next) => {
   }
 };
 
-// Mark review as helpful => /api/reviews/:id/helpful
 exports.markHelpful = async (req, res, next) => {
   try {
     const { helpful } = req.body; // true or false
@@ -260,7 +251,6 @@ exports.markHelpful = async (req, res, next) => {
   }
 };
 
-// Get user's reviews => /api/reviews/user/me
 exports.getMyReviews = async (req, res, next) => {
   try {
     const { page = 1, limit = 10, status } = req.query;
@@ -288,7 +278,6 @@ exports.getMyReviews = async (req, res, next) => {
   }
 };
 
-// Get review statistics => /api/reviews/stats
 exports.getReviewStats = async (req, res, next) => {
   try {
     const { productId } = req.query;

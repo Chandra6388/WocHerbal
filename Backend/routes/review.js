@@ -22,7 +22,7 @@ router.get('/stats', getReviewStats);
 router.use(protect);
 
 // Review CRUD
-router.post('/', validate('createReview'), createReview);
+router.post('/add', createReview);
 router.get('/:id', getReview);
 router.put('/:id', validate('updateReview'), updateReview);
 router.delete('/:id', deleteReview);

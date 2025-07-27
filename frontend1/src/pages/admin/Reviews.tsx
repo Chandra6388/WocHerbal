@@ -4,8 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Star, Check, Trash2 } from 'lucide-react';
+import { Star, Check, Trash2, Plus } from 'lucide-react';
 import { toast } from 'sonner';
+import AddReviewModal from './addReviewModal'; // Adjust the import path as necessary
 
 interface Review {
   id: string;
@@ -18,6 +19,7 @@ interface Review {
 }
 
 const Reviews = () => {
+  const [open, setOpen] = useState(false);
   const [reviews, setReviews] = useState<Review[]>([
     {
       id: '1',
@@ -88,11 +90,15 @@ const Reviews = () => {
 
   return (
     <div className="p-6 space-y-6">
+      <div className='flex items-center justify-between mb-4'>
       <div>
         <h1 className="text-3xl font-bold">Reviews</h1>
         <p className="text-muted-foreground">Manage customer reviews and feedback</p>
       </div>
-
+      <div>
+        <Button className="btn btn-primary" onClick={() => { setOpen(true); }}><Plus/> Add Review</Button>
+      </div>
+      </div>
       <Card>
         <CardHeader>
           <CardTitle>Customer Reviews</CardTitle>
@@ -149,6 +155,8 @@ const Reviews = () => {
           </Table>
         </CardContent>
       </Card>
+
+      <AddReviewModal open={open} setModal={setOpen} />
     </div>
   );
 };

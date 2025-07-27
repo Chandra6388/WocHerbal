@@ -10,55 +10,41 @@ import {
 } from "@/components/ui/dialog"
 import { Star } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { createProductReview } from "@/services/productsServices"
+import { addProductReview , getAllProduct } from "@/services/admin/productService";
 import { getUserFromToken } from "@/Utils/TokenData";
-import { getUserProfile } from "@/services/authSerives";
-import { useToast } from "../hooks/use-toast";
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label";
 
-export default function ReviewModal({ product, open, setModal }) {
-    const { toast } = useToast();
-
+export default function ReviewModal({open, setModal }) {
     const [rating, setRating] = useState(0)
     const [hoverRating, setHoverRating] = useState(0)
     const [reviewText, setReviewText] = useState("")
+    const [userName, setUserName] = useState("")
+    const [products, setProducts] = useState([]);
     const userdata = getUserFromToken() as { id: string };
-    const [userName, setUserName] = useState("");
 
     useEffect(() => {
-        if (product) {
+        if (open) {
             setRating(0)
             setReviewText("")
-            getProfiledata();
+            fetchProducts();
         }
-    }, [product])
+    }, [open])
 
-
-    const getProfiledata = () => {
-        getUserProfile({ id: userdata?.id })
-            .then((res) => {
-                if (res?.status === "success") {
-                    setUserName(res?.user?.name);
-                }
-            })
-            .catch(() => {
-                toast({
-                    title: "Error",
-                    description: "Failed to fetch profile data.",
-                    variant: "destructive",
-                });
-            });
-    };
 
     const handleSubmit = async () => {
-        if (!product?.product || rating === 0) return
-
+        if (rating === 0) return
         try {
-            await createProductReview({
-                productId: product.product,
+           
+                // userId: userdata.id,
+            await addProductReview({
                 rating,
                 comment: reviewText,
-                userName: userName,
+                userId: userdata.id,
+                productId: userName
             })
+
+            
 
             setModal(false)
             setRating(0)
@@ -68,14 +54,24 @@ export default function ReviewModal({ product, open, setModal }) {
         }
     }
 
+    const fetchProducts = async () => {
+        try {
+            const data = await getAllProduct();
+            if(data.status !== 'success') {
+                throw new Error(data.message || 'Failed to fetch products');
+            }
+            setProducts(data.products);
+        } catch (error) {
+            console.error("Failed to fetch products:", error);
+        }
+    };
+
     return (
         <Dialog open={open} onOpenChange={setModal}>
-            <DialogContent>
+            <DialogContent className="max-w-2xl">
                 <DialogHeader>
-                    <DialogTitle>Review for {product?.name}</DialogTitle>
+                    <DialogTitle>Add Review</DialogTitle>
                 </DialogHeader>
-
-                {/* ⭐ Star Rating */}
                 <div className="flex items-center gap-1 mb-4">
                     {[...Array(5)].map((_, i) => (
                         <Star
@@ -84,14 +80,40 @@ export default function ReviewModal({ product, open, setModal }) {
                             onMouseLeave={() => setHoverRating(0)}
                             onClick={() => setRating(i + 1)}
                             className={`w-6 h-6 cursor-pointer transition-colors ${(hoverRating || rating) > i
-                                ? "fill-yellow-400 text-yellow-400"
-                                : "text-gray-300"
+                                    ? "fill-yellow-400 text-yellow-400"
+                                    : "text-gray-300"
                                 }`}
                         />
                     ))}
                 </div>
-
-                {/* 📝 Review Text */}
+                <div>
+                    <Input
+                        placeholder="Your Review"
+                        value={reviewText}
+                        onChange={(e) => setReviewText(e.target.value)}
+                        className="mb-4"
+                    />
+                    <div className="space-y-2">
+                      <Label htmlFor="status">Category</Label>
+                      <select
+                        id="status"
+                        value={userName}
+                        onChange={(e) =>
+                          setUserName(e.target.value)
+                        }
+                        className="w-full px-3 py-2 border border-input rounded-md"
+                      >
+                        <option value="">Select User</option>
+                        {products.map((product) => (
+                          <option key={product.id} value={product.name}>
+                            {product.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                </div>
+                <div>
+                </div>
                 <textarea
                     className="w-full border rounded-md p-2 text-sm"
                     rows={4}

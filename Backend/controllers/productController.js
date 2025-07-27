@@ -1,4 +1,5 @@
 const Product = require('../models/Product');
+const Review = require('../models/Review');
 const ErrorHandler = require('../utils/errorHandler');
 const APIFeatures = require('../utils/apiFeatures');
 
@@ -45,6 +46,7 @@ exports.getProducts = async (req, res, next) => {
 };
 
 exports.getSingleProduct = async (req, res, next) => {
+  console.log("Fetching single product with ID:", req.params.id); 
   try {
     const product = await Product.findById(req.params.id)
     // .populate('user', 'name email')
@@ -124,11 +126,14 @@ exports.deleteProduct = async (req, res, next) => {
   }
 };
 
+
+
 exports.createProductReview = async (req, res, next) => {
+   
   try {
     const { rating, comment, productId, userId } = req.body;
     const review = {
-      user: userId,
+      user: userName,
       rating: Number(rating),
       comment
     };
@@ -448,3 +453,18 @@ exports.updateStockAndSoldCount = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.getAllProductIdAndName = async (req, res, next) => {
+  try {
+    const products = await Product.find({}, 'name')
+      .select('_id name')
+
+    res.status(200).json({
+      status: 'success',
+      products
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+  
