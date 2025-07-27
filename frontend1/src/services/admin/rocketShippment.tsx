@@ -6,7 +6,6 @@ export const getRocketShipmentsAvailabilty = async (data) => {
   try {
     const response = await axios.post(
       `${API_URL}/shipment/getServiceability`,
-
       data
     );
     return response.data;
