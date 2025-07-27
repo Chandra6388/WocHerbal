@@ -2,11 +2,22 @@ import { useState, useEffect } from "react";
 // import { useCart } from "../contexts/CartContext";
 import { useAuth } from "../contexts/AuthContext";
 import { Button } from "../components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, } from "../components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { Textarea } from "../components/ui/textarea";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, } from "../components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "../components/ui/dialog";
 import { createOrder, createOrderByrazorpay } from "@/services/admin/User";
 import { useToast } from "../hooks/use-toast";
 import { RAZORPAY_KEY_ID } from "@/Utils/privateKeys";
@@ -74,7 +85,9 @@ const Checkout = () => {
   const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
@@ -88,11 +101,11 @@ const Checkout = () => {
     name: productdata?.name,
     image: productdata?.images,
     price: productdata?.price,
-  }
+  };
 
   const createOrderPayload = (paymentId: string | null = null) => ({
     user: user?._id,
-    orderItems: formattedItems,
+    orderItems: [formattedItems],
     shippingInfo: {
       address: formData.address,
       city: formData.city,
@@ -117,12 +130,15 @@ const Checkout = () => {
     setIsOtpLoading(true);
     try {
       const data = {
-        email: formData.email, name: formData.name, phone: formData.phone, address: {
+        email: formData.email,
+        name: formData.name,
+        phone: formData.phone,
+        address: {
           street: formData.address,
           city: formData.city,
           state: formData.state,
           zipCode: formData.pincode,
-        }
+        },
       };
       const otpResponse = await sendOTP(data);
       if (otpResponse.status) {
@@ -165,7 +181,7 @@ const Checkout = () => {
     try {
       const verifyResponse = await verifyOTP({
         email: formData.email,
-        otp: otp
+        otp: otp,
       });
 
       if (verifyResponse.status) {
@@ -216,10 +232,12 @@ const Checkout = () => {
               createOrderPayload(response.razorpay_payment_id)
             );
             if (orderRes.success) {
-              const productIds = [{
-                product: productdata._id,
-                quantity: location?.state?.quantity,
-              }];
+              const productIds = [
+                {
+                  product: productdata._id,
+                  quantity: location?.state?.quantity,
+                },
+              ];
               await updateStockAndSoldCount(productIds);
               toast({
                 title: "Success",
@@ -267,7 +285,6 @@ const Checkout = () => {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-
     e.preventDefault();
 
     if (
@@ -313,12 +330,14 @@ const Checkout = () => {
 
     try {
       const response = await getRocketShipmentsAvailabilty(payload);
-      console.log("Shipping Availability Response:", response);
+      console.log("Shipping Availability Response:", response?.available);
 
-      if (response?.status !== "success" || !response?.available) {
+      if (!response?.available) {
         toast({
           title: "Error",
-          description: response?.message || "No courier service available for this pincode.",
+          description:
+            response?.message ||
+            "No courier service available for this pincode.",
           variant: "destructive",
         });
         return; // ⛔️ STOP here if not available
@@ -333,8 +352,6 @@ const Checkout = () => {
       return; // ⛔️ STOP on failure
     }
 
-
-
     if (!isAuthenticated) {
       setIsOtpModalOpen(true);
       await handleSendOTP();
@@ -342,7 +359,6 @@ const Checkout = () => {
       await proceedWithOrder();
     }
   };
-
 
   return (
     <div className="min-h-screen pt-20 bg-background">
@@ -386,7 +402,7 @@ const Checkout = () => {
                   <div>
                     <Label htmlFor="phone">Phone Number</Label>
                     <Input
-                    
+                      type="number"
                       id="phone"
                       name="phone"
                       value={formData.phone}
@@ -440,7 +456,12 @@ const Checkout = () => {
                     </div>
                   </div>
 
-                  <Button type="submit" size="lg" className="w-full" onClick={handleSubmit}>
+                  <Button
+                    type="submit"
+                    size="lg"
+                    className="w-full"
+                    onClick={handleSubmit}
+                  >
                     Place Order
                   </Button>
                 </div>
@@ -462,14 +483,18 @@ const Checkout = () => {
                       className="w-12 h-12 object-cover rounded"
                     />
                     <div>
-                      <p className="font-medium">{location?.state?.product?.name}</p>
+                      <p className="font-medium">
+                        {location?.state?.product?.name}
+                      </p>
                       <p className="text-sm text-muted-foreground">
                         Qty: {location?.state?.quantity}
                       </p>
                     </div>
                   </div>
                   <p className="font-semibold">
-                    ₹{location?.state?.product?.price * location?.state?.quantity}
+                    ₹
+                    {location?.state?.product?.price *
+                      location?.state?.quantity}
                   </p>
                 </div>
                 <hr />
@@ -511,7 +536,7 @@ const Checkout = () => {
                   type="text"
                   maxLength={6}
                   value={otp}
-                  onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
+                  onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
                   placeholder="Enter 6-digit OTP"
                   className="text-center text-lg tracking-widest"
                 />

@@ -174,6 +174,8 @@ const LoginPage = () => {
         }
 
         navigate("/");
+        window.location.reload();
+
         setShowOTPModal(false);
       } else {
         // Handle backend validation errors
