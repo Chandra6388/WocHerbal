@@ -45,8 +45,11 @@ const ProtectedRoute: React.FC = () =>
   getUserFromToken() ? <Outlet /> : <Navigate to="/login" replace />;
 
 const AppRoutes: React.FC = () => {
+
+  
   const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
+
   useEffect(() => {
     if (!isAuthenticated && window.location.pathname.includes("admin")) {
       navigate("/login");

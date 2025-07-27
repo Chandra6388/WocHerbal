@@ -14,7 +14,7 @@ import { Label } from "../components/ui/label";
 import { Textarea } from "../components/ui/textarea";
 import { createOrder, createOrderByrazorpay } from "@/services/admin/User";
 import { useToast } from "../hooks/use-toast";
-import {RAZORPAY_KEY_ID} from "@/Utils/privateKeys";
+import { RAZORPAY_KEY_ID } from "@/Utils/privateKeys";
 import { loadRazorpayScript } from "@/Utils/RazorpayLoader";
 import { updateStockAndSoldCount } from "@/services/admin/productService";
 import { getRocketShipmentsAvailabilty } from "@/services/admin/rocketShippment";
@@ -229,7 +229,9 @@ const Checkout = () => {
 
     // Handle Razorpay
     try {
-      const isLoaded = await loadRazorpayScript("https://checkout.razorpay.com/v1/checkout.js");
+      const isLoaded = await loadRazorpayScript(
+        "https://checkout.razorpay.com/v1/checkout.js"
+      );
       const finalAmount = Math.round(totalPrice * 1.18);
       const { order } = await createOrderByrazorpay({ amount: finalAmount });
       const options: RazorpayOptions = {
