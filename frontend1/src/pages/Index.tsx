@@ -264,6 +264,8 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      
       <section className="py-24 bg-background">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">

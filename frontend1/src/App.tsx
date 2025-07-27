@@ -35,6 +35,10 @@ import { getUserFromToken } from "./Utils/TokenData";
 import ScrollToTop from '@/components/ScrollToTop'
 import ViewBlogs from '@/pages/ViewBlogs'
 import Orderhistory from "./pages/Orderhistory";
+import TermsOfService from "./pages/TermsOfService";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import ShippingPolicy from "./pages/ShippingPolicy";
+import RefundPolicy from "./pages/RefundPolicy";
 const queryClient = new QueryClient();
 
 const ProtectedRoute: React.FC = () =>
@@ -75,7 +79,12 @@ const AppRoutes: React.FC = () => {
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/not-found" element={<NotFound />} />
       <Route path="/blog/:id" element={<Layout><ViewBlogs/></Layout>} />
+      <Route path="/terms-of-service" element={<Layout><TermsOfService/></Layout>} />
+      <Route path="/privacy-policy" element={<Layout><PrivacyPolicy/></Layout>} />
+      <Route path="/shipping-policy" element={<Layout><ShippingPolicy/></Layout>} />
+      <Route path="/refund-policy" element={<Layout><RefundPolicy/></Layout>} />
       <Route path="/orderhistory" element={<Layout><Orderhistory/></Layout>} />
+
       <Route element={<ProtectedRoute />}>
         <Route path="/purchase/:productId" element={<Products />} />
       </Route>

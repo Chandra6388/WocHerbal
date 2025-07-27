@@ -90,19 +90,19 @@ const TestimonialsCarousel = () => {
         >
           {testimonials.map((testimonial) => (
             <div key={testimonial.id} className="w-full flex-shrink-0">
-              <Card className="mx-4 bg-gradient-to-br from-card via-card/95 to-accent/5 border-2 border-accent/20 hover:border-accent/40 transition-all duration-300 shadow-xl">
-                <CardContent className="p-8">
-                  <div className="flex items-start space-x-6">
+              <Card className="mx-2 sm:mx-4 bg-gradient-to-br from-card via-card/95 to-accent/5 border-2 border-accent/20 hover:border-accent/40 transition-all duration-300 shadow-xl">
+                <CardContent className="p-4 sm:p-6 lg:p-8">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-start space-y-4 sm:space-y-0 sm:space-x-4 lg:space-x-6">
                     {/* Profile Image */}
-                    <div className="relative flex-shrink-0">
+                    <div className="relative flex-shrink-0 mx-auto sm:mx-0">
                       <img 
                         src={testimonial.image} 
                         alt={testimonial.name}
-                        className="w-20 h-20 rounded-full object-cover border-4 border-accent/30 shadow-lg hover:scale-110 transition-transform duration-300"
+                        className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border-4 border-accent/30 shadow-lg hover:scale-110 transition-transform duration-300"
                       />
                       {testimonial.verified && (
                         <div className="absolute -bottom-1 -right-1 bg-green-500 text-white rounded-full p-1">
-                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                          <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                           </svg>
                         </div>
@@ -110,17 +110,17 @@ const TestimonialsCarousel = () => {
                     </div>
                     
                     {/* Content */}
-                    <div className="flex-1">
+                    <div className="flex-1 text-center sm:text-left">
                       {/* Header */}
-                      <div className="flex items-center justify-between mb-4">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-3 sm:mb-4 space-y-2 sm:space-y-0">
                         <div>
-                          <h4 className="font-bold text-lg text-foreground">{testimonial.name}</h4>
-                          <p className="text-muted-foreground text-sm">{testimonial.location}</p>
+                          <h4 className="font-bold text-base sm:text-lg text-foreground">{testimonial.name}</h4>
+                          <p className="text-muted-foreground text-xs sm:text-sm">{testimonial.location}</p>
                         </div>
-                        <div className="text-right">
-                          <div className="flex items-center mb-1">
+                        <div className="text-center sm:text-right">
+                          <div className="flex items-center justify-center sm:justify-end mb-1">
                             {[...Array(testimonial.rating)].map((_, i) => (
-                              <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                              <Star key={i} className="w-3 h-3 sm:w-4 sm:h-4 fill-yellow-400 text-yellow-400" />
                             ))}
                           </div>
                           <p className="text-xs text-muted-foreground">{testimonial.timeAgo}</p>
@@ -128,31 +128,32 @@ const TestimonialsCarousel = () => {
                       </div>
                       
                       {/* Quote */}
-                      <div className="relative mb-4">
-                        <Quote className="absolute -top-2 -left-2 w-8 h-8 text-accent/30" />
-                        <p className="text-muted-foreground italic leading-relaxed pl-6">
+                      <div className="relative mb-3 sm:mb-4">
+                        <Quote className="absolute -top-1 -left-1 sm:-top-2 sm:-left-2 w-6 h-6 sm:w-8 sm:h-8 text-accent/30" />
+                        <p className="text-muted-foreground italic leading-relaxed pl-4 sm:pl-6 text-sm sm:text-base">
                           "{testimonial.text}"
                         </p>
                       </div>
                       
                       {/* Actions */}
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-4">
-                          <button className="flex items-center space-x-2 text-muted-foreground hover:text-accent transition-colors group">
-                            <ThumbsUp className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                            <span className="text-sm">{testimonial.likes}</span>
+                      <div className="flex flex-col sm:flex-row items-center justify-between space-y-2 sm:space-y-0">
+                        <div className="flex items-center space-x-3 sm:space-x-4">
+                          <button className="flex items-center space-x-1 sm:space-x-2 text-muted-foreground hover:text-accent transition-colors group">
+                            <ThumbsUp className="w-3 h-3 sm:w-4 sm:h-4 group-hover:scale-110 transition-transform" />
+                            <span className="text-xs sm:text-sm">{testimonial.likes}</span>
                           </button>
-                          <button className="flex items-center space-x-2 text-muted-foreground hover:text-red-500 transition-colors group">
-                            <Heart className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                            <span className="text-sm">Love</span>
+                          <button className="flex items-center space-x-1 sm:space-x-2 text-muted-foreground hover:text-red-500 transition-colors group">
+                            <Heart className="w-3 h-3 sm:w-4 sm:h-4 group-hover:scale-110 transition-transform" />
+                            <span className="text-xs sm:text-sm">Love</span>
                           </button>
                         </div>
                         {testimonial.verified && (
-                          <div className="flex items-center space-x-1 text-green-600 text-sm">
-                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                          <div className="flex items-center space-x-1 text-green-600 text-xs sm:text-sm">
+                            <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="currentColor" viewBox="0 0 20 20">
                               <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                             </svg>
-                            <span>Verified Purchase</span>
+                            <span className="hidden sm:inline">Verified Purchase</span>
+                            <span className="sm:hidden">Verified</span>
                           </div>
                         )}
                       </div>
@@ -170,27 +171,27 @@ const TestimonialsCarousel = () => {
         variant="outline"
         size="sm"
         onClick={prevTestimonial}
-        className="absolute left-2 top-1/2 transform -translate-y-1/2 rounded-full w-12 h-12 bg-card/80 backdrop-blur-sm border-accent/30 hover:bg-accent/10 hover:scale-110 transition-all duration-300 z-10"
+        className="absolute left-1 sm:left-2 top-1/2 transform -translate-y-1/2 rounded-full w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-card/80 backdrop-blur-sm border-accent/30 hover:bg-accent/10 hover:scale-110 transition-all duration-300 z-10"
       >
-        <ChevronLeft className="w-5 h-5" />
+        <ChevronLeft className="w-3 h-3 sm:w-4 sm:h-4 lg:w-5 lg:h-5" />
       </Button>
       
       <Button
         variant="outline"
         size="sm"
         onClick={nextTestimonial}
-        className="absolute right-2 top-1/2 transform -translate-y-1/2 rounded-full w-12 h-12 bg-card/80 backdrop-blur-sm border-accent/30 hover:bg-accent/10 hover:scale-110 transition-all duration-300 z-10"
+        className="absolute right-1 sm:right-2 top-1/2 transform -translate-y-1/2 rounded-full w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-card/80 backdrop-blur-sm border-accent/30 hover:bg-accent/10 hover:scale-110 transition-all duration-300 z-10"
       >
-        <ChevronRight className="w-5 h-5" />
+        <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 lg:w-5 lg:h-5" />
       </Button>
       
       {/* Dots Indicator */}
-      <div className="flex justify-center space-x-3 mt-6">
+      <div className="flex justify-center space-x-2 sm:space-x-3 mt-4 sm:mt-6">
         {testimonials.map((_, index) => (
           <button
             key={index}
             onClick={() => goToSlide(index)}
-            className={`w-3 h-3 rounded-full transition-all duration-300 ${
+            className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-all duration-300 ${
               index === currentIndex 
                 ? 'bg-accent scale-125 shadow-lg' 
                 : 'bg-muted-foreground/30 hover:bg-accent/50 hover:scale-110'
