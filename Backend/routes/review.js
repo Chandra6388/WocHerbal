@@ -11,7 +11,8 @@ const {
   deleteReview,
   markHelpful,
   getMyReviews,
-  getReviewStats
+  getReviewStats,
+  getAllReview
 } = require('../controllers/reviewController');
 
 // Public routes
@@ -23,6 +24,8 @@ router.use(protect);
 
 // Review CRUD
 router.post('/add', createReview);
+router.get('/all', getAllReview);
+
 router.get('/:id', getReview);
 router.put('/:id', validate('updateReview'), updateReview);
 router.delete('/:id', deleteReview);

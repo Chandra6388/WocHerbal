@@ -300,3 +300,26 @@ exports.getReviewStats = async (req, res, next) => {
     next(error);
   }
 }; 
+
+
+exports.getAllReview = async (req, res, next) => {
+  try {
+    const reviews = await Review.find()
+      .sort('-createdAt')
+      .populate('productId', 'name images')
+      .populate('user', 'name avatar');    
+
+    res.status(200).json({
+      status: 'success',
+      count: reviews.length,
+      reviews
+    });
+  } catch (error) {
+    console.error('Error fetching reviews:', error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Something went wrong while fetching reviews',
+      error: error.message
+    });
+  }
+};

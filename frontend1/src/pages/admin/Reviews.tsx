@@ -1,54 +1,51 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Star, Check, Trash2, Plus } from 'lucide-react';
 import { toast } from 'sonner';
-import AddReviewModal from './addReviewModal'; // Adjust the import path as necessary
-
+import AddReviewModal from './addReviewModal';
+import { getAllReview } from '@/services/admin/reviewsServices';
 interface Review {
   id: string;
-  customerName: string;
+  user  : string;
   rating: number;
-  message: string;
+  comment: string;
   product: string;
-  date: string;
+  createdAt: string;
+  productId: {
+    name: string;
+  };
   status: 'pending' | 'approved' | 'rejected';
 }
 
 const Reviews = () => {
   const [open, setOpen] = useState(false);
-  const [reviews, setReviews] = useState<Review[]>([
-    {
-      id: '1',
-      customerName: 'Priya Sharma',
-      rating: 5,
-      message: 'Excellent quality lavender oil! Very relaxing and helps with sleep.',
-      product: 'Organic Lavender Oil',
-      date: '2024-01-15',
-      status: 'pending'
-    },
-    {
-      id: '2',
-      customerName: 'Raj Kumar',
-      rating: 4,
-      message: 'Good tea tree oil, effective for acne treatment.',
-      product: 'Tea Tree Oil',
-      date: '2024-01-14',
-      status: 'approved'
-    },
-    {
-      id: '3',
-      customerName: 'Anita Patel',
-      rating: 5,
-      message: 'Amazing product! Fast delivery and excellent packaging.',
-      product: 'Organic Lavender Oil',
-      date: '2024-01-13',
-      status: 'approved'
+  const [reviews, setReviews] = useState<Review[]>([]);
+
+
+  console.log("Initial Reviews:", reviews);
+
+  // Fetch reviews from the server
+  const fetchReviews = async () => {
+    try {
+      const response = await getAllReview();
+      if(response?.status !== 'success') {
+        throw new Error('Failed to fetch reviews');
+      }
+      setReviews(response.reviews);
+    } catch (error) {
+      toast.error('Failed to fetch reviews');
     }
-  ]);
+  };
+  useEffect(() => {
+    fetchReviews();
+  }, []);
+
+
+  console.log("Reviews:", reviews); 
 
   const renderStars = (rating: number) => {
     return (
@@ -91,13 +88,13 @@ const Reviews = () => {
   return (
     <div className="p-6 space-y-6">
       <div className='flex items-center justify-between mb-4'>
-      <div>
-        <h1 className="text-3xl font-bold">Reviews</h1>
-        <p className="text-muted-foreground">Manage customer reviews and feedback</p>
-      </div>
-      <div>
-        <Button className="btn btn-primary" onClick={() => { setOpen(true); }}><Plus/> Add Review</Button>
-      </div>
+        <div>
+          <h1 className="text-3xl font-bold">Reviews</h1>
+          <p className="text-muted-foreground">Manage customer reviews and feedback</p>
+        </div>
+        <div>
+          <Button className="btn btn-primary" onClick={() => { setOpen(true); }}><Plus /> Add Review</Button>
+        </div>
       </div>
       <Card>
         <CardHeader>
@@ -119,15 +116,15 @@ const Reviews = () => {
             <TableBody>
               {reviews.map((review) => (
                 <TableRow key={review.id}>
-                  <TableCell className="font-medium">{review.customerName}</TableCell>
+                  <TableCell className="font-medium">{review.user}</TableCell>
                   <TableCell>{renderStars(review.rating)}</TableCell>
                   <TableCell>
                     <div className="max-w-xs">
-                      <p className="text-sm truncate">{review.message}</p>
+                      <p className="text-sm truncate">{review.comment}</p>
                     </div>
                   </TableCell>
-                  <TableCell>{review.product}</TableCell>
-                  <TableCell>{new Date(review.date).toLocaleDateString()}</TableCell>
+                  <TableCell>{review.productId.name}</TableCell>
+                  <TableCell>{new Date(review.createdAt).toLocaleDateString()}</TableCell>
                   <TableCell>{getStatusBadge(review.status)}</TableCell>
                   <TableCell>
                     <div className="flex gap-2">
