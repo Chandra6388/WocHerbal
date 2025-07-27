@@ -14,7 +14,11 @@ type Product = {
   price: number;
   images: string;
   ratings: number;
-  reviews: Review[];
+   productReviews: {
+    user?: string;
+    rating?: string;
+    comment?: string;
+  }[];
   stock: number;
   originalPrice?: number;
   description: string;
@@ -22,15 +26,7 @@ type Product = {
   ingredients: string[];
 };
 
-interface Review {
-  user: {
-    name: string;
-    avatar: string;
-  };
-  rating: number;
-  comment: string;
-  createdAt: string;
-};
+ 
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -84,6 +80,14 @@ const ProductDetail = () => {
     navigate('/cart');
   };
 
+  
+  const getAvgRating = (reviews: { rating: number }[]) => {
+    if (reviews.length === 0) return 0;
+
+    const total = reviews.reduce((acc, review) => acc + review.rating, 0);
+    return total / reviews.length;
+  };
+
 
   return (
     <div className="min-h-screen pt-20 bg-background">
@@ -116,8 +120,8 @@ const ProductDetail = () => {
               <div className="flex items-center gap-4 mb-4">
                 <div className="flex items-center">
                   <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-                  <span className="text-lg font-semibold ml-1">{product?.ratings || 0}</span>
-                  <span className="text-muted-foreground ml-1">({product?.reviews?.length || 0} reviews)</span>
+                  <span className="text-lg font-semibold ml-1">{getAvgRating((product?.productReviews || []).map(r => ({ rating: Number(r.rating) || 0 }))) || 0}</span>
+                  <span className="text-muted-foreground ml-1">({product?.productReviews?.length || 0} reviews)</span>
                 </div>
                 {product?.stock > 0 && (
                   <Badge variant="secondary">In Stock</Badge>
@@ -259,25 +263,24 @@ const ProductDetail = () => {
                 </CardContent>
               </Card>
             </TabsContent>
-            
             <TabsContent value="reviews" className="mt-6">
               <Card>
                 <CardContent className="p-6">
                   <h3 className="text-xl font-semibold mb-4">Customer Reviews</h3>
                   <div className="space-y-4">
-                    {product?.reviews?.length > 0 ? (
-                      product.reviews.map((review, index) => (
+                    {product?.productReviews?.length > 0 ? (
+                      product.productReviews.map((review, index) => (
                         <div key={index} className="border-b pb-4">
                           <div className="flex items-center mb-2">
                             <div className="flex items-center">
                               {[...Array(5)].map((_, i) => (
                                 <Star
                                   key={i}
-                                  className={`w-4 h-4 ${i < review.rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`}
+                                  className={`w-4 h-4 ${i < (Number(review?.rating) || 0) ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`}
                                 />
                               ))}
                             </div>
-                            <span className="ml-2 font-semibold">{review.user.name}</span>
+                            <span className="ml-2 font-semibold">{review?.user || 'Anonymous'}</span>
                           </div>
                           <p className="text-muted-foreground">{review.comment}</p>
                         </div>
