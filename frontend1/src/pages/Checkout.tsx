@@ -27,6 +27,7 @@ import { getRocketShipmentsAvailabilty } from "@/services/admin/rocketShippment"
 
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { sendOTP, verifyOTP } from "@/services/authSerives";
+import { getUserFromToken } from "@/Utils/TokenData";
 
 interface RazorpayOptions {
   key: string;
@@ -53,6 +54,14 @@ declare global {
   }
 }
 
+interface UserData {
+  email?: string;
+  [key: string]: any;
+}
+
+const userdata = getUserFromToken() as UserData;
+
+
 const Checkout = () => {
   const location = useLocation();
   const productdata = location?.state?.product;
@@ -69,7 +78,7 @@ const Checkout = () => {
   const [formData, setFormData] = useState({
     _id: "",
     name: "",
-    email: "",
+    email: userdata?.email || "",
     phone: "",
     address: addressString,
     city: "",
@@ -392,8 +401,9 @@ const Checkout = () => {
                         id="email"
                         name="email"
                         type="email"
-                        value={formData.email}
+                        value={formData?.email}
                         onChange={handleInputChange}
+                        disabled={userdata?.email == null || userdata?.email === "" ? false : true} // Disable if email is already set from token
                         required
                       />
                     </div>
