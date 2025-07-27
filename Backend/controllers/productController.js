@@ -2,6 +2,7 @@ const Product = require('../models/Product');
 const Review = require('../models/Review');
 const ErrorHandler = require('../utils/errorHandler');
 const APIFeatures = require('../utils/apiFeatures');
+const mongoose = require('mongoose');
 
 exports.newProduct = async (req, res, next) => {
   try {
@@ -18,20 +19,53 @@ exports.newProduct = async (req, res, next) => {
 exports.getProducts = async (req, res, next) => {
   try {
     const resPerPage = 8;
+    const page = Number(req.query.page) || 1;
 
-    // Count only active products
-    const productsCount = await Product.countDocuments({ status: 'active' });
+    const matchStage = {
+      status: 'active',
+    };
 
-    // Start with only active products in the query
-    const apiFeatures = new APIFeatures(Product.find({ status: 'active' }), req.query)
-      .search()
-      .filter();
+    // Total active products
+    const productsCount = await Product.countDocuments(matchStage);
 
-    let products = await apiFeatures.query;
-    let filteredProductsCount = products.length;
+    const skip = resPerPage * (page - 1);
 
-    apiFeatures.pagination(resPerPage);
-    products = await apiFeatures.query.clone();
+    const products = await Product.aggregate([
+      { $match: matchStage },
+
+      // Search by name if keyword passed
+      ...(req.query.keyword
+        ? [
+            {
+              $match: {
+                name: {
+                  $regex: req.query.keyword,
+                  $options: 'i',
+                },
+              },
+            },
+          ]
+        : []),
+
+      // Filter logic (if any additional filters are passed in req.query)
+      // Add here if needed
+
+      // Lookup Reviews
+      {
+        $lookup: {
+          from: 'reviews', // collection name in MongoDB (lowercase plural of model)
+          localField: '_id',
+          foreignField: 'productId',
+          as: 'productReviews',
+        },
+      },
+
+      // Pagination
+      { $skip: skip },
+      { $limit: resPerPage },
+    ]);
+
+    const filteredProductsCount = products.length;
 
     res.status(200).json({
       status: 'success',
@@ -46,19 +80,78 @@ exports.getProducts = async (req, res, next) => {
 };
 
 exports.getSingleProduct = async (req, res, next) => {
-  console.log("Fetching single product with ID:", req.params.id); 
   try {
-    const product = await Product.findById(req.params.id)
-    // .populate('user', 'name email')
-    .populate({
-      path: 'reviews',
-      populate: {
-        path: 'user',
-        select: 'name avatar'
-      }
-    });
+    const productId = req.params.id;
 
-    if (!product) {
+    const productData = await Product.aggregate([
+      {
+        $match: {
+          _id: new mongoose.Types.ObjectId(productId),
+        },
+      },
+
+      // Lookup Reviews for the Product
+      {
+        $lookup: {
+          from: 'reviews',
+          localField: '_id',
+          foreignField: 'productId',
+          as: 'productReviews',
+        },
+      },
+
+      // Lookup User inside each Review
+      {
+        $unwind: {
+          path: '$productReviews',
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'productReviews.user',
+          foreignField: '_id',
+          as: 'productReviews.userDetails'
+        }
+      },
+      {
+        $unwind: {
+          path: '$productReviews.userDetails',
+          preserveNullAndEmptyArrays: true
+        }
+      },
+
+      // Group reviews back together
+      {
+        $group: {
+          _id: '$_id',
+          doc: { $first: '$$ROOT' },
+          productReviews: {
+            $push: {
+              _id: '$productReviews._id',
+              rating: '$productReviews.rating',
+              comment: '$productReviews.comment',
+              images: '$productReviews.images',
+              status: '$productReviews.status',
+              createdAt: '$productReviews.createdAt',
+              user:'$productReviews.user'
+            }
+          }
+        }
+      },
+
+      // Merge grouped reviews into final product object
+      {
+        $replaceRoot: {
+          newRoot: {
+            $mergeObjects: ['$doc', { productReviews: '$productReviews' }]
+          }
+        }
+      }
+    ]);
+
+    if (!productData || productData.length === 0) {
       return res.status(404).json({
         status: 'error',
         message: 'Product not found'
@@ -66,17 +159,18 @@ exports.getSingleProduct = async (req, res, next) => {
     }
 
     // Increment view count
-    product.views += 1;
-    await product.save();
+    await Product.findByIdAndUpdate(productId, { $inc: { views: 1 } });
 
     res.status(200).json({
       status: 'success',
-      product
+      product: productData[0]
     });
+
   } catch (error) {
     next(error);
   }
 };
+
 
 exports.updateProduct = async (req, res, next) => {
   try {
@@ -125,8 +219,6 @@ exports.deleteProduct = async (req, res, next) => {
     next(error);
   }
 };
-
-
 
 exports.createProductReview = async (req, res, next) => {
    

@@ -93,10 +93,9 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
+  console.log("CartProvider rendered with userId:", userdata?.id);
   useEffect(() => {
-    if (userdata?.id) {
-      getAddToCart(userdata.id);
-    }
+    
     if (!isAuthenticated) {
       setItems([]);
     }

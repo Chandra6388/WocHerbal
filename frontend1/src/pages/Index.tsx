@@ -8,7 +8,8 @@ import { Star, ArrowRight, Shield, Truck, Award, Users, MapPin, Phone, Mail, Spa
 import { featuredProduct } from '../data/products';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
-
+import {  } from '@/services/user/reviewsService';
+import { useEffect, useState } from 'react';
 const Index = () => {
   const benefits = [
     {
@@ -55,6 +56,9 @@ const Index = () => {
     { icon: <Gift className="w-6 h-6" />, text: "Money-back Guarantee", color: "text-purple-600" },
     { icon: <Zap className="w-6 h-6" />, text: "Fast-acting Formula", color: "text-yellow-600" }
   ];
+;
+
+
 
   return (
     <div className="min-h-screen">
@@ -252,7 +256,7 @@ const Index = () => {
             </p>
           </div>
 
-          <TestimonialsCarousel />
+          <TestimonialsCarousel/>
 
           <div className="text-center mt-12">
             <Link to="/testimonials">
@@ -265,7 +269,7 @@ const Index = () => {
         </div>
       </section>
 
-      
+
       <section className="py-24 bg-background">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">

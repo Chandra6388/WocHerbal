@@ -2,12 +2,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Plus, Minus, Trash2, ShoppingBag } from "lucide-react";
 import { useCart } from "../contexts/CartContext";
 import { Button } from "../components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "../components/ui/card";
+import { Card, CardContent,CardHeader,CardTitle,} from "../components/ui/card";
 import { getUserFromToken } from "@/Utils/TokenData";
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
@@ -15,23 +10,17 @@ import { useToast } from "@/hooks/use-toast";
 const Cart = () => {
   const { toast } = useToast();
   const userdata = getUserFromToken() as { id: string };
-  const {
-    getAddToCart,
-    items,
-    updateQuantity,
-    removeFromCart,
-    totalPrice,
-    totalItems,
-  } = useCart();
+  const [quantity, setQuantity] = useState(1);
+  const { getAddToCart, items, updateQuantity, removeFromCart, totalPrice, totalItems, } = useCart();
   const navigate = useNavigate();
-
-  const [quantity, setQuantity] = useState<number>(1);
 
   const location = useLocation();
   const productdata = location?.state?.product;
   console.log("location?.state?.product", location?.state?.product);
 
-  if (items.length === 0) {
+  
+
+  if (!location?.state?.product) {
     return (
       <div className="min-h-screen pt-20 flex items-center justify-center">
         <div className="text-center">
@@ -52,7 +41,7 @@ const Cart = () => {
     <div className="min-h-screen pt-20 bg-background">
       <div className="container mx-auto px-6 py-8">
         <h1 className="text-3xl font-playfair font-bold text-foreground mb-8">
-          Shopping Cart ({totalItems} items)
+          Shopping Cart (1 items)
         </h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

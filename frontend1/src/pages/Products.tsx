@@ -4,12 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Star, ShoppingCart, Heart } from "lucide-react";
 import { useCart } from "../contexts/CartContext";
 import { Button } from "../components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-} from "../components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader,} from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
 import { getUserProducts } from "@/services/admin/productService";
 import { useToast } from "../hooks/use-toast";
@@ -39,10 +34,9 @@ interface Product {
   tags: string[];
   weight: string;
   ratings: number;
-  reviews: {
+  productReviews: {
     user?: string;
-    name?: string;
-    rating?: number;
+    rating?: string;
     comment?: string;
   }[];
 }
@@ -62,15 +56,10 @@ const Products = () => {
   const [favorList, setFavorList] = useState<Product[]>([]);
   const [category, setCategory] = useState<Category[]>([]);
   const userdata = getUserFromToken() as { id: string };
-  const [pincodeInputs, setPincodeInputs] = useState<{ [key: string]: string }>(
-    {}
-  );
+  const [pincodeInputs, setPincodeInputs] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
     getAllCategory();
-  }, []);
-
-  useEffect(() => {
     getProducts();
     handleGetFavorites();
   }, []);
@@ -274,6 +263,14 @@ const Products = () => {
     }
   };
 
+
+  const getAvgRating = (reviews: { rating: number }[]) => {
+    if (reviews.length === 0) return 0;
+
+    const total = reviews.reduce((acc, review) => acc + review.rating, 0);
+    return total / reviews.length;
+  };
+
   return (
     <div className="min-h-screen pt-20 bg-background">
       <div className="container mx-auto px-6 py-12">
@@ -367,7 +364,15 @@ const Products = () => {
                   <div className="flex items-center">
                     <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
                     <span className="text-sm text-muted-foreground ml-1">
-                      {product.ratings} ({product.reviews.length})
+                      {product.productReviews.length > 0
+                        ? getAvgRating(
+                            product.productReviews
+                              .filter((r) => r.rating !== undefined && r.rating !== null)
+                              .map((r) => ({
+                                rating: typeof r.rating === "string" ? Number(r.rating) : (r.rating ?? 0),
+                              }))
+                          ).toFixed(1)
+                        : 0} ({product.productReviews.length})
                     </span>
                   </div>
                   {product.stock > 0 && (
@@ -431,13 +436,22 @@ const Products = () => {
                     Add to Cart
                   </Button>
                 )} */}
+                {/* <Button
+                  onClick={() => navigate(`/product/${product._id}`)}
+                  className="w-full"
+                  disabled={product.stock === 0}
+                >
+                  <ShoppingCart className="w-4 h-4 mr-2" />
+                  Buy Now
+                </Button> */}
+
                 <Button
                   onClick={() => navigate(`/product/${product._id}`)}
                   className="w-full"
                   disabled={product.stock === 0}
                 >
                   <ShoppingCart className="w-4 h-4 mr-2" />
-                  BUY
+                  Buy Now
                 </Button>
               </CardFooter>
             </Card>

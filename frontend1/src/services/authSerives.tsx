@@ -46,3 +46,23 @@ export const updateProfile = async (data) => {
     throw error.response.data;
   }
 };
+
+// otp verification
+export const sendOTP = async (data) => {
+  try {
+    const response = await axios.post(`${API_URL}/otp/sendOTP`, data);
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+}
+
+
+export const verifyOTP = async (data) => {
+  try {
+    const response = await axios.post(`${API_URL}/otp/verifyOTP`, data);
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};

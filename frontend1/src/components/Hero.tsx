@@ -58,12 +58,7 @@ const Hero = () => {
     bg: "bg-gray-100"
   }];
 
-  const handleAddToCart = () => {
-    addToCart({ id: featuredProduct.id, userId: userdata?.id as string });
-    setIsAdded(true);
-    setShowPopup(true);
-    setTimeout(() => setIsAdded(false), 3000);
-  };
+ 
 
   return (
     <section className="min-h-screen flex items-center bg-gradient-to-br from-background via-accent-light/10 to-accent-soft/5 relative overflow-hidden">

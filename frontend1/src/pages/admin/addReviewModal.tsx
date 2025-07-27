@@ -21,7 +21,7 @@ export default function ReviewModal({open, setModal }) {
     const [reviewText, setReviewText] = useState("")
     const [userName, setUserName] = useState("")
     const [products, setProducts] = useState([]);
-    const userdata = getUserFromToken() as { id: string };
+    const [selectedProduct, setSelectedProduct] = useState("");
 
     useEffect(() => {
         if (open) {
@@ -31,24 +31,15 @@ export default function ReviewModal({open, setModal }) {
         }
     }, [open])
 
-
     const handleSubmit = async () => {
         if (rating === 0) return
         try {
-           
-                // userId: userdata.id,
-            await addProductReview({
-                rating,
-                comment: reviewText,
-                userId: userdata.id,
-                productId: userName
-            })
-
-            
-
+            await addProductReview({rating, comment: reviewText, user: userName, productId: selectedProduct});
             setModal(false)
             setRating(0)
             setReviewText("")
+            setSelectedProduct("");
+            setUserName("");
         } catch (err) {
             console.error("Failed to submit review:", err)
         }
@@ -88,24 +79,24 @@ export default function ReviewModal({open, setModal }) {
                 </div>
                 <div>
                     <Input
-                        placeholder="Your Review"
-                        value={reviewText}
-                        onChange={(e) => setReviewText(e.target.value)}
+                        placeholder="Your Name"
+                        value={userName}
+                        onChange={(e) => setUserName(e.target.value)}
                         className="mb-4"
                     />
                     <div className="space-y-2">
                       <Label htmlFor="status">Category</Label>
                       <select
                         id="status"
-                        value={userName}
+                        value={selectedProduct}
                         onChange={(e) =>
-                          setUserName(e.target.value)
+                          setSelectedProduct(e.target.value)
                         }
                         className="w-full px-3 py-2 border border-input rounded-md"
                       >
-                        <option value="">Select User</option>
+                        <option value="">Select Product</option>
                         {products.map((product) => (
-                          <option key={product.id} value={product.name}>
+                          <option key={product._id} value={product._id}>
                             {product.name}
                           </option>
                         ))}
@@ -122,12 +113,11 @@ export default function ReviewModal({open, setModal }) {
                     onChange={(e) => setReviewText(e.target.value)}
                 />
 
-                {/* ✅ Buttons */}
                 <DialogFooter className="mt-4">
                     <DialogClose asChild>
                         <Button variant="secondary">Cancel</Button>
                     </DialogClose>
-                    <Button onClick={handleSubmit} disabled={rating === 0}>
+                    <Button onClick={handleSubmit} disabled={rating === 0 || !selectedProduct || !userName}>
                         Submit Review
                     </Button>
                 </DialogFooter>

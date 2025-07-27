@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import { useCart } from "../contexts/CartContext";
+// import { useCart } from "../contexts/CartContext";
 import {
   Menu,
   X,
@@ -19,7 +19,7 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showReviewUpload, setShowReviewUpload] = useState(false);
   const { user, logout, isAdmin } = useAuth();
-  const { items } = useCart();
+  // const { items } = useCart();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
 
@@ -34,8 +34,9 @@ const Header = () => {
     }
   };
 
-  const itemCount = items.reduce((total, item) => total + item.quantity, 0);
+  // const itemCount = items.reduce((total, item) => total + item.quantity, 0);
 
+   const itemCount=0
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b border-cream-200">
       <div className="container mx-auto px-6">

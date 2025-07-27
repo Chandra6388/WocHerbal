@@ -19,7 +19,7 @@ const helpRoutes = require('./routes/help');
 const category = require('./routes/category');
 const shipmentRoutes = require('./routes/Shipment');
 const blogsRoutes = require('./routes/blogs');
-
+const otpMailer = require('./routes/Otpmailer');
 
 
 app.use(helmet());
@@ -56,6 +56,7 @@ app.use('/api/help', helpRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/shipment', shipmentRoutes);
 app.use('/api/blogs', blogsRoutes);
+app.use('/api/otp', otpMailer);
 
 
 // Health check
