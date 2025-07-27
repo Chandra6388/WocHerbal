@@ -89,7 +89,7 @@ const Checkout = () => {
 
   // OTP related states
   const [isOtpModalOpen, setIsOtpModalOpen] = useState(false);
-  const [otp, setOtp] = useState("");
+  const [otp, setOtp] = useState<string[]>(["", "", "", "", "", ""]);
   const [isOtpLoading, setIsOtpLoading] = useState(false);
   const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
@@ -177,7 +177,8 @@ const Checkout = () => {
   };
 
   const handleVerifyOTP = async () => {
-    if (!otp || otp.length !== 6) {
+    const otpValue = otp.join("");
+    if (!otpValue || otpValue.length !== 6) {
       toast({
         title: "Error",
         description: "Please enter a valid 6-digit OTP.",
@@ -190,7 +191,7 @@ const Checkout = () => {
     try {
       const verifyResponse = await verifyOTP({
         email: formData.email,
-        otp: otp,
+        otp: otpValue,
       });
 
       if (verifyResponse.status) {
@@ -253,8 +254,8 @@ const Checkout = () => {
                 description: "Order placed successfully!",
                 variant: "default",
               });
-              console.log("ss");
               navigate("/orders");
+        
             } else {
               toast({
                 title: "Error",
@@ -540,16 +541,43 @@ const Checkout = () => {
             </DialogHeader>
             <div className="space-y-4">
               <div>
-                <Label htmlFor="otp">Enter OTP</Label>
-                <Input
-                  id="otp"
-                  type="text"
-                  maxLength={6}
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
-                  placeholder="Enter 6-digit OTP"
-                  className="text-center text-lg tracking-widest"
-                />
+                <Label>Enter OTP</Label>
+                <div className="flex gap-2 justify-center mt-2">
+                  {otp.map((digit, idx) => (
+                    <input
+                      key={idx}
+                      type="text"
+                      inputMode="numeric"
+                      maxLength={1}
+                      value={digit}
+                      onChange={e => {
+                        const val = e.target.value.replace(/\D/g, "");
+                        if (!val) return;
+                        const newOtp = [...otp];
+                        newOtp[idx] = val;
+                        setOtp(newOtp);
+                        // Move focus to next box
+                        const next = document.getElementById(`otp-box-${idx + 1}`);
+                        if (next) (next as HTMLInputElement).focus();
+                      }}
+                      onKeyDown={e => {
+                        if (e.key === "Backspace") {
+                          const newOtp = [...otp];
+                          if (otp[idx]) {
+                            newOtp[idx] = "";
+                            setOtp(newOtp);
+                          } else if (idx > 0) {
+                            const prev = document.getElementById(`otp-box-${idx - 1}`);
+                            if (prev) (prev as HTMLInputElement).focus();
+                          }
+                        }
+                      }}
+                      id={`otp-box-${idx}`}
+                      className="w-10 h-12 border rounded text-center text-xl font-bold focus:outline-primary bg-background"
+                      autoFocus={idx === 0}
+                    />
+                  ))}
+                </div>
               </div>
               <div className="flex space-x-2">
                 <Button
@@ -562,7 +590,7 @@ const Checkout = () => {
                 </Button>
                 <Button
                   onClick={handleVerifyOTP}
-                  disabled={isVerifyingOtp || otp.length !== 6}
+                  disabled={isVerifyingOtp || otp.join("").length !== 6}
                   className="flex-1"
                 >
                   {isVerifyingOtp ? "Verifying..." : "Verify & Place Order"}
