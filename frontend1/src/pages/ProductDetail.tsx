@@ -29,7 +29,7 @@ type Product = {
   price: number;
   images: string;
   ratings: number;
-   productReviews: {
+  productReviews: {
     user?: string;
     rating?: string;
     comment?: string;
@@ -59,25 +59,45 @@ const ProductDetail = () => {
   const [quantity, setQuantity] = useState<number>(1);
   const [product, setProduct] = useState<Product | null>(null);
   const userdata = getUserFromToken() as { id: string };
+  const ingredients = ['Panchgavya', 'Tulsi', 'Palmarosa Oil', 'Moringa Leaves', 'Lemon Extract', 'Brahmi', 'Amla', 'Bhringraj', 'Neem', 'Coconut Oil', 'Sesame Oil'];
 
-  useEffect(() => {
-    const fetchProduct = async () => {
-      try {
-        const response = await getProductById({ productId: id });
-        if (response?.status === "error") {
-          navigate("/products");
-          return;
+  const benefits = [
+    'Reduces scalp odor naturally',
+    'Fights lice and nits effectively',
+    'Treats scalp infections',
+    'Revives damaged hair',
+    'Balances pH of the scalp',
+    'Supports microbial balance',
+    'Supports collagen production',
+    'Enhances scalp hydration',
+    'Root strength charger',
+    'Vitamin boost for volume',
+    'Scalp detox shield',
+    'Natural shine enhancer',
+    'Thickens hair naturally',
+    'Helps prevent split ends',
+    'Acts as natural conditioner',
+    'Scalp soother and calmer'
+  ]
+    useEffect(() => {
+      const fetchProduct = async () => {
+        try {
+          const response = await getProductById({ productId: id });
+          if (response?.status === "error") {
+            navigate("/products");
+            return;
+          }
+          setProduct(response?.product);
+        } catch (error) {
+          console.error("Error fetching product:", error);
+          // navigate('/products');
         }
-        setProduct(response?.product);
-      } catch (error) {
-        console.error("Error fetching product:", error);
-        // navigate('/products');
+      };
+      if (id) {
+        fetchProduct();
       }
-    };
-    if (id) {
-      fetchProduct();
-    }
-  }, [id, navigate]);
+    }, [id, navigate]);
+
 
   if (!product) {
     return (
@@ -109,7 +129,7 @@ const ProductDetail = () => {
     navigate("/cart");
   };
 
-  
+
   const getAvgRating = (reviews: { rating: number }[]) => {
     if (reviews.length === 0) return 0;
 
@@ -167,7 +187,7 @@ const ProductDetail = () => {
                     {Math.round(
                       ((product?.originalPrice - product?.price) /
                         product?.originalPrice) *
-                        100
+                      100
                     )}
                     % OFF
                   </Badge>
@@ -232,17 +252,17 @@ const ProductDetail = () => {
                   Buy Now
                 </Button> */}
 
-                 <Button
-                    onClick={() =>navigate('/checkout' , {state: {product, quantity }})}
-                    className="w-full"
-                    disabled={product.stock === 0}
-                  >
-                    <ShoppingCart className="w-4 h-4 mr-2" />
-                    Buy Now
-                  </Button>
+                <Button
+                  onClick={() => navigate('/checkout', { state: { product, quantity } })}
+                  className="w-full"
+                  disabled={product.stock === 0}
+                >
+                  <ShoppingCart className="w-4 h-4 mr-2" />
+                  Buy Now
+                </Button>
               </div>
 
-              <div className="flex gap-2">
+              {/* <div className="flex gap-2">
                 <Button variant="outline" size="sm">
                   <Heart className="w-4 h-4 mr-2" />
                   Wishlist
@@ -251,7 +271,7 @@ const ProductDetail = () => {
                   <Share2 className="w-4 h-4 mr-2" />
                   Share
                 </Button>
-              </div>
+              </div> */}
             </div>
 
             {/* Trust Indicators */}
@@ -286,10 +306,12 @@ const ProductDetail = () => {
                 <CardContent className="p-6">
                   <h3 className="text-xl font-semibold mb-4">Key Benefits</h3>
                   <ul className="space-y-2">
-                    <li className="flex items-start">
-                      <span className="w-2 h-2 bg-primary rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                      <span>{product?.benefits}</span>
-                    </li>
+                    {benefits.map((benefit, index) => (
+                      <li key={index} className="flex items-start">
+                        <span className="w-2 h-2 bg-primary rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                        <span>{benefit}</span>
+                      </li>
+                    ))}
                   </ul>
                 </CardContent>
               </Card>
@@ -302,7 +324,7 @@ const ProductDetail = () => {
                     Natural Ingredients
                   </h3>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {[]?.map((ingredient, index) => (
+                    {ingredients?.map((ingredient, index) => (
                       <div
                         key={index}
                         className="bg-secondary p-3 rounded-lg text-center"
