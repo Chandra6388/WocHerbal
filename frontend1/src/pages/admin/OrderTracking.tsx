@@ -46,6 +46,7 @@ interface OrderTracking {
   product: string;
   customer_name: string;
   customer_pincode: string;
+  customer_address: string;
   products: { name: string }[];
   shipments: {
     awb: string;
@@ -78,6 +79,7 @@ interface OrderTracking {
 }
 
 const OrderTracking = () => {
+
   const [orders, setOrders] = useState<OrderTracking[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -292,7 +294,6 @@ const OrderTracking = () => {
   };
 
 
-  console.log("orders", orders);
   return (
     <div className="p-6 space-y-6">
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
@@ -525,23 +526,23 @@ const OrderTracking = () => {
                         Tracking Number:
                       </span>
                       <span className="font-mono text-sm">
-                        {selectedOrder.trackingNumber}
+                        {selectedOrder.shipments[0].awb || "--"}
                       </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Carrier:</span>
                       <span className="font-medium">
-                        {selectedOrder.carrier}
+                        {selectedOrder?.carrier || "--"}
                       </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Status:</span>
-                      {getStatusBadge(selectedOrder.status)}
+                      {getStatusBadge(selectedOrder?.status)}
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Amount:</span>
                       <span className="font-medium">
-                        ₹{selectedOrder.amount}
+                        ₹{selectedOrder?.total || "--"}
                       </span>
                     </div>
                   </CardContent>
@@ -555,7 +556,7 @@ const OrderTracking = () => {
                     <div className="flex items-center space-x-3">
                       <div className="w-full">
                         <p className="font-medium">
-                          {selectedOrder.customerName}
+                          {selectedOrder?.customer_name}
                         </p>
                         <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                           <Mail className="w-4 h-4" />
@@ -567,7 +568,7 @@ const OrderTracking = () => {
                         </div>
                         <div className="flex items-start space-x-2 text-sm text-muted-foreground mt-2">
                           <MapPin className="w-4 h-4 mt-0.5" />
-                          <span>{selectedOrder.shippingAddress}</span>
+                          <span>{selectedOrder?.customer_address}</span>
                         </div>
                       </div>
                     </div>
