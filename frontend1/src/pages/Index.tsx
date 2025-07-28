@@ -202,7 +202,7 @@ const Index = () => {
                   <div className="relative group order-2 lg:order-1">
                     <div className="aspect-square overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-accent/5 to-green-500/5 relative">
                       <img
-                        src={featuredProduct.image}
+                        src={featuredProduct.images}
                         alt={featuredProduct.name}
                         className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-700"
                       />

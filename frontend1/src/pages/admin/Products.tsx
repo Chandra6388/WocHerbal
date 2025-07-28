@@ -232,6 +232,9 @@ const Products = () => {
     setIsDialogOpen(true);
   };
 
+
+
+  console.log("Products:", formData);
   const handleEditProduct = (product: Product) => {
     setEditingProduct(product);
     setFormData({
@@ -603,6 +606,7 @@ const Products = () => {
                         }
                         className="w-full px-3 py-2 border border-input rounded-md"
                       >
+                        <option value="">Select Category</option>
                         {category?.map((item) => {
                           return (
                             <option value={item?._id}>{item?.name}</option>
