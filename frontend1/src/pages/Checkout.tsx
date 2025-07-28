@@ -68,7 +68,7 @@ const Checkout = () => {
   const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
-  console.log("user",user)
+  console.log("user", user);
   const addressString = user?.address
     ? typeof user.address === "string"
       ? user.address
@@ -226,7 +226,7 @@ const Checkout = () => {
       const isLoaded = await loadRazorpayScript(
         "https://checkout.razorpay.com/v1/checkout.js"
       );
-      const finalAmount = Math.round(getSubtotal() * 1.18);
+      const finalAmount = Math.round(getSubtotal());
       const { order } = await createOrderByrazorpay({ amount: finalAmount });
 
       const options: RazorpayOptions = {
@@ -342,7 +342,7 @@ const Checkout = () => {
 
     try {
       const response = await getRocketShipmentsAvailabilty(payload);
-      console.log("Shipping Availability Response:", response?.available);
+      console.log("Shipping Availability Response:", response);
 
       if (!response?.available) {
         toast({
@@ -352,7 +352,7 @@ const Checkout = () => {
             "No courier service available for this pincode.",
           variant: "destructive",
         });
-        return; 
+        return;
       }
     } catch (error) {
       console.error("Shipping Availability Error:", error);
@@ -361,7 +361,7 @@ const Checkout = () => {
         description: "Failed to check shipping availability.",
         variant: "destructive",
       });
-      return; 
+      return;
     }
 
     if (!isAuthenticated) {
@@ -556,24 +556,28 @@ const Checkout = () => {
                       inputMode="numeric"
                       maxLength={1}
                       value={digit}
-                      onChange={e => {
+                      onChange={(e) => {
                         const val = e.target.value.replace(/\D/g, "");
                         if (!val) return;
                         const newOtp = [...otp];
                         newOtp[idx] = val;
                         setOtp(newOtp);
                         // Move focus to next box
-                        const next = document.getElementById(`otp-box-${idx + 1}`);
+                        const next = document.getElementById(
+                          `otp-box-${idx + 1}`
+                        );
                         if (next) (next as HTMLInputElement).focus();
                       }}
-                      onKeyDown={e => {
+                      onKeyDown={(e) => {
                         if (e.key === "Backspace") {
                           const newOtp = [...otp];
                           if (otp[idx]) {
                             newOtp[idx] = "";
                             setOtp(newOtp);
                           } else if (idx > 0) {
-                            const prev = document.getElementById(`otp-box-${idx - 1}`);
+                            const prev = document.getElementById(
+                              `otp-box-${idx - 1}`
+                            );
                             if (prev) (prev as HTMLInputElement).focus();
                           }
                         }
