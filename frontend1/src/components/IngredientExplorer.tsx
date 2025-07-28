@@ -115,7 +115,7 @@ const IngredientExplorer = () => {
   const selectedIng = ingredients[selectedIngredient];
 
   return (
-    <div className="max-w-6xl mx-auto">
+    <div className="container mx-auto px-6">
       <div className="text-center mb-12">
         <h2 className="text-3xl md:text-4xl font-playfair font-bold mb-4">
           Explore Our Sacred Ingredients

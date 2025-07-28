@@ -17,7 +17,7 @@ async function getShiprocketToken() {
         shiprocketToken = user.accessToken;
         return shiprocketToken;
     }
-    console.log("Genrate new token");
+
 
 
     const loginRes = await axios.post('https://apiv2.shiprocket.in/v1/external/auth/login', {
@@ -91,7 +91,7 @@ exports.getServiceability = async (req, res) => {
 exports.createOrder = async (req, res) => {
     try {
         const orderData = req.body;
-        console.log("orderData", req.body)
+       
         const response = await shiprocket.post('/v1/external/orders/create/adhoc', orderData);
         const data = response.data;
         // Save to DB

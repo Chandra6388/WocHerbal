@@ -13,40 +13,40 @@ import { } from '@/services/user/reviewsService';
 const Index = () => {
   const benefits = [
     {
-      icon: <Shield className="w-12 h-12" />,
-      title: "100% Natural & Safe",
-      description: "No harmful chemicals, parabens, or artificial additives. Pure Ayurvedic formula crafted with traditional herbs and modern science.",
-      gradient: "from-green-400 to-emerald-500",
-      bgGradient: "bg-gradient-to-br from-green-50 to-emerald-50",
-      textColor: "text-green-700",
-      features: ["Chemical-free", "Dermatologically tested", "Safe for daily use"]
+      icon: <Shield className="w-12 h-12 text-alime" />,
+      title: "Powered by Panchgavya & 30+ Ayurvedic Herbs",
+      description: "Our hair oil is enriched with Panchgavya and over 30 natural herbs that deeply nourish the scalp and promote healthy.",
+      gradient: "from-gray-600 to-gray-800",
+      bgGradient: "bg-gradient-to-br from-gray-50 to-gray-100",
+      textColor: "text-gray-700",
+      features: ["30+ time tested herbs", "Root to tip nourishment", "Panchgavya based formula"]
     },
     {
       icon: <Award className="w-12 h-12" />,
-      title: "Clinically Proven Results",
-      description: "Scientifically validated formulation with 95% customer satisfaction rate. Visible results in just 2-4 weeks of regular use.",
-      gradient: "from-blue-400 to-cyan-500",
-      bgGradient: "bg-gradient-to-br from-blue-50 to-cyan-50",
-      textColor: "text-blue-700",
-      features: ["Lab tested", "95% satisfaction", "Proven efficacy"]
+      title: "Visible Results in 2–4 Weeks",
+      description: "Experience noticeable improvement in hair fall, dandruff, and texture with consistent use. Our customers see visible changes in just a few weeks.",
+      gradient: "from-gray-600 to-gray-800",
+      bgGradient: "bg-gradient-to-br from-gray-100 to-gray-200",
+      textColor: "text-gray-800",
+      features: ["Reduces hair fall", "Boosts natural shine", "Improves scalp health"]
     },
     {
       icon: <Truck className="w-12 h-12" />,
-      title: "Free & Fast Delivery",
-      description: "Complimentary shipping across India with secure packaging. Express delivery available in major cities within 24-48 hours.",
-      gradient: "from-purple-400 to-pink-500",
-      bgGradient: "bg-gradient-to-br from-purple-50 to-pink-50",
-      textColor: "text-purple-700",
-      features: ["Free shipping", "Secure packaging", "Express delivery"]
+      title: "100% Natural & Lab Tested",
+      description: "Free from parabens, sulfates, and synthetic fragrances. Safe for all hair types and suitable for daily or weekly use.",
+      gradient: "from-gray-600 to-gray-800",
+      bgGradient: "bg-gradient-to-br from-gray-200 to-gray-300",
+      textColor: "text-gray-900",
+      features: ["No harmful chemicals", "Aromatic soothing effect", "Suitable for men & women"]
     },
     {
       icon: <Users className="w-12 h-12" />,
-      title: "Trusted by 10,000+",
-      description: "Join our growing family of satisfied customers who have transformed their hair naturally with WOC's Ayurvedic formula.",
-      gradient: "from-orange-400 to-red-500",
-      bgGradient: "bg-gradient-to-br from-orange-50 to-red-50",
-      textColor: "text-orange-700",
-      features: ["10k+ customers", "5-star reviews", "Natural transformation"]
+      title: "Free & Fast Delivery across India",
+      description: "We offer quick and complimentary shipping with safe packaging. Expect your order at your doorstep in 2–5 business days.",
+      gradient: "from-gray-600 to-gray-800",
+      bgGradient: "bg-gradient-to-br from-gray-50 to-gray-150",
+      textColor: "text-gray-600",
+      features: ["Free shipping", "Real-time tracking on all orders", "Secure & eco-friendly packaging"]
     }
   ];
 
@@ -92,11 +92,7 @@ const Index = () => {
         </div>
       </section>
 
-      <section className="py-24 bg-background">
-        <div className="container mx-auto px-6">
-          <IngredientExplorer />
-        </div>
-      </section>
+      <IngredientExplorer />
 
       <BlogSection />
       <section className="py-24 bg-gradient-to-br from-secondary/10 via-background to-muted/5 relative overflow-hidden">
@@ -184,7 +180,6 @@ const Index = () => {
         </div>
       </section>
 
-
       <section className="py-24 bg-gradient-to-br from-accent/5 via-background to-muted/5">
         <div className="container mx-auto px-4 sm:px-6">
           <div className="text-center mb-12 sm:mb-16">
@@ -270,9 +265,6 @@ const Index = () => {
           </div>
         </div>
       </section>
-
-
-
 
       <section className="py-24 bg-background">
         <div className="container mx-auto px-6">
