@@ -7,23 +7,26 @@ const BannerSlider = () => {
 
   const slides = [
     {
-      id: 4,
-      image: "/uploads/86ce4255-a691-49a9-99fb-52b0851d8c58.png"
+      id: 1,
+      image: "/uploads/86ce4255-a691-49a9-99fb-52b0851d8c58.png",
+      mobileImage: "/uploads/b320ad20-94fa-49d0-b7be-bc45347f57b0.png" 
     },
     {
-      id: 5,
-      image: "/uploads/9bd6cb1c-011e-4067-b5f0-4fceb1e26a90.png"
+      id: 2,
+      image: "/uploads/9bd6cb1c-011e-4067-b5f0-4fceb1e26a90.png",
+      mobileImage: "/uploads/96af52de-e5d2-4f86-a7c6-e71952e09270.png" 
     },
     {
-      id: 6,
-      image: "/uploads/986595a1-1c57-44d7-8c20-6dad4265e611.png"
+      id: 3,
+      image: "/uploads/986595a1-1c57-44d7-8c20-6dad4265e611.png",
+      mobileImage: "/uploads/8ce48a99-1a06-4083-bc03-b1d3b20c16fd.png"
     }
   ];
 
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length);
-    }, 3000);
+    }, 5000);
     return () => clearInterval(interval);
   }, []);
 
@@ -36,8 +39,7 @@ const BannerSlider = () => {
   };
 
   return (
-    <section className="relative h-[30vh] md:h-[40vh] overflow-hidden mt-16 md:">
-      {/* Background slides */}
+    <section className="relative h-[400px] md:h-[40vh] overflow-hidden pt-4 mt-16 md:pt-0">
       {slides.map((slide, index) => (
         <div
           key={slide.id}
@@ -45,10 +47,17 @@ const BannerSlider = () => {
             index === currentSlide ? 'opacity-100' : 'opacity-0'
           }`}
         >
+          {/* Desktop Image */}
           <img
             src={slide.image}
             alt="Product banner"
-            className="w-full h-full object-cover"
+            className="hidden md:block w-full h-full object-cover"
+          />
+          {/* Mobile Image - 1080x1080 aspect ratio */}
+          <img
+            src={slide.mobileImage}
+            alt="Product banner"
+            className="block md:hidden w-full h-full object-cover object-center"
           />
         </div>
       ))}
