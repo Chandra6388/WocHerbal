@@ -1,6 +1,7 @@
 const axios = require('axios');
 const User = require('../models/User');
 const ShiprocketOrder = require('../models/shiprocketOrder');
+const Order = require("../models/Order")
 require('dotenv').config();
 const { refundPayment } = require('../utils/razorpay');
 let shiprocketToken = null;
@@ -238,15 +239,18 @@ exports.cancelShipment = async (req, res) => {
 exports.cancelorder = async (req, res) => {
     try {
         const { orderId } = req.body;
-        console.log("ids", orderId)
         const ShiprocketOrderFind = await ShiprocketOrder.findOne({ orderId: orderId })
-        console.log("ShiprocketOrderFind", ShiprocketOrderFind?.paymentInfo.id)
 
+        const OrderGet = await Order.findOne({ _id: ShiprocketOrderFind.order_id })
 
-        await refundPayment(ShiprocketOrderFind?.paymentInfo.id, refundAmount, refundReason);
-        return
-        const response = await shiprocket.post('/v1/external/orders/cancel', { ids });
-        res.status(200).json({ status: 'success', data: response.data });
+        let responseRefund = await refundPayment(ShiprocketOrderFind?.paymentInfo.id, OrderGet.totalPrice);
+        console.log("responseRefund", responseRefund)
+        if (responseRefund.code == "BAD_REQUEST_ERROR") {
+            return res.status(200).json({ status: 'failed', data: responseRefund.description });
+        }
+
+        const response = await shiprocket.post('/v1/external/orders/cancel', { orderId });
+        return res.status(200).json({ status: 'success', data: response.data });
     } catch (error) {
         console.error('Error in cancelorder:', error.message);
         res.status(error.response?.status || 500).json({ status: 'error', message: error.response?.data?.message || 'Internal Server Error' });

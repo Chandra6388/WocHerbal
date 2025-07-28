@@ -18,7 +18,7 @@ const createOrder = async (amount, currency = 'INR', receipt) => {
       receipt: receipt,
       payment_capture: 1
     };
-    
+
     const order = await razorpay.orders.create(options);
     return order;
   } catch (error) {
@@ -55,15 +55,21 @@ const getPaymentDetails = async (paymentId) => {
 // Refund payment
 const refundPayment = async (paymentId, amount, reason = 'Customer request') => {
   try {
-    const refund = await razorpay.payments.refund(paymentId, {
-      amount: amount * 100, // Convert to paise
-      speed: 'normal',
-      notes: {
-        reason: reason
-      }
-    });
+    console.log("data", paymentId, amount, reason)
+
+
+    const options = amount
+      ? { amount: amount } // in paise, so ₹10 = 1000
+      : {}; // full refund if no amount specified
+
+    const refund = await razorpay.payments.refund(paymentId, options);
+
     return refund;
   } catch (error) {
+    if (error.statusCode == 400) {
+      return error.error
+    }
+
     throw new Error(`Error processing refund: ${error.message}`);
   }
 };
