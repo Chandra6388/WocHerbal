@@ -41,16 +41,21 @@ interface OrderTracking {
   id: string;
   orderId: string;
   customerName: string;
-  customerEmail: string;
-  customerPhone: string;
+  customer_email: string;
+  customer_phone: string;
   product: string;
   customer_name: string;
   customer_pincode: string;
+  customer_address: string;
+  customer_city?: string;
+  customer_state?: string;
   products: { name: string }[];
   shipments: {
     awb: string;
     delivered_date: string;
     id: string;
+    pickup_scheduled_date?: string;
+    pickedup_timestamp?: string;
   }[];
   channel_created_at: string;
   total: number;
@@ -75,9 +80,14 @@ interface OrderTracking {
     location: string;
     description: string;
   }[];
+  pickup_address_detail?: {
+    city?: string;
+    [key: string]: any;
+  };
 }
 
 const OrderTracking = () => {
+
   const [orders, setOrders] = useState<OrderTracking[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -292,7 +302,6 @@ const OrderTracking = () => {
   };
 
 
-  console.log("orders", orders);
   return (
     <div className="p-6 space-y-6">
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
@@ -525,62 +534,125 @@ const OrderTracking = () => {
                         Tracking Number:
                       </span>
                       <span className="font-mono text-sm">
-                        {selectedOrder.trackingNumber}
+                        {selectedOrder.shipments[0].awb || "--"}
                       </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Carrier:</span>
                       <span className="font-medium">
-                        {selectedOrder.carrier}
+                        {selectedOrder?.carrier || "--"}
                       </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Status:</span>
-                      {getStatusBadge(selectedOrder.status)}
+                      {getStatusBadge(selectedOrder?.status)}
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Amount:</span>
                       <span className="font-medium">
-                        ₹{selectedOrder.amount}
+                        ₹{selectedOrder?.total || "--"}
                       </span>
                     </div>
                   </CardContent>
                 </Card>
 
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">Customer Details</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-full">
-                        <p className="font-medium">
-                          {selectedOrder.customerName}
-                        </p>
-                        <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                          <Mail className="w-4 h-4" />
-                          <span>{selectedOrder.customerEmail}</span>
-                        </div>
-                        <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                          <Phone className="w-4 h-4" />
-                          <span>{selectedOrder.customerPhone}</span>
-                        </div>
-                        <div className="flex items-start space-x-2 text-sm text-muted-foreground mt-2">
-                          <MapPin className="w-4 h-4 mt-0.5" />
-                          <span>{selectedOrder.shippingAddress}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+               <Card>
+  <CardHeader>
+    <CardTitle className="text-lg">Customer Details</CardTitle>
+  </CardHeader>
+  <CardContent className="space-y-3">
+    <div className="flex items-center space-x-3">
+      <div className="w-full">
+        <p className="font-medium">
+          {selectedOrder?.customer_name || "--"}
+        </p>
+
+        <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+          <Mail className="w-4 h-4" />
+          <span>{selectedOrder?.customer_email || "--"}</span>
+        </div>
+
+        <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+          <Phone className="w-4 h-4" />
+          <span>{selectedOrder?.customer_phone || "--"}</span>
+        </div>
+
+        <div className="flex items-start space-x-2 text-sm text-muted-foreground mt-2">
+          <MapPin className="w-4 h-4 mt-0.5" />
+          <span>
+            {selectedOrder?.customer_address}, {selectedOrder?.customer_city},{" "}
+            {selectedOrder?.customer_state} - {selectedOrder?.customer_pincode}
+          </span>
+        </div>
+      </div>
+    </div>
+  </CardContent>
+</Card>
+
               </div>
 
               {/* Tracking Timeline */}
               <div>
                 <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">Tracking Timeline</CardTitle>
-                  </CardHeader>
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg">Tracking Timeline</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <ol className="relative border-s border-gray-300 ml-4 mt-2">
+                        {[
+                          {
+                            status: "Order Created",
+                            timestamp: selectedOrder?.channel_created_at,
+                            location: selectedOrder?.customer_city,
+                            remarks: "Order successfully created"
+                          },
+                          {
+                            status: "Pickup Scheduled",
+                            timestamp: selectedOrder?.shipments?.[0]?.pickup_scheduled_date !== "0000-00-00 00:00:00"
+                              ? selectedOrder?.shipments?.[0]?.pickup_scheduled_date
+                              : null,
+                            location: selectedOrder?.pickup_address_detail?.city,
+                            remarks: "Courier will pick up the package"
+                          },
+                          {
+                            status: "Picked Up",
+                            timestamp: selectedOrder?.shipments?.[0]?.pickedup_timestamp,
+                            location: selectedOrder?.pickup_address_detail?.city,
+                            remarks: "Package picked up by delivery partner"
+                          },
+                          {
+                            status: "Out for Delivery",
+                            timestamp: selectedOrder?.shipments?.[0]?.pickup_scheduled_date,
+                            location: selectedOrder?.customer_city,
+                            remarks: "Courier is out for delivery"
+                          },
+                          {
+                            status: "Delivered",
+                            timestamp: selectedOrder?.shipments?.[0]?.delivered_date,
+                            location: selectedOrder?.customer_city,
+                            remarks: "Package delivered"
+                          }
+                        ]
+                          .filter(item => item.timestamp)
+                          .map((item, idx) => (
+                            <li key={idx} className="mb-6 ms-4">
+                              <div className="absolute w-3 h-3 bg-blue-600 rounded-full -start-1.5 border border-white" />
+                              <time className="block text-sm text-gray-500">
+                                {item.timestamp || "—"}
+                              </time>
+                              <h3 className="text-base font-semibold text-gray-900">{item.status}</h3>
+                              <p className="text-sm text-gray-700">
+                                <span className="font-medium">Location:</span> {item.location || "N/A"}
+                              </p>
+                              <p className="text-sm text-gray-600">{item.remarks}</p>
+                            </li>
+                          ))}
+                      </ol>
+                    </CardContent>
+                  </Card>
+
+
                   <CardContent>
                     <div className="space-y-4">
                       {selectedOrder?.timeline?.map((event, index) => (

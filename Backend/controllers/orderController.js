@@ -141,7 +141,7 @@ exports.newOrder = async (req, res, next) => {
     const shiprocketRes = await shiprocket.post('/v1/external/orders/create/adhoc', shipmentData);
     // const data = response.data;
 
-    console.log("shiprocketRes", shiprocketRes.data)
+  
 
 
 
