@@ -66,8 +66,6 @@ const Hero = () => {
         <div className="absolute top-20 left-10 w-32 h-32 bg-gradient-to-br from-accent/30 to-green-400/30 rounded-full blur-2xl animate-pulse"></div>
         <div className="absolute bottom-20 right-10 w-40 h-40 bg-gradient-to-br from-green-400/30 to-blue-400/30 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '1s' }}></div>
         <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-gradient-to-br from-blue-400/30 to-purple-400/30 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '2s' }}></div>
-
-        {/* Floating Icons */}
         <div className="absolute top-1/4 right-1/4 animate-float">
           <Leaf className="w-8 h-8 text-accent/40" />
         </div>

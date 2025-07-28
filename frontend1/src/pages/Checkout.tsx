@@ -68,6 +68,7 @@ const Checkout = () => {
   const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
+  console.log("user",user)
   const addressString = user?.address
     ? typeof user.address === "string"
       ? user.address
@@ -256,7 +257,7 @@ const Checkout = () => {
 
               navigate("/orders", { state: { orderId: order.id } });
 
-              window.location.reload();
+              // window.location.reload();
             } else {
               toast({
                 title: "Error",
@@ -351,7 +352,7 @@ const Checkout = () => {
             "No courier service available for this pincode.",
           variant: "destructive",
         });
-        return; // ⛔️ STOP here if not available
+        return; 
       }
     } catch (error) {
       console.error("Shipping Availability Error:", error);
@@ -360,7 +361,7 @@ const Checkout = () => {
         description: "Failed to check shipping availability.",
         variant: "destructive",
       });
-      return; // ⛔️ STOP on failure
+      return; 
     }
 
     if (!isAuthenticated) {

@@ -69,10 +69,8 @@ const BlogSection = () => {
             Latest from Our Blog
           </div>
           <h2 className="text-4xl md:text-5xl font-playfair font-bold text-foreground mb-6">
-            Hair Care Insights &
-            <span className="block bg-gradient-to-r from-accent via-green-600 to-teal-500 bg-clip-text text-transparent">
-              Expert Tips
-            </span>
+            Knowledge Center
+            
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             Stay updated with the latest hair care trends, natural remedies, and expert advice

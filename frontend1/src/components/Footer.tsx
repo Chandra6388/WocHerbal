@@ -1,3 +1,4 @@
+
 import { Link } from 'react-router-dom';
 import { Leaf, Mail, Phone, MapPin, Facebook, Twitter, Instagram } from 'lucide-react';
 
@@ -10,14 +11,14 @@ const Footer = () => {
           <div className="space-y-4">
             <Link to="/" className="flex items-center space-x-2">
               <img 
-              src="/uploads/WOChairOil_2.png"
+                 src="/uploads/WOChairOil_2.png"
                 alt="WocHerbal" 
                 className="h-8 w-auto sm:h-10 object-contain"
               />
             </Link>
-            <p className="text-muted-foreground">
+            {/* <p className="text-muted-foreground">
               Natural wellness reimagined with the power of Ayurveda and Panchgavya.
-            </p>
+            </p> */}
             <div className="flex space-x-4">
               <a 
                 href="https://facebook.com" 
@@ -66,7 +67,7 @@ const Footer = () => {
           </div>
 
           {/* Categories */}
-          <div>
+          {/* <div>
             <h3 className="font-semibold mb-4">Categories</h3>
             <ul className="space-y-2">
               <li>
@@ -90,7 +91,7 @@ const Footer = () => {
                 </Link>
               </li>
             </ul>
-          </div>
+          </div> */}
 
           {/* Policies */}
           <div>
@@ -143,7 +144,7 @@ const Footer = () => {
 
         <div className="border-t border-border mt-12 pt-8 text-center">
           <p className="text-muted-foreground">
-            © 2024 WocHerbal. All rights reserved. | Made with ❤️ for natural wellness
+            © 2025 WocHerbal. All rights reserved. | Jaiswal Innovations 
           </p>
         </div>
       </div>

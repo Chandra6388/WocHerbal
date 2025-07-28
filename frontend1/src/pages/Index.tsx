@@ -1,5 +1,6 @@
 
 import Hero from '@/components/Hero';
+import BannerSlider from '@/components/BannerSlider';
 import TestimonialsCarousel from '@/components/TestimonialsCarousel';
 import IngredientExplorer from '@/components/IngredientExplorer';
 import BlogSection from '@/components/BlogSection';
@@ -8,7 +9,7 @@ import { Star, ArrowRight, Shield, Truck, Award, Users, MapPin, Phone, Mail, Spa
 import { featuredProduct } from '../data/products';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
-import {  } from '@/services/user/reviewsService';
+import { } from '@/services/user/reviewsService';
 import { useEffect, useState } from 'react';
 const Index = () => {
   const benefits = [
@@ -56,13 +57,50 @@ const Index = () => {
     { icon: <Gift className="w-6 h-6" />, text: "Money-back Guarantee", color: "text-purple-600" },
     { icon: <Zap className="w-6 h-6" />, text: "Fast-acting Formula", color: "text-yellow-600" }
   ];
-;
+  ;
 
 
 
   return (
     <div className="min-h-screen">
+      <BannerSlider />
       <Hero />
+
+
+      <section className="py-24 bg-gradient-to-br from-secondary/20 via-background to-muted/10">
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center bg-accent/10 text-accent px-6 py-3 rounded-full text-sm font-medium mb-6">
+              <Users className="w-4 h-4 mr-2" />
+              Customer Stories
+            </div>
+            <h2 className="text-4xl md:text-5xl font-playfair font-bold text-foreground mb-6">
+              Real Results from Real People
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              Discover why thousands of customers trust WOC Herbal for their natural hair care journey
+            </p>
+          </div>
+
+          <TestimonialsCarousel />
+
+          <div className="text-center mt-12">
+            <Link to="/testimonials">
+              <Button size="lg" variant="outline" className="border-2 border-accent/30 hover:bg-accent/5 hover:scale-105 transition-all duration-300">
+                Read All Customer Stories
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-24 bg-background">
+        <div className="container mx-auto px-6">
+          <IngredientExplorer />
+        </div>
+      </section>
+
       <BlogSection />
       <section className="py-24 bg-gradient-to-br from-secondary/10 via-background to-muted/5 relative overflow-hidden">
         <div className="absolute inset-0 opacity-10">
@@ -78,22 +116,21 @@ const Index = () => {
               <Sparkles className="w-4 h-4 ml-2 animate-spin" style={{ animationDuration: '3s' }} />
             </div>
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-playfair font-bold text-foreground mb-4 sm:mb-6">
-              Rooted in Ancient Wisdom,
-              <span className="block bg-gradient-to-r from-accent via-muted-foreground to-primary bg-clip-text text-transparent">
-                Perfected by Science
+              <span className="relative inline-block">
+                <span className="bg-gradient-to-r from-accent via-primary to-accent-soft bg-clip-text text-transparent font-extrabold">
+                  WOC Highlights
+                </span>
+                <span className="absolute -bottom-2 left-0 w-full h-1 bg-gradient-to-r from-accent via-primary to-accent-soft rounded-full transform scale-x-75 group-hover:scale-x-100 transition-transform duration-300"></span>
               </span>
             </h2>
-            <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed px-4">
-              Discover the perfect blend of traditional Ayurvedic knowledge and modern scientific research,
-              crafted to give you the healthiest, most beautiful hair naturally.
-            </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 mb-12 sm:mb-16">
             {benefits.map((benefit, index) => (
               <Card
                 key={index}
-                className={`${benefit.bgGradient} border-2 border-transparent hover:border-accent/30 transition-all duration-500 hover:scale-105 hover:shadow-2xl group cursor-pointer`}
+                className={`bg-white
+ border-2 border-transparent hover:border-accent/30 transition-all duration-500 hover:scale-105 hover:shadow-2xl group cursor-pointer`}
               >
                 <CardContent className="p-6 sm:p-8 text-center h-full flex flex-col">
                   <div className={`w-16 h-16 sm:w-20 sm:h-20 mx-auto rounded-2xl bg-gradient-to-r ${benefit.gradient} flex items-center justify-center text-white mb-4 sm:mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shadow-xl`}>
@@ -118,12 +155,13 @@ const Index = () => {
             ))}
           </div>
 
-          <div className="text-center mb-8 sm:mb-12">
+          {/* Why Choose Us */}
+          {/* <div className="text-center mb-8 sm:mb-12 ">
             <h3 className="text-xl sm:text-2xl font-playfair font-bold mb-6 sm:mb-8 flex items-center justify-center">
               <Zap className="w-5 h-5 sm:w-6 sm:h-6 mr-2 text-accent" />
               Why Choose WOC Herbal?
             </h3>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 ">
               {whyChooseUs.map((item, index) => (
                 <div key={index} className="flex flex-col items-center space-y-2 sm:space-y-3 p-3 sm:p-4 bg-card/50 rounded-xl hover:bg-card transition-colors duration-300 group">
                   <div className={`${item.color} group-hover:scale-110 transition-transform`}>
@@ -135,7 +173,7 @@ const Index = () => {
                 </div>
               ))}
             </div>
-          </div>
+          </div> */}
 
           <div className="text-center">
             <Link to="/about">
@@ -149,11 +187,6 @@ const Index = () => {
         </div>
       </section>
 
-      <section className="py-24 bg-background">
-        <div className="container mx-auto px-6">
-          <IngredientExplorer />
-        </div>
-      </section>
 
       <section className="py-24 bg-gradient-to-br from-accent/5 via-background to-muted/5">
         <div className="container mx-auto px-4 sm:px-6">
@@ -170,7 +203,7 @@ const Index = () => {
             </p>
           </div>
 
-          <div className="max-w-6xl mx-auto">
+          <div className=" mx-auto">
             <Card className="overflow-hidden hover:shadow-2xl transition-all duration-700 border-2 border-accent/20 hover:border-accent/40 bg-gradient-to-br from-card to-card/90">
               <CardContent className="p-6 sm:p-8 lg:p-12">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 items-center">
@@ -241,33 +274,7 @@ const Index = () => {
         </div>
       </section>
 
-      <section className="py-24 bg-gradient-to-br from-secondary/20 via-background to-muted/10">
-        <div className="container mx-auto px-6">
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center bg-accent/10 text-accent px-6 py-3 rounded-full text-sm font-medium mb-6">
-              <Users className="w-4 h-4 mr-2" />
-              Customer Stories
-            </div>
-            <h2 className="text-4xl md:text-5xl font-playfair font-bold text-foreground mb-6">
-              Real Results from Real People
-            </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Discover why thousands of customers trust WOC Herbal for their natural hair care journey
-            </p>
-          </div>
 
-          <TestimonialsCarousel/>
-
-          <div className="text-center mt-12">
-            <Link to="/testimonials">
-              <Button size="lg" variant="outline" className="border-2 border-accent/30 hover:bg-accent/5 hover:scale-105 transition-all duration-300">
-                Read All Customer Stories
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
 
 
       <section className="py-24 bg-background">
