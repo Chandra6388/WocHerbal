@@ -10,7 +10,6 @@ import { featuredProduct } from '../data/products';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
 import { } from '@/services/user/reviewsService';
-import { useEffect, useState } from 'react';
 const Index = () => {
   const benefits = [
     {
@@ -65,8 +64,6 @@ const Index = () => {
     <div className="min-h-screen">
       <BannerSlider />
       <Hero />
-
-
       <section className="py-24 bg-gradient-to-br from-secondary/20 via-background to-muted/10">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">

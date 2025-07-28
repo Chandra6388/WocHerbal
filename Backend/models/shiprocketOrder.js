@@ -13,6 +13,22 @@ const shiprocketOrderSchema = new mongoose.Schema({
     postalCode: String,
     phone: String
   },
+  paymentInfo: {
+    id: {
+      type: String,
+      required: true
+    },
+    status: {
+      type: String,
+      required: true
+    },
+    method: {
+      type: String,
+      required: true
+    }
+  },
+  itemsPrice: { type: String, default: null },
+  order_id: { type: String, default: null },
   manifestLink: { type: String },
   labelPdfLink: { type: String },
   invoicePdfLink: { type: String },

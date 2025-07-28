@@ -151,6 +151,7 @@ exports.newOrder = async (req, res, next) => {
 
     const sr = shiprocketRes?.data;
 
+    console.log("itemsPrice", itemsPrice)
 
     // 7️⃣ Save Shiprocket response
     const savedShiprocketOrder = await ShiprocketOrder.create({
@@ -166,10 +167,13 @@ exports.newOrder = async (req, res, next) => {
         postalCode: shipmentData?.billing_pincode,
         phone: shipmentData?.billing_phone
       },
+      paymentInfo: paymentInfo,
       manifestLink: sr?.manifest_link,
       labelPdfLink: sr?.label_url,
       invoicePdfLink: sr?.invoice_url,
       trackingStatus: sr?.status,
+      itemsPrice: itemsPrice,
+      order_id: order?._id,
       createdAt: new Date(),
       updatedAt: new Date()
     });

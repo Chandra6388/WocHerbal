@@ -2,7 +2,7 @@ const axios = require('axios');
 const User = require('../models/User');
 const ShiprocketOrder = require('../models/shiprocketOrder');
 require('dotenv').config();
-
+const { refundPayment } = require('../utils/razorpay');
 let shiprocketToken = null;
 let tokenExpiry = null;
 
@@ -91,7 +91,7 @@ exports.getServiceability = async (req, res) => {
 exports.createOrder = async (req, res) => {
     try {
         const orderData = req.body;
-        console.log("orderData",req.body)
+        console.log("orderData", req.body)
         const response = await shiprocket.post('/v1/external/orders/create/adhoc', orderData);
         const data = response.data;
         // Save to DB
@@ -235,9 +235,16 @@ exports.cancelShipment = async (req, res) => {
 //   "ids": [16168898,16167171]
 // }'
 
-exports.cancelorder=async (req, res) => {
+exports.cancelorder = async (req, res) => {
     try {
-        const { ids } = req.body;
+        const { orderId } = req.body;
+        console.log("ids", orderId)
+        const ShiprocketOrderFind = await ShiprocketOrder.findOne({ orderId: orderId })
+        console.log("ShiprocketOrderFind", ShiprocketOrderFind?.paymentInfo.id)
+
+
+        await refundPayment(ShiprocketOrderFind?.paymentInfo.id, refundAmount, refundReason);
+        return
         const response = await shiprocket.post('/v1/external/orders/cancel', { ids });
         res.status(200).json({ status: 'success', data: response.data });
     } catch (error) {

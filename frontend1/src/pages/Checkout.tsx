@@ -6,8 +6,7 @@ import {
   Card,
   CardContent,
   CardHeader,
-  CardTitle,
-} from "../components/ui/card";
+  CardTitle,} from "../components/ui/card";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { Textarea } from "../components/ui/textarea";
@@ -342,7 +341,7 @@ const Checkout = () => {
 
     try {
       const response = await getRocketShipmentsAvailabilty(payload);
-      console.log("Shipping Availability Response:", response);
+      // console.log("Shipping Availability Response:", response);
 
       if (!response?.available) {
         toast({
