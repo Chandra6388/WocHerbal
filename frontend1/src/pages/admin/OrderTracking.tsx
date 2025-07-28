@@ -436,7 +436,7 @@ const OrderTracking = () => {
                     <div>
                       <p className="font-medium">{order.customer_name}</p>
                       <p className="text-sm text-muted-foreground">
-                        {order.customerEmail}
+                        {order.customer_email || "--"}
                       </p>
                     </div>
                   </TableCell>
