@@ -6,7 +6,8 @@ import {
   Card,
   CardContent,
   CardHeader,
-  CardTitle,} from "../components/ui/card";
+  CardTitle,
+} from "../components/ui/card";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { Textarea } from "../components/ui/textarea";
@@ -23,7 +24,6 @@ import { RAZORPAY_KEY_ID } from "@/Utils/privateKeys";
 import { loadRazorpayScript } from "@/Utils/RazorpayLoader";
 import { updateStockAndSoldCount } from "@/services/admin/productService";
 import { getRocketShipmentsAvailabilty } from "@/services/admin/rocketShippment";
-
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { sendOTP, verifyOTP } from "@/services/authSerives";
 import { getUserFromToken } from "@/Utils/TokenData";
@@ -67,7 +67,6 @@ const Checkout = () => {
   const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
-  console.log("user", user);
   const addressString = user?.address
     ? typeof user.address === "string"
       ? user.address

@@ -58,6 +58,17 @@ const Hero = () => {
     bg: "bg-gray-100"
   }];
 
+
+  const product = {
+    price: 999,
+    images:
+      "https://res.cloudinary.com/dlpeqbowx/image/upload/v1753729968/xw386jpopxvbbwib4hd8.jpg",
+    name: "Herbal Hair Oil ",
+    _id: "",
+    weight: "",
+  };
+
+  const quantity=1;
  
 
   return (
