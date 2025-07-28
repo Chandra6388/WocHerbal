@@ -18,7 +18,7 @@ const createOrder = async (amount, currency = 'INR', receipt) => {
       receipt: receipt,
       payment_capture: 1
     };
-    console.log("Creating Razorpay order with options:", options);
+    
     const order = await razorpay.orders.create(options);
     return order;
   } catch (error) {
