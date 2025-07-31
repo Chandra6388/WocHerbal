@@ -6,6 +6,7 @@ const { createOrder: createRazorpayOrder, verifyPayment, CapturePayment } = requ
 const ErrorHandler = require('../utils/errorHandler');
 const User = require("../models/User");
 const ShiprocketOrder = require('../models/shiprocketOrder');
+const crypto = require('crypto');
 
 let shiprocketToken = null;
 let tokenExpiry = null;
@@ -21,8 +22,7 @@ async function getShiprocketToken() {
     shiprocketToken = user.accessToken;
     return shiprocketToken;
   }
-  console.log("Genrate new token");
-
+ 
 
   const loginRes = await axios.post('https://apiv2.shiprocket.in/v1/external/auth/login', {
     email: process.env.SHIPROCKET_EMAIL,
@@ -347,50 +347,68 @@ exports.createPayment = async (req, res, next) => {
 };
 
 // Verify payment => /api/orders/verify-payment
-exports.verifyPayment = async (req, res, next) => {
-  try {
-    const {
-      razorpay_order_id,
-      razorpay_payment_id,
-      razorpay_signature,
-      orderData
-    } = req.body;
+// exports.verifyPayment = async (req, res, next) => {
+//   try {
+//     const {
+//       razorpay_order_id,
+//       razorpay_payment_id,
+//       razorpay_signature,
+//       orderData
+//     } = req.body;
 
-    const isAuthentic = verifyPayment(
-      razorpay_order_id,
-      razorpay_payment_id,
-      razorpay_signature
-    );
+//     const isAuthentic = verifyPayment(
+//       razorpay_order_id,
+//       razorpay_payment_id,
+//       razorpay_signature
+//     );
 
-    if (!isAuthentic) {
-      return res.status(400).json({
-        status: 'error',
-        message: 'Payment verification failed'
-      });
-    }
+//     if (!isAuthentic) {
+//       return res.status(400).json({
+//         status: 'error',
+//         message: 'Payment verification failed'
+//       });
+//     }
 
-    // Create order in database
-    const order = await Order.create({
-      ...orderData,
-      user: req.user._id,
-      razorpayOrderId: razorpay_order_id,
-      razorpayPaymentId: razorpay_payment_id,
-      razorpaySignature: razorpay_signature
-    });
+//     // Create order in database
+//     const order = await Order.create({
+//       ...orderData,
+//       user: req.user._id,
+//       razorpayOrderId: razorpay_order_id,
+//       razorpayPaymentId: razorpay_payment_id,
+//       razorpaySignature: razorpay_signature
+//     });
 
-    // Clear cart after successful order
-    await Cart.findOneAndUpdate(
-      { user: req.user._id },
-      { $set: { items: [], totalItems: 0, totalPrice: 0 } }
-    );
+//     // Clear cart after successful order
+//     await Cart.findOneAndUpdate(
+//       { user: req.user._id },
+//       { $set: { items: [], totalItems: 0, totalPrice: 0 } }
+//     );
 
-    res.status(200).json({
-      status: 'success',
-      message: 'Payment verified successfully',
-      order
-    });
-  } catch (error) {
-    next(error);
+//     res.status(200).json({
+//       status: 'success',
+//       message: 'Payment verified successfully',
+//       order
+//     });
+//   } catch (error) {
+//     next(error);
+//   }
+// };
+
+
+exports.verifyPayment = async(req, res) => {
+  const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
+
+  const secret = process.env.RAZORPAY_KEY_SECRET;
+
+  const generatedSignature = crypto
+    .createHmac("sha256", secret)
+    .update(`${razorpay_order_id}|${razorpay_payment_id}`)
+    .digest("hex");
+
+  if (generatedSignature === razorpay_signature) {
+    return res.status(200).json({ success: true, message: "Payment verified" });
+  } else {
+    return res.status(400).json({ success: false, message: "Invalid signature" });
   }
 };
 

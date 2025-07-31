@@ -181,24 +181,24 @@ const Reviews = () => {
             </TableHeader>
             <TableBody>
               {reviews.map((review) => (
-                <TableRow key={review._id}>
-                  <TableCell className="font-medium">{review.user}</TableCell>
-                  <TableCell>{renderStars(review.rating)}</TableCell>
+                <TableRow key={review?._id}>
+                  <TableCell className="font-medium">{review?.user}</TableCell>
+                  <TableCell>{renderStars(review?.rating)}</TableCell>
                   <TableCell>
                     <div className="max-w-xs">
-                      <p className="text-sm truncate">{review.comment}</p>
+                      <p className="text-sm truncate">{review?.comment}</p>
                     </div>
                   </TableCell>
-                  <TableCell>{review.productId.name}</TableCell>
-                  <TableCell>{new Date(review.createdAt).toLocaleDateString()}</TableCell>
-                  <TableCell>{getStatusBadge(review.status)}</TableCell>
+                  <TableCell>{review?.productId?.name}</TableCell>
+                  <TableCell>{new Date(review?.createdAt).toLocaleDateString()}</TableCell>
+                  <TableCell>{getStatusBadge(review?.status)}</TableCell>
                   <TableCell>
                     <div className="flex gap-2">
-                      {review.status === 'pending' && (
+                      {review?.status === 'pending' && (
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => handleApproveReview(review._id)}
+                          onClick={() => handleApproveReview(review?._id)}
                         >
                           <Check className="h-4 w-4" />
                         </Button>
@@ -206,7 +206,7 @@ const Reviews = () => {
                       <Button
                         variant="destructive"
                         size="sm"
-                        onClick={() => handleDeleteReview(review._id)}
+                        onClick={() => handleDeleteReview(review?._id)}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>

@@ -18,7 +18,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../components/ui/dialog";
-import { createOrder, createOrderByrazorpay } from "@/services/admin/User";
+import { createOrder, createOrderByrazorpay , verifyByrazorpay } from "@/services/admin/User";
 import { useToast } from "../hooks/use-toast";
 import { RAZORPAY_KEY_ID } from "@/Utils/privateKeys";
 import { loadRazorpayScript } from "@/Utils/RazorpayLoader";
@@ -27,6 +27,7 @@ import { getRocketShipmentsAvailabilty } from "@/services/admin/rocketShippment"
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { sendOTP, verifyOTP } from "@/services/authSerives";
 import { getUserFromToken } from "@/Utils/TokenData";
+import axios from "axios";
 
 interface RazorpayOptions {
   key: string;
@@ -34,7 +35,7 @@ interface RazorpayOptions {
   currency: string;
   name: string;
   description: string;
-  // order_id: string;
+  order_id: string;
   handler: (response: any) => void;
   prefill?: {
     name?: string;
@@ -349,128 +350,258 @@ const Checkout = () => {
     }
   };
 
-  const proceedWithOrder = async () => {
-    // Final validation before processing order
-    const validation = validateFormData();
-    if (!validation.isValid) {
+  // const proceedWithOrder = async () => {
+  //   // Final validation before processing order
+  //   const validation = validateFormData();
+  //   if (!validation.isValid) {
+  //     toast({
+  //       title: "Validation Error",
+  //       description: validation.errorMessage,
+  //       variant: "destructive",
+  //     });
+  //     return;
+  //   }
+
+  //   try {
+  //    await loadRazorpayScript("https://checkout.razorpay.com/v1/checkout.js");
+  //     const finalAmount = Math.round(getSubtotal());
+  //     if (finalAmount <= 0) {
+  //       toast({
+  //         title: "Error",
+  //         description: "Invalid order amount. Please check your order details.",
+  //         variant: "destructive",
+  //       });
+  //       return;
+  //     }
+
+  //     const orderResponse = await createOrderByrazorpay({ amount: finalAmount });
+  //     if (!orderResponse?.order?.id) {
+  //       toast({
+  //         title: "Error",
+  //         description: "Failed to create payment order. Please try again.",
+  //         variant: "destructive",
+  //       });
+  //       return;
+  //     }
+
+  //     const { order } = orderResponse;
+
+  //     const options: RazorpayOptions = {
+  //       key: RAZORPAY_KEY_ID,
+  //       amount: order.amount,
+  //       currency: "INR",
+  //       order_id: order._id,
+  //       name: "My E-Commerce Store",
+  //       description: "Order Payment",
+  //       handler: async (response: any) => {
+  //         try {
+  //           if (!response?.razorpay_payment_id) {
+  //             toast({
+  //               title: "Error",
+  //               description: "Payment verification failed. Please contact support.",
+  //               variant: "destructive",
+  //             });
+  //             return;
+  //           }
+
+  //           const orderRes = await createOrder(
+  //             createOrderPayload(response.razorpay_payment_id)
+  //           );
+  //           if (orderRes?.success) {
+  //             const productIds = [
+  //               {
+  //                 product: productdata._id,
+  //                 quantity: location?.state?.quantity,
+  //               },
+  //             ];
+  //             await updateStockAndSoldCount(productIds);
+  //             toast({
+  //               title: "Success",
+  //               description: "Order placed successfully!",
+  //               variant: "default",
+  //             });
+
+  //             navigate("/orders", { state: { orderId: order.id } });
+  //           } else {
+  //             toast({
+  //               title: "Error",
+  //               description: orderRes?.message || "Order save failed!",
+  //               variant: "destructive",
+  //             });
+  //           }
+  //         } catch (err) {
+  //           console.error(err);
+  //           toast({
+  //             title: "Error",
+  //             description: "Failed to save order!",
+  //             variant: "destructive",
+  //           });
+  //         }
+  //       },
+  //       prefill: {
+  //         name: formData.name.trim(),
+  //         email: formData.email.trim(),
+  //         contact: formData.phone.trim(),
+  //       },
+  //       theme: {
+  //         color: "#528FF0",
+  //       },
+  //     };
+
+  //     const razorpay = new window.Razorpay(options);
+  //     razorpay.open();
+  //   } catch (err: any) {
+  //     console.error("Razorpay Error:", err.message || err);
+  //     toast({
+  //       title: "Error",
+  //       description: err?.message || "Payment initialization failed!",
+  //       variant: "destructive",
+  //     });
+  //   }
+  // };
+
+
+const proceedWithOrder = async () => {
+  const validation = validateFormData();
+  if (!validation.isValid) {
+    toast({
+      title: "Validation Error",
+      description: validation.errorMessage,
+      variant: "destructive",
+    });
+    return;
+  }
+
+  try {
+    await loadRazorpayScript("https://checkout.razorpay.com/v1/checkout.js");
+
+    const finalAmount = Math.round(getSubtotal());
+    if (finalAmount <= 0) {
       toast({
-        title: "Validation Error",
-        description: validation.errorMessage,
+        title: "Error",
+        description: "Invalid order amount. Please check your order details.",
         variant: "destructive",
       });
       return;
     }
 
-    try {
-      await loadRazorpayScript("https://checkout.razorpay.com/v1/checkout.js");
-      const finalAmount = Math.round(getSubtotal());
-      if (finalAmount <= 0) {
-        toast({
-          title: "Error",
-          description: "Invalid order amount. Please check your order details.",
-          variant: "destructive",
-        });
-        return;
-      }
+    const orderResponse = await createOrderByrazorpay({ amount: finalAmount });
+    const { order } = orderResponse;
 
-      const orderResponse = await createOrderByrazorpay({
-        amount: finalAmount,
+    if (!order?.id) {
+      toast({
+        title: "Error",
+        description: "Failed to create payment order. Please try again.",
+        variant: "destructive",
       });
-      if (!orderResponse?.order?.id) {
-        toast({
-          title: "Error",
-          description: "Failed to create payment order. Please try again.",
-          variant: "destructive",
-        });
-        return;
-      }
+      return;
+    }
 
-      const { order } = orderResponse;
+    const options: RazorpayOptions = {
+      key: RAZORPAY_KEY_ID,
+      amount: order.amount,
+      currency: "INR",
+      order_id: order.id, // ✅ Razorpay order ID
+      name: "My E-Commerce Store",
+      description: "Order Payment",
 
-      const options: RazorpayOptions = {
-        key: RAZORPAY_KEY_ID,
-        amount: order.amount,
-        currency: "INR",
-        // order_id: order._id,
-        name: "My E-Commerce Store",
-        description: "Order Payment",
-        handler: async (response: any) => {
-          try {
-            if (!response?.razorpay_payment_id) {
-              toast({
-                title: "Error",
-                description:
-                  "Payment verification failed. Please contact support.",
-                variant: "destructive",
-              });
-              return;
-            }
-            console.log("order_id: order._id", order._id);
-            console.log(
-              "response.razorpay_payment_id",
-              response.razorpay_payment_id
-            );
-
-            const orderRes = await createOrder(
-              createOrderPayload(response.razorpay_payment_id)
-            );
-            if (orderRes?.success) {
-              const productIds = [
-                {
-                  product: productdata._id,
-                  quantity: location?.state?.quantity,
-                },
-              ];
-              await updateStockAndSoldCount(productIds);
-              toast({
-                title: "Success",
-                description: "Order placed successfully!",
-                variant: "default",
-              });
-
-              navigate("/orders", { state: { orderId: order.id } });
-            } else {
-              toast({
-                title: "Error",
-                description: orderRes?.message || "Order save failed!",
-                variant: "destructive",
-              });
-            }
-          } catch (err) {
-            console.error(err);
+      handler: async (response: any) => {
+        try {
+          if (
+            !response?.razorpay_payment_id ||
+            !response?.razorpay_order_id ||
+            !response?.razorpay_signature
+          ) {
             toast({
               title: "Error",
-              description: "Failed to save order!",
+              description: "Payment verification failed. Please contact support.",
+              variant: "destructive",
+            });
+            return;
+          }
+
+          const data = {
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_signature: response.razorpay_signature,
+          };
+
+          const verifyRes = await verifyByrazorpay(data); 
+
+          if (verifyRes?.success == false) {
+
+            toast({
+              title: "Error",
+              description: "Signature verification failed.",
+              variant: "destructive",
+            });
+            return;
+          }
+
+          const orderRes = await createOrder(
+            createOrderPayload(response.razorpay_payment_id)
+          );
+
+          if (orderRes?.success) {
+            const productIds = [
+              {
+                product: productdata._id,
+                quantity: location?.state?.quantity,
+              },
+            ];
+            await updateStockAndSoldCount(productIds);
+            toast({
+              title: "Success",
+              description: "Order placed successfully!",
+              variant: "default",
+            });
+            navigate("/orders", { state: { orderId: order.id } });
+          } else {
+            toast({
+              title: "Error",
+              description: orderRes?.message || "Order save failed!",
               variant: "destructive",
             });
           }
-        },
-        prefill: {
-          name: formData.name.trim(),
-          email: formData.email.trim(),
-          contact: formData.phone.trim(),
-        },
-        theme: {
-          color: "#528FF0",
-        },
-      };
+        } catch (err) {
+          console.error(err);
+          toast({
+            title: "Error",
+            description: "Payment verification request failed!",
+            variant: "destructive",
+          });
+        }
+      },
 
-      const razorpay = new window.Razorpay(options);
-      razorpay.open();
-    } catch (err: any) {
-      console.error("Razorpay Error:", err.message || err);
-      toast({
-        title: "Error",
-        description: err?.message || "Payment initialization failed!",
-        variant: "destructive",
-      });
-    }
-  };
+      prefill: {
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        contact: formData.phone.trim(),
+      },
+
+      theme: {
+        color: "#528FF0",
+      },
+    };
+
+    const razorpay = new window.Razorpay(options);
+    razorpay.open();
+  } catch (err: any) {
+    console.error("Razorpay Error:", err.message || err);
+    toast({
+      title: "Error",
+      description: err?.message || "Payment initialization failed!",
+      variant: "destructive",
+    });
+  }
+};
+
+
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Comprehensive validation
     const validation = validateFormData();
     if (!validation.isValid) {
       toast({
