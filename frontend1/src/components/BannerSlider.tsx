@@ -9,7 +9,7 @@ const BannerSlider = () => {
     {
       id: 1,
       image: "/uploads/86ce4255-a691-49a9-99fb-52b0851d8c58.png",
-      mobileImage: "/scrollng_image_mobile/01.jpg",
+      mobileImage: "/scrollng_image_mobile/06.jpg",
     },
     {
       id: 2,

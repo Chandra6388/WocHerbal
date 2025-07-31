@@ -1,9 +1,9 @@
-import React, {useState, useEffect} from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { Button } from '../../components/ui/button';
-import { ArrowLeft, Calendar, User, Clock, Share2, Heart } from 'lucide-react';
-import {getBlogById } from '@/services/admin/blogsService'
-import { useToast } from '@/hooks/use-toast';
+import React, { useState, useEffect } from "react";
+import { useParams, Link } from "react-router-dom";
+import { Button } from "../../components/ui/button";
+import { ArrowLeft, Calendar, User, Clock, Share2, Heart } from "lucide-react";
+import { getBlogById } from "@/services/admin/blogsService";
+import { useToast } from "@/hooks/use-toast";
 
 interface BlogPost {
   _id: string;
@@ -22,7 +22,7 @@ const BlogPost = () => {
   const { id } = useParams();
   const [post, setPost] = useState<BlogPost | null>(null);
 
-   useEffect(() => {
+  useEffect(() => {
     if (id) {
       fetchBlog();
     }
@@ -32,34 +32,35 @@ const BlogPost = () => {
     try {
       const req = { id };
       const res = await getBlogById(req);
-      if (res?.status === 'success') {
+      if (res?.status === "success") {
         setPost(res.blog);
       } else {
         setPost(null);
         toast({
-          title: 'No Blog Found',
-          description: res?.message || 'No blog post available right now.',
-          variant: 'default',
+          title: "No Blog Found",
+          description: res?.message || "No blog post available right now.",
+          variant: "default",
           duration: 3000,
         });
       }
     } catch (error) {
-      console.error('Error fetching blog:', error);
+      console.error("Error fetching blog:", error);
       toast({
-        title: 'Failed to Load Blog',
-        description: 'Something went wrong while fetching the blog post.',
-        variant: 'destructive',
+        title: "Failed to Load Blog",
+        description: "Something went wrong while fetching the blog post.",
+        variant: "destructive",
         duration: 3000,
       });
     }
   };
 
-
-    if (!post) {
+  if (!post) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-foreground mb-4">Blog post not found</h1>
+          <h1 className="text-2xl font-bold text-foreground mb-4">
+            Blog post not found
+          </h1>
           <Link to="/blog">
             <Button>Back to Blog</Button>
           </Link>
@@ -71,18 +72,24 @@ const BlogPost = () => {
   return (
     <div className="min-h-screen bg-background py-10">
       <div className="container mx-auto px-6 max-w-5xl">
-        <Link to="/admin/blog" className="inline-flex items-center text-accent hover:text-green-600 transition-colors mb-8">
+        <Link
+          to="/admin/blog"
+          className="inline-flex items-center text-accent hover:text-green-600 transition-colors mb-8"
+        >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Home
         </Link>
 
         <article>
           <div className="mb-8">
-            <div className="aspect-video overflow-hidden rounded-2xl mb-8">
+            <div
+              className="aspect-video overflow-hidden rounded-2xl mb-8"
+              style={{ width: "1080px", height: "1080px" }}
+            >
               <img
                 src={post.image}
                 alt={post.title}
-                className="w-full h-full object-cover"
+                className=" object-contain"
               />
             </div>
 
@@ -98,7 +105,6 @@ const BlogPost = () => {
                 <User className="w-4 h-4" />
                 <span>{post.author}</span>
               </div>
-             
             </div>
 
             <h1 className="text-4xl md:text-5xl font-playfair font-bold text-foreground mb-6">
@@ -130,7 +136,5 @@ const BlogPost = () => {
     </div>
   );
 };
-
-
 
 export default BlogPost;
