@@ -85,24 +85,23 @@ const HeroSection = () => {
                 Each bottle contains 30+ carefully selected natural ingredients for complete hair transformation.
               </p>
             </div>
-
             {/* Product highlights */}
             <div className="grid grid-cols-2 gap-4 max-w-md mx-auto">
               <div className="flex items-center space-x-3">
                 <div className="w-3 h-3 bg-accent rounded-full"></div>
-                <span className="text-muted-foreground text-sm">Repairs & Restores</span>
+                <span className="text-muted-foreground text-sm">Made in India</span>
               </div>
               <div className="flex items-center space-x-3">
                 <div className="w-3 h-3 bg-accent rounded-full"></div>
-                <span className="text-muted-foreground text-sm">Promotes Growth</span>
+                <span className="text-muted-foreground text-sm">100% Authentic Ingredients</span>
               </div>
               <div className="flex items-center space-x-3">
                 <div className="w-3 h-3 bg-accent rounded-full"></div>
-                <span className="text-muted-foreground text-sm">100% Natural</span>
+                <span className="text-muted-foreground text-sm">Aromatic Therapy</span>
               </div>
               <div className="flex items-center space-x-3">
                 <div className="w-3 h-3 bg-accent rounded-full"></div>
-                <span className="text-muted-foreground text-sm">Clinically Tested</span>
+                <span className="text-muted-foreground text-sm">Long-Lasting Results</span>
               </div>
             </div>
 
@@ -136,25 +135,25 @@ const HeroSection = () => {
                 WOC Herbal Hair Oil brings you the perfect blend of traditional Ayurveda and modern science. 
                 Each bottle contains 30+ carefully selected natural ingredients for complete hair transformation.
               </p>
-            </div>
+            </div> 
 
             {/* Product highlights */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="flex items-center space-x-3">
                 <div className="w-3 h-3 bg-accent rounded-full"></div>
-                <span className="text-muted-foreground">Repairs & Restores</span>
+                <span className="text-muted-foreground">Made in India</span>
               </div>
               <div className="flex items-center space-x-3">
                 <div className="w-3 h-3 bg-accent rounded-full"></div>
-                <span className="text-muted-foreground">Promotes Growth</span>
+                <span className="text-muted-foreground">100% Authentic Ingredients</span>
               </div>
               <div className="flex items-center space-x-3">
                 <div className="w-3 h-3 bg-accent rounded-full"></div>
-                <span className="text-muted-foreground">100% Natural</span>
+                <span className="text-muted-foreground">Aromatic Therapy</span>
               </div>
               <div className="flex items-center space-x-3">
                 <div className="w-3 h-3 bg-accent rounded-full"></div>
-                <span className="text-muted-foreground">Clinically Tested</span>
+                <span className="text-muted-foreground">Long-Lasting Results</span>
               </div>
             </div>
 

@@ -8,6 +8,8 @@ import {
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Textarea } from "../../components/ui/textarea";
+import { JoditEditor } from '@/components/ui/jodit-editor';
+
 import { Badge } from "../../components/ui/badge";
 import {
   Plus,
@@ -432,22 +434,16 @@ const BlogManagement = () => {
               <label className="text-sm font-semibold text-forest-700">
                 Content *
               </label>
-              <Textarea
+
+              <JoditEditor
                 value={editingPost.content || ""}
-                onChange={(e) =>
-                  setEditingPost((prev) => ({
-                    ...prev,
-                    content: e.target.value,
-                  }))
-                }
+                onChange={(content) => setEditingPost({ ...editingPost, content })}
                 placeholder="Write your full blog content here. HTML tags are supported for formatting."
-                rows={12}
-                className="border-accent/30 focus:border-accent focus:ring-accent/20 font-mono text-sm"
+                height={300}
               />
-              <p className="text-sm text-muted-foreground">
-                You can use HTML tags like &lt;h2&gt;, &lt;p&gt;, &lt;ul&gt;,
-                &lt;strong&gt; for formatting
-              </p>
+             
+
+             
             </div>
 
             <div className="flex flex-wrap gap-4 pt-4 border-t border-accent/10">

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import axios from "axios";
 import { uploadToCloudinary } from "@/services/admin/blogsService";
+import { JoditEditor } from '@/components/ui/jodit-editor';
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -522,7 +523,17 @@ const Products = () => {
 
                   <div className="space-y-2">
                     <Label htmlFor="description">Description</Label>
-                    <Textarea
+
+
+
+                     <JoditEditor
+                      value={formData.description}
+                      onChange={(content) => setFormData({...formData, description: content})}
+                      placeholder="Enter product description with formatting..."
+                      height={150}
+                    />
+
+                    {/* <Textarea
                       id="description"
                       value={formData.description}
                       onChange={(e) =>
@@ -533,12 +544,18 @@ const Products = () => {
                       }
                       rows={3}
                       required
-                    />
+                    /> */}
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="benefits">Benefits</Label>
-                    <Textarea
+                      <JoditEditor
+                      value={formData.benefits}
+                      onChange={(content) => setFormData({...formData, benefits: content})}
+                      placeholder="Enter product benefits with formatting..."
+                      height={150}
+                    />
+                    {/* <Textarea
                       id="benefits"
                       value={formData.benefits}
                       onChange={(e) =>
@@ -546,7 +563,7 @@ const Products = () => {
                       }
                       rows={3}
                       required
-                    />
+                    /> */}
                   </div>
                 </div>
 

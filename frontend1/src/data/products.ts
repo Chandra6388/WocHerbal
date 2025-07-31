@@ -26,7 +26,7 @@ export const products: Product[] = [
     images: '/uploads/96af52de-e5d2-4f86-a7c6-e71952e09270.png',
     category: 'ayurvedic',
     volume: '100ml',
-    weight: 100,
+    weight: 270,
     description: 'Discover the magic of Ayurveda with WOC Panchgavya Ayurvedic Herbal Hair Oil, a powerful blend of 30 premium natural herbs, designed to nourish, strengthen, and rejuvenate your hair from the roots. Crafted using the traditional Kshir Pak method and enriched with Indigenous cow milk, this hair oil provides deep nourishment to your scalp and hair, delivering a healthy, shiny, and revitalized look.',
     ingredients: ['Panchgavya', 'Tulsi', 'Palmarosa Oil', 'Moringa Leaves', 'Lemon Extract', 'Brahmi', 'Amla', 'Bhringraj', 'Neem', 'Coconut Oil', 'Sesame Oil'],
     benefits: [

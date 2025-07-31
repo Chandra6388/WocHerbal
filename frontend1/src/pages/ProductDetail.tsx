@@ -79,24 +79,24 @@ const ProductDetail = () => {
     'Acts as natural conditioner',
     'Scalp soother and calmer'
   ]
-    useEffect(() => {
-      const fetchProduct = async () => {
-        try {
-          const response = await getProductById({ productId: id });
-          if (response?.status === "error") {
-            navigate("/products");
-            return;
-          }
-          setProduct(response?.product);
-        } catch (error) {
-          console.error("Error fetching product:", error);
-          // navigate('/products');
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const response = await getProductById({ productId: id });
+        if (response?.status === "error") {
+          navigate("/products");
+          return;
         }
-      };
-      if (id) {
-        fetchProduct();
+        setProduct(response?.product);
+      } catch (error) {
+        console.error("Error fetching product:", error);
+        // navigate('/products');
       }
-    }, [id, navigate]);
+    };
+    if (id) {
+      fetchProduct();
+    }
+  }, [id, navigate]);
 
 
   if (!product) {
@@ -194,11 +194,10 @@ const ProductDetail = () => {
                 )}
               </div>
             </div>
-
-            <p className="text-muted-foreground text-lg">
-              {product?.description}
-            </p>
-
+            <div
+              className="text-muted-foreground text-lg"
+              dangerouslySetInnerHTML={{ __html: product?.description || "" }}
+            />
             {/* Quantity and Actions */}
             <div className="space-y-4">
               <div className="flex items-center gap-4">
