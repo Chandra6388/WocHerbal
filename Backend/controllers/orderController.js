@@ -110,8 +110,8 @@ exports.newOrder = async (req, res, next) => {
     if (!accessToken) {
       return res.status(500).json({ success: false, message: "Missing Shiprocket access token." });
     }
-
-    // 5️⃣ Prepare shipment data
+ 
+ 
     const shipmentData = {
       order_id: order?._id?.toString(),
       order_date: new Date().toISOString().slice(0, 10),
@@ -131,17 +131,17 @@ exports.newOrder = async (req, res, next) => {
       order_items: orderItemsReq,
       payment_method: paymentInfo?.method === "COD" ? "COD" : "Prepaid",
       sub_total,
-      length: 10,
-      breadth: 15,
-      height: 20,
-      weight: 2
+      length: 2.5,
+      breadth: 17,
+      height: 2.5,
+      weight: 0.27
     }
 
 
     const shiprocketRes = await shiprocket.post('/v1/external/orders/create/adhoc', shipmentData);
     // const data = response.data;
 
-  
+
 
 
 

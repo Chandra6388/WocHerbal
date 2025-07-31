@@ -88,7 +88,7 @@ const TestimonialsCarousel = () => {
   return (
     <div className="relative max-w-7xl mx-auto">
       <div className="space-y-6 grid grid-cols-1 sm:grid-cols-2  gap-6">
-        {allReviews.map((testimonial) => (
+        {allReviews?.slice(0, 4)?.map((testimonial) => (
 
           <Card key={testimonial._id} className=" bg-gradient-to-br from-card via-card/95 to-accent/5 border-2 border-accent/20 hover:border-accent/40 transition-all duration-300 shadow-xl hover:scale-105">
             <CardContent className="p-4 sm:p-6">
