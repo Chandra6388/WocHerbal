@@ -22,7 +22,7 @@ async function getShiprocketToken() {
     shiprocketToken = user.accessToken;
     return shiprocketToken;
   }
- 
+
 
   const loginRes = await axios.post('https://apiv2.shiprocket.in/v1/external/auth/login', {
     email: process.env.SHIPROCKET_EMAIL,
@@ -71,9 +71,10 @@ exports.newOrder = async (req, res, next) => {
       taxPrice,
       shippingPrice,
       totalPrice,
-      paymentInfo
+      paymentInfo,
+      user
     } = req.body;
-    console.log("paymentInfo", paymentInfo)
+    console.log("paymentInfo", req.body)
 
     // 1️⃣ Create order in DB
     const order = await Order.create({
@@ -85,7 +86,7 @@ exports.newOrder = async (req, res, next) => {
       totalPrice,
       paymentInfo,
       paidAt: Date.now(),
-      user: req.user?._id || null
+      user: user
     });
 
     // 2️⃣ Map order items for Shiprocket
@@ -112,9 +113,9 @@ exports.newOrder = async (req, res, next) => {
       return res.status(500).json({ success: false, message: "Missing Shiprocket access token." });
     }
 
-    console.log(paymentInfo.id, totalPrice)
-    let captureRes = await CapturePayment(paymentInfo.id, totalPrice)
-    console.log("captureRes", captureRes)
+    // console.log(paymentInfo.id, totalPrice)
+    // let captureRes = await CapturePayment(paymentInfo.id, totalPrice)
+    // console.log("captureRes", captureRes)
 
 
     const shipmentData = {
@@ -395,7 +396,7 @@ exports.createPayment = async (req, res, next) => {
 // };
 
 
-exports.verifyPayment = async(req, res) => {
+exports.verifyPayment = async (req, res) => {
   const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
 
   const secret = process.env.RAZORPAY_KEY_SECRET;
