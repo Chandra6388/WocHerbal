@@ -4,7 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { getOrders } from "@/services/admin/rocketShippment";
-import { getRocketShipmentsAvailabilty, assignAwb, cancelShipment, cancelorder } from "@/services/admin/rocketShippment";
+import {
+  getRocketShipmentsAvailabilty,
+  assignAwb,
+  cancelShipment,
+  cancelorder,
+} from "@/services/admin/rocketShippment";
 import Swal from "sweetalert2";
 import {
   Table,
@@ -61,12 +66,12 @@ interface OrderTracking {
   total: number;
   amount: number;
   status:
-  | "confirmed"
-  | "processing"
-  | "shipped"
-  | "out-for-delivery"
-  | "delivered"
-  | "cancelled";
+    | "confirmed"
+    | "processing"
+    | "shipped"
+    | "out-for-delivery"
+    | "delivered"
+    | "cancelled";
   trackingNumber: string;
   shippingAddress: string;
   orderDate: string;
@@ -87,17 +92,17 @@ interface OrderTracking {
 }
 
 const OrderTracking = () => {
-
   const [orders, setOrders] = useState<OrderTracking[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [selectedOrder, setSelectedOrder] = useState<OrderTracking | null>(null);
+  const [selectedOrder, setSelectedOrder] = useState<OrderTracking | null>(
+    null
+  );
   const [isTrackingDialogOpen, setIsTrackingDialogOpen] = useState(false);
 
   useEffect(() => {
     GetOrders();
   }, []);
-
 
   // PICKUP SCHEDULED
   // CANCELLATION REQUESTED
@@ -111,7 +116,11 @@ const OrderTracking = () => {
           <Badge className="bg-yellow-100 text-yellow-800">Processing</Badge>
         );
       case "PICKUP SCHEDULED":
-        return <Badge className="bg-purple-100 text-purple-800">Pickup Scheduled</Badge>;
+        return (
+          <Badge className="bg-purple-100 text-purple-800">
+            Pickup Scheduled
+          </Badge>
+        );
       case "out-for-delivery":
         return (
           <Badge className="bg-orange-100 text-orange-800">
@@ -123,7 +132,11 @@ const OrderTracking = () => {
       case "CANCELED":
         return <Badge className="bg-red-100 text-red-800">Cancelled</Badge>;
       case "CANCELLATION REQUESTED":
-        return (<Badge className="bg-blue-100 text-blue-800">Cancellation Requested</Badge>);
+        return (
+          <Badge className="bg-blue-100 text-blue-800">
+            Cancellation Requested
+          </Badge>
+        );
       default:
         return <Badge variant="secondary">{status}</Badge>;
     }
@@ -201,12 +214,10 @@ const OrderTracking = () => {
         } else {
           toast.error("Failed to assign AWB");
         }
-
       } catch (error) {
         console.error("Error in AWB assignment:", error);
         toast.error("Something went wrong while assigning AWB");
       }
-
     } else {
       // Cancel flow
       if (firstShipment.awb) {
@@ -217,7 +228,7 @@ const OrderTracking = () => {
         );
 
         if (result.isConfirmed) {
-          const payload = { awbs: firstShipment.awb };
+          const payload = { orderId: order.id };
 
           try {
             await cancelShipment(payload);
@@ -248,7 +259,6 @@ const OrderTracking = () => {
       }
     }
   };
-
 
   const handleExportData = () => {
     const csvContent = [
@@ -298,9 +308,8 @@ const OrderTracking = () => {
     try {
       let getOrdersData = await getOrders({});
       setOrders(getOrdersData.data.data);
-    } catch (error) { }
+    } catch (error) {}
   };
-
 
   return (
     <div className="p-6 space-y-6">
@@ -428,7 +437,9 @@ const OrderTracking = () => {
                     <div>
                       <p className="font-medium">{order.id}</p>
                       <p className="text-sm text-muted-foreground">
-                        {new Date(order.channel_created_at).toLocaleDateString()}
+                        {new Date(
+                          order.channel_created_at
+                        ).toLocaleDateString()}
                       </p>
                     </div>
                   </TableCell>
@@ -464,7 +475,9 @@ const OrderTracking = () => {
                     <div>
                       <p className="text-sm">
                         Est:{" "}
-                        {new Date(order.shipments?.[0]?.delivered_date).toLocaleDateString()}
+                        {new Date(
+                          order.shipments?.[0]?.delivered_date
+                        ).toLocaleDateString()}
                       </p>
                       {order.actualDelivery && (
                         <p className="text-sm text-green-600">
@@ -507,7 +520,10 @@ const OrderTracking = () => {
         </CardContent>
       </Card>
 
-      <Dialog open={isTrackingDialogOpen} onOpenChange={setIsTrackingDialogOpen} >
+      <Dialog
+        open={isTrackingDialogOpen}
+        onOpenChange={setIsTrackingDialogOpen}
+      >
         <DialogContent className="max-w-4xl">
           <DialogHeader>
             <DialogTitle>Order Tracking Details</DialogTitle>
@@ -525,9 +541,7 @@ const OrderTracking = () => {
                   <CardContent className="space-y-3">
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Order ID:</span>
-                      <span className="font-medium">
-                        {selectedOrder?.id}
-                      </span>
+                      <span className="font-medium">{selectedOrder?.id}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">
@@ -556,39 +570,40 @@ const OrderTracking = () => {
                   </CardContent>
                 </Card>
 
-               <Card>
-  <CardHeader>
-    <CardTitle className="text-lg">Customer Details</CardTitle>
-  </CardHeader>
-  <CardContent className="space-y-3">
-    <div className="flex items-center space-x-3">
-      <div className="w-full">
-        <p className="font-medium">
-          {selectedOrder?.customer_name || "--"}
-        </p>
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Customer Details</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-full">
+                        <p className="font-medium">
+                          {selectedOrder?.customer_name || "--"}
+                        </p>
 
-        <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-          <Mail className="w-4 h-4" />
-          <span>{selectedOrder?.customer_email || "--"}</span>
-        </div>
+                        <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+                          <Mail className="w-4 h-4" />
+                          <span>{selectedOrder?.customer_email || "--"}</span>
+                        </div>
 
-        <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-          <Phone className="w-4 h-4" />
-          <span>{selectedOrder?.customer_phone || "--"}</span>
-        </div>
+                        <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+                          <Phone className="w-4 h-4" />
+                          <span>{selectedOrder?.customer_phone || "--"}</span>
+                        </div>
 
-        <div className="flex items-start space-x-2 text-sm text-muted-foreground mt-2">
-          <MapPin className="w-4 h-4 mt-0.5" />
-          <span>
-            {selectedOrder?.customer_address}, {selectedOrder?.customer_city},{" "}
-            {selectedOrder?.customer_state} - {selectedOrder?.customer_pincode}
-          </span>
-        </div>
-      </div>
-    </div>
-  </CardContent>
-</Card>
-
+                        <div className="flex items-start space-x-2 text-sm text-muted-foreground mt-2">
+                          <MapPin className="w-4 h-4 mt-0.5" />
+                          <span>
+                            {selectedOrder?.customer_address},{" "}
+                            {selectedOrder?.customer_city},{" "}
+                            {selectedOrder?.customer_state} -{" "}
+                            {selectedOrder?.customer_pincode}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
 
               {/* Tracking Timeline */}
@@ -596,7 +611,9 @@ const OrderTracking = () => {
                 <Card>
                   <Card>
                     <CardHeader>
-                      <CardTitle className="text-lg">Tracking Timeline</CardTitle>
+                      <CardTitle className="text-lg">
+                        Tracking Timeline
+                      </CardTitle>
                     </CardHeader>
                     <CardContent>
                       <ol className="relative border-s border-gray-300 ml-4 mt-2">
@@ -605,53 +622,67 @@ const OrderTracking = () => {
                             status: "Order Created",
                             timestamp: selectedOrder?.channel_created_at,
                             location: selectedOrder?.customer_city,
-                            remarks: "Order successfully created"
+                            remarks: "Order successfully created",
                           },
                           {
                             status: "Pickup Scheduled",
-                            timestamp: selectedOrder?.shipments?.[0]?.pickup_scheduled_date !== "0000-00-00 00:00:00"
-                              ? selectedOrder?.shipments?.[0]?.pickup_scheduled_date
-                              : null,
-                            location: selectedOrder?.pickup_address_detail?.city,
-                            remarks: "Courier will pick up the package"
+                            timestamp:
+                              selectedOrder?.shipments?.[0]
+                                ?.pickup_scheduled_date !==
+                              "0000-00-00 00:00:00"
+                                ? selectedOrder?.shipments?.[0]
+                                    ?.pickup_scheduled_date
+                                : null,
+                            location:
+                              selectedOrder?.pickup_address_detail?.city,
+                            remarks: "Courier will pick up the package",
                           },
                           {
                             status: "Picked Up",
-                            timestamp: selectedOrder?.shipments?.[0]?.pickedup_timestamp,
-                            location: selectedOrder?.pickup_address_detail?.city,
-                            remarks: "Package picked up by delivery partner"
+                            timestamp:
+                              selectedOrder?.shipments?.[0]?.pickedup_timestamp,
+                            location:
+                              selectedOrder?.pickup_address_detail?.city,
+                            remarks: "Package picked up by delivery partner",
                           },
                           {
                             status: "Out for Delivery",
-                            timestamp: selectedOrder?.shipments?.[0]?.pickup_scheduled_date,
+                            timestamp:
+                              selectedOrder?.shipments?.[0]
+                                ?.pickup_scheduled_date,
                             location: selectedOrder?.customer_city,
-                            remarks: "Courier is out for delivery"
+                            remarks: "Courier is out for delivery",
                           },
                           {
                             status: "Delivered",
-                            timestamp: selectedOrder?.shipments?.[0]?.delivered_date,
+                            timestamp:
+                              selectedOrder?.shipments?.[0]?.delivered_date,
                             location: selectedOrder?.customer_city,
-                            remarks: "Package delivered"
-                          }
+                            remarks: "Package delivered",
+                          },
                         ]
-                          .filter(item => item.timestamp)
+                          .filter((item) => item.timestamp)
                           .map((item, idx) => (
                             <li key={idx} className="mb-6 ms-4">
                               <div className="absolute w-3 h-3 bg-blue-600 rounded-full -start-1.5 border border-white" />
                               <time className="block text-sm text-gray-500">
                                 {item.timestamp || "—"}
                               </time>
-                              <h3 className="text-base font-semibold text-gray-900">{item.status}</h3>
+                              <h3 className="text-base font-semibold text-gray-900">
+                                {item.status}
+                              </h3>
                               <p className="text-sm text-gray-700">
-                                <span className="font-medium">Location:</span> {item.location || "N/A"}
+                                <span className="font-medium">Location:</span>{" "}
+                                {item.location || "N/A"}
                               </p>
-                              <p className="text-sm text-gray-600">{item.remarks}</p>
+                              <p className="text-sm text-gray-600">
+                                {item.remarks}
+                              </p>
                             </li>
                           ))}
                       </ol>
                     </CardContent>
                   </Card>
-
 
                   <CardContent>
                     <div className="space-y-4">

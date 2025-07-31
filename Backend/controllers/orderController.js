@@ -2,7 +2,7 @@ const axios = require('axios');
 const Order = require('../models/Order');
 const Product = require('../models/Product');
 const Cart = require('../models/Cart');
-const { createOrder: createRazorpayOrder, verifyPayment } = require('../utils/razorpay');
+const { createOrder: createRazorpayOrder, verifyPayment, CapturePayment } = require('../utils/razorpay');
 const ErrorHandler = require('../utils/errorHandler');
 const User = require("../models/User");
 const ShiprocketOrder = require('../models/shiprocketOrder');
@@ -73,6 +73,7 @@ exports.newOrder = async (req, res, next) => {
       totalPrice,
       paymentInfo
     } = req.body;
+    console.log("paymentInfo", paymentInfo)
 
     // 1️⃣ Create order in DB
     const order = await Order.create({
@@ -110,8 +111,12 @@ exports.newOrder = async (req, res, next) => {
     if (!accessToken) {
       return res.status(500).json({ success: false, message: "Missing Shiprocket access token." });
     }
- 
- 
+
+    console.log(paymentInfo.id, totalPrice)
+    let captureRes = await CapturePayment(paymentInfo.id, totalPrice)
+    console.log("captureRes", captureRes)
+
+
     const shipmentData = {
       order_id: order?._id?.toString(),
       order_date: new Date().toISOString().slice(0, 10),
@@ -514,3 +519,18 @@ exports.getOverallRevenue = async (req, res) => {
     res.status(500).json({ success: false, message: 'Failed to fetch overall revenue', error: error.message });
   }
 };
+
+exports.captureOrder = async (req, res) => {
+  try {
+    const { paymentid, amount } = req.body;
+
+    let captureRes = await CapturePayment(paymentid, amount);
+    console.log(captureRes)
+
+    return res.json({ status: true, data: captureRes })
+
+
+  } catch (error) {
+    return res.json({ status: false, data: error })
+  }
+}

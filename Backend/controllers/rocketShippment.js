@@ -92,7 +92,7 @@ exports.getServiceability = async (req, res) => {
 exports.createOrder = async (req, res) => {
     try {
         const orderData = req.body;
-       
+
         const response = await shiprocket.post('/v1/external/orders/create/adhoc', orderData);
         const data = response.data;
         // Save to DB
@@ -220,39 +220,88 @@ exports.getOrders = async (req, res) => {
 
 exports.cancelShipment = async (req, res) => {
     try {
-        const { awbs } = req.body;
-        const response = await shiprocket.post('/v1/external/orders/cancel/shipment/awbs', { awbs });
-        res.status(200).json({ status: 'success', data: response.data });
+        const { orderId } = req.body;
+
+        // Step 1: Find Shiprocket Order
+        const shiprocketOrder = await ShiprocketOrder.findOne({ orderId });
+        if (!shiprocketOrder) {
+            return res.status(404).json({ status: 'error', message: 'Shiprocket Order not found' });
+        }
+
+        // Step 2: Find Local Order
+        const localOrder = await Order.findOne({ _id: shiprocketOrder.order_id });
+        if (!localOrder) {
+            return res.status(404).json({ status: 'error', message: 'Local Order not found' });
+        }
+
+        // Step 4: Cancel Shiprocket Order
+        const cancelResponse = await shiprocket.post('/v1/external/orders/cancel/shipment/awbs', {
+            ids: [Number(orderId)] // Ensure orderId is a number
+        });
+        if (cancelResponse.data.status_code != 200) {
+            return res.status(404).json({ status: 'error', message: 'Error in shiprocket', error: cancelResponse.data });
+        }
+
+        // Step 3: Refund via Razorpay
+        let refundResponse = await refundPayment(shiprocketOrder?.paymentInfo?.id, localOrder.totalPrice);
+
+        if (refundResponse?.error?.code === "BAD_REQUEST_ERROR") {
+            return res.status(400).json({ status: 'failed', message: refundResponse.error.description });
+        }
+
+
+
+        return res.status(200).json({ status: 'success', data: cancelResponse.data });
     } catch (error) {
-        console.error('Error in cancelShipment:', error.message);
-        res.status(error.response?.status || 500).json({ status: 'error', message: error.response?.data?.message || 'Internal Server Error' });
+        console.error('Error in cancelorder:', error.response?.data || error.message);
+        return res.status(error.response?.status || 500).json({
+            status: 'error',
+            message: error.response?.data?.message || error.message || 'Internal Server Error',
+        });
     }
 }
 
-// curl --location 'https://apiv2.shiprocket.in/v1/external/orders/cancel' \
-// --header 'Content-Type: application/json' \
-// --header 'Authorization: Bearer {{token}}' \
-// --data '{
-//   "ids": [16168898,16167171]
-// }'
+
 
 exports.cancelorder = async (req, res) => {
     try {
         const { orderId } = req.body;
-        const ShiprocketOrderFind = await ShiprocketOrder.findOne({ orderId: orderId })
 
-        const OrderGet = await Order.findOne({ _id: ShiprocketOrderFind.order_id })
-
-        let responseRefund = await refundPayment(ShiprocketOrderFind?.paymentInfo.id, OrderGet.totalPrice);
-        console.log("responseRefund", responseRefund)
-        if (responseRefund.code == "BAD_REQUEST_ERROR") {
-            return res.status(200).json({ status: 'failed', data: responseRefund.description });
+        // Step 1: Find Shiprocket Order
+        const shiprocketOrder = await ShiprocketOrder.findOne({ orderId });
+        if (!shiprocketOrder) {
+            return res.status(404).json({ status: 'error', message: 'Shiprocket Order not found' });
         }
 
-        const response = await shiprocket.post('/v1/external/orders/cancel', { orderId });
-        return res.status(200).json({ status: 'success', data: response.data });
+        // Step 2: Find Local Order
+        const localOrder = await Order.findOne({ _id: shiprocketOrder.order_id });
+        if (!localOrder) {
+            return res.status(404).json({ status: 'error', message: 'Local Order not found' });
+        }
+
+        // Step 4: Cancel Shiprocket Order
+        const cancelResponse = await shiprocket.post('/v1/external/orders/cancel', {
+            ids: [Number(orderId)] // Ensure orderId is a number
+        });
+        if (cancelResponse.data.status_code != 200) {
+            return res.status(404).json({ status: 'error', message: 'Error in shiprocket', error: cancelResponse.data });
+        }
+
+        // Step 3: Refund via Razorpay
+        let refundResponse = await refundPayment(shiprocketOrder?.paymentInfo?.id, localOrder.totalPrice);
+
+        if (refundResponse?.error?.code === "BAD_REQUEST_ERROR") {
+            return res.status(400).json({ status: 'failed', message: refundResponse.error.description });
+        }
+
+
+
+        return res.status(200).json({ status: 'success', data: cancelResponse.data });
     } catch (error) {
-        console.error('Error in cancelorder:', error.message);
-        res.status(error.response?.status || 500).json({ status: 'error', message: error.response?.data?.message || 'Internal Server Error' });
+        console.error('Error in cancelorder:', error.response?.data || error.message);
+        return res.status(error.response?.status || 500).json({
+            status: 'error',
+            message: error.response?.data?.message || error.message || 'Internal Server Error',
+        });
     }
-}
+};

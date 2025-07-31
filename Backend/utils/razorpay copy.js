@@ -16,7 +16,7 @@ const createOrder = async (amount, currency = 'INR', receipt) => {
       amount: amount * 100,
       currency: currency,
       receipt: receipt,
-      payment_capture: 1
+      // payment_capture: 1
     };
 
     const order = await razorpay.orders.create(options);
@@ -59,7 +59,7 @@ const refundPayment = async (paymentId, amount, reason = 'Customer request') => 
 
 
     const options = amount
-      ? { amount: amount * 100 } // in paise, so ₹10 = 1000
+      ? { amount: amount } // in paise, so ₹10 = 1000
       : {}; // full refund if no amount specified
 
     const refund = await razorpay.payments.refund(paymentId, options);
@@ -74,9 +74,23 @@ const refundPayment = async (paymentId, amount, reason = 'Customer request') => 
   }
 };
 
+//  Capture the Payment
+const CapturePayment = async (paymentid, amount) => {
+  try {
+    console.log("ff", paymentid, amount)
+    const order = await razorpay.payments.capture(paymentid, amount * 100, 'INR');
+    console.log("order", order)
+    return order;
+  } catch (error) {
+    console.log(error)
+    throw new Error(`Error creating Razorpay order: ${error.message}`);
+  }
+}
+
 module.exports = {
   createOrder,
   verifyPayment,
   getPaymentDetails,
-  refundPayment
+  refundPayment,
+  CapturePayment
 }; 

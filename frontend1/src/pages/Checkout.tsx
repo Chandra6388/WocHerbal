@@ -34,7 +34,7 @@ interface RazorpayOptions {
   currency: string;
   name: string;
   description: string;
-  order_id: string;
+  // order_id: string;
   handler: (response: any) => void;
   prefill?: {
     name?: string;
@@ -94,19 +94,32 @@ const Checkout = () => {
 
   // Validation function to check if a value is empty, null, or undefined
   const isEmptyOrInvalid = (value: any): boolean => {
-    return value === null || value === undefined || value === "" || (typeof value === 'string' && value.trim() === "");
+    return (
+      value === null ||
+      value === undefined ||
+      value === "" ||
+      (typeof value === "string" && value.trim() === "")
+    );
   };
 
   // Comprehensive validation function
   const validateFormData = (): { isValid: boolean; errorMessage: string } => {
     // Check if product data exists
     if (!productdata || isEmptyOrInvalid(productdata._id)) {
-      return { isValid: false, errorMessage: "Product information is missing. Please go back and select a product." };
+      return {
+        isValid: false,
+        errorMessage:
+          "Product information is missing. Please go back and select a product.",
+      };
     }
 
     // Check if quantity exists
     if (!location?.state?.quantity || location.state.quantity <= 0) {
-      return { isValid: false, errorMessage: "Invalid quantity. Please go back and select a valid quantity." };
+      return {
+        isValid: false,
+        errorMessage:
+          "Invalid quantity. Please go back and select a valid quantity.",
+      };
     }
 
     // Check required form fields
@@ -122,31 +135,46 @@ const Checkout = () => {
 
     for (const { field, name } of requiredFields) {
       if (isEmptyOrInvalid(field)) {
-        return { isValid: false, errorMessage: `${name} is required and cannot be empty.` };
+        return {
+          isValid: false,
+          errorMessage: `${name} is required and cannot be empty.`,
+        };
       }
     }
 
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email.trim())) {
-      return { isValid: false, errorMessage: "Please enter a valid email address." };
+      return {
+        isValid: false,
+        errorMessage: "Please enter a valid email address.",
+      };
     }
 
     // Phone validation (basic)
     const phoneRegex = /^\d{10}$/;
     if (!phoneRegex.test(formData.phone.trim())) {
-      return { isValid: false, errorMessage: "Please enter a valid 10-digit phone number." };
+      return {
+        isValid: false,
+        errorMessage: "Please enter a valid 10-digit phone number.",
+      };
     }
 
     // Pincode validation (Indian pincode format)
     const pincodeRegex = /^\d{6}$/;
     if (!pincodeRegex.test(formData.pincode.trim())) {
-      return { isValid: false, errorMessage: "Please enter a valid 6-digit pincode." };
+      return {
+        isValid: false,
+        errorMessage: "Please enter a valid 6-digit pincode.",
+      };
     }
 
     // Payment method validation
     if (!["razorpay", "cod"].includes(formData.paymentMethod)) {
-      return { isValid: false, errorMessage: "Please select a valid payment method." };
+      return {
+        isValid: false,
+        errorMessage: "Please select a valid payment method.",
+      };
     }
 
     return { isValid: true, errorMessage: "" };
@@ -249,7 +277,8 @@ const Checkout = () => {
       } else {
         toast({
           title: "Error",
-          description: otpResponse?.message || "Failed to send OTP. Please try again.",
+          description:
+            otpResponse?.message || "Failed to send OTP. Please try again.",
           variant: "destructive",
         });
       }
@@ -303,7 +332,8 @@ const Checkout = () => {
       } else {
         toast({
           title: "Error",
-          description: verifyResponse?.message || "Invalid OTP. Please try again.",
+          description:
+            verifyResponse?.message || "Invalid OTP. Please try again.",
           variant: "destructive",
         });
       }
@@ -332,7 +362,7 @@ const Checkout = () => {
     }
 
     try {
-     await loadRazorpayScript("https://checkout.razorpay.com/v1/checkout.js");
+      await loadRazorpayScript("https://checkout.razorpay.com/v1/checkout.js");
       const finalAmount = Math.round(getSubtotal());
       if (finalAmount <= 0) {
         toast({
@@ -343,7 +373,9 @@ const Checkout = () => {
         return;
       }
 
-      const orderResponse = await createOrderByrazorpay({ amount: finalAmount });
+      const orderResponse = await createOrderByrazorpay({
+        amount: finalAmount,
+      });
       if (!orderResponse?.order?.id) {
         toast({
           title: "Error",
@@ -359,7 +391,7 @@ const Checkout = () => {
         key: RAZORPAY_KEY_ID,
         amount: order.amount,
         currency: "INR",
-        order_id: order._id,
+        // order_id: order._id,
         name: "My E-Commerce Store",
         description: "Order Payment",
         handler: async (response: any) => {
@@ -367,11 +399,17 @@ const Checkout = () => {
             if (!response?.razorpay_payment_id) {
               toast({
                 title: "Error",
-                description: "Payment verification failed. Please contact support.",
+                description:
+                  "Payment verification failed. Please contact support.",
                 variant: "destructive",
               });
               return;
             }
+            console.log("order_id: order._id", order._id);
+            console.log(
+              "response.razorpay_payment_id",
+              response.razorpay_payment_id
+            );
 
             const orderRes = await createOrder(
               createOrderPayload(response.razorpay_payment_id)
@@ -447,7 +485,8 @@ const Checkout = () => {
     if (isEmptyOrInvalid(RAZORPAY_KEY_ID)) {
       toast({
         title: "Configuration Error",
-        description: "Payment gateway configuration is missing. Please contact support.",
+        description:
+          "Payment gateway configuration is missing. Please contact support.",
         variant: "destructive",
       });
       return;
@@ -477,16 +516,16 @@ const Checkout = () => {
             "No courier service available for this pincode. Please try a different pincode.",
           variant: "destructive",
         });
-        return; 
+        return;
       }
     } catch (error) {
       console.error("Shipping Availability Error:", error);
       toast({
-        title: "Shipping Error",  
+        title: "Shipping Error",
         description: "Failed to check shipping availability. Please try again.",
         variant: "destructive",
       });
-      return; 
+      return;
     }
 
     if (!isAuthenticated) {
@@ -504,9 +543,12 @@ const Checkout = () => {
         <div className="container mx-auto px-6 py-8">
           <Card>
             <CardContent className="p-8 text-center">
-              <h2 className="text-2xl font-bold text-foreground mb-4">Invalid Order</h2>
+              <h2 className="text-2xl font-bold text-foreground mb-4">
+                Invalid Order
+              </h2>
               <p className="text-muted-foreground mb-4">
-                Product information is missing. Please go back and select a product.
+                Product information is missing. Please go back and select a
+                product.
               </p>
               <Button onClick={() => navigate(-1)}>Go Back</Button>
             </CardContent>
@@ -709,24 +751,28 @@ const Checkout = () => {
                       inputMode="numeric"
                       maxLength={1}
                       value={digit}
-                      onChange={e => {
+                      onChange={(e) => {
                         const val = e.target.value.replace(/\D/g, "");
                         if (!val) return;
                         const newOtp = [...otp];
                         newOtp[idx] = val;
                         setOtp(newOtp);
                         // Move focus to next box
-                        const next = document.getElementById(`otp-box-${idx + 1}`);
+                        const next = document.getElementById(
+                          `otp-box-${idx + 1}`
+                        );
                         if (next) (next as HTMLInputElement).focus();
                       }}
-                      onKeyDown={e => {
+                      onKeyDown={(e) => {
                         if (e.key === "Backspace") {
                           const newOtp = [...otp];
                           if (otp[idx]) {
                             newOtp[idx] = "";
                             setOtp(newOtp);
                           } else if (idx > 0) {
-                            const prev = document.getElementById(`otp-box-${idx - 1}`);
+                            const prev = document.getElementById(
+                              `otp-box-${idx - 1}`
+                            );
                             if (prev) (prev as HTMLInputElement).focus();
                           }
                         }
