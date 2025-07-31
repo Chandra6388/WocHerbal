@@ -41,9 +41,9 @@ const Customers = () => {
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const filteredCustomers = customers.filter(customer => {
-    const matchesSearch = customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      customer.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || customer.status === statusFilter;
+    const matchesSearch = customer?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      customer?.email?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = statusFilter === 'all' || customer?.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
