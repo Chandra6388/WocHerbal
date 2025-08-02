@@ -175,7 +175,7 @@ const Checkout = () => {
   };
 
   const createOrderPayload = (paymentId: string | null = null) => ({
-    user: user?._id,
+    user: user?._id, 
     orderItems: [formattedItems],
     shippingInfo: {
       address: formData.address,

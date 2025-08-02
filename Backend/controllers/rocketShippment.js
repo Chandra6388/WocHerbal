@@ -25,8 +25,7 @@ async function getShiprocketToken() {
         password: process.env.SHIPROCKET_PASSWORD
     });
     shiprocketToken = loginRes?.data?.token;
-    await User.updateOne({ role: "admin" }, { accessToken: shiprocketToken });
-    // 10 days expiry
+    await User.updateOne({ role: "admin" }, { accessToken: shiprocketToken });// 10 days expiry
     tokenExpiry = Date.now() + 10 * 24 * 60 * 60 * 1000;
     return shiprocketToken;
 }
