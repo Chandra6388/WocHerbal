@@ -74,7 +74,7 @@ exports.newOrder = async (req, res, next) => {
       paymentInfo,
       user
     } = req.body;
-    console.log("paymentInfo", req.body)
+
 
     // 1️⃣ Create order in DB
     const order = await Order.create({
@@ -108,6 +108,7 @@ exports.newOrder = async (req, res, next) => {
 
     // 4️⃣ Get Shiprocket access token
     const admin = await User.findOne({ role: "admin" }).select("accessToken");
+    console.log("sss", admin)
     const accessToken = admin?.accessToken;
     if (!accessToken) {
       return res.status(500).json({ success: false, message: "Missing Shiprocket access token." });

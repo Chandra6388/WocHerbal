@@ -7,30 +7,108 @@ const { refundPayment } = require('../utils/razorpay');
 let shiprocketToken = null;
 let tokenExpiry = null;
 
+// async function getShiprocketToken() {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//     if (shiprocketToken && tokenExpiry && Date.now() < tokenExpiry) {
+//         return shiprocketToken;
+//     }
+//     let user = await User.findOne({ role: "admin" }).select('accessToken');
+//     if (user && user.accessToken) {
+//         shiprocketToken = user.accessToken;
+//         return shiprocketToken;
+//     }
+
+
+
+//     const loginRes = await axios.post('https://apiv2.shiprocket.in/v1/external/auth/login', {
+//         email: process.env.SHIPROCKET_EMAIL,
+//         password: process.env.SHIPROCKET_PASSWORD
+//     });
+//     console.log("ssssss", loginRes)
+//     shiprocketToken = loginRes?.data?.token;
+//     await User.updateOne({ role: "admin" }, { accessToken: shiprocketToken });
+//     // 10 days expiry
+//     tokenExpiry = Date.now() + 10 * 24 * 60 * 60 * 1000;
+//     return shiprocketToken;
+// }
+
+
+
+
+// Update path as needed
+
 async function getShiprocketToken() {
+    try {
+        // ✅ 1. In-memory cache check
+        if (shiprocketToken && tokenExpiry && Date.now() < tokenExpiry) {
+            return shiprocketToken;
+        }
 
-    if (shiprocketToken && tokenExpiry && Date.now() < tokenExpiry) {
-        return shiprocketToken;
+        // ✅ 2. Check token in DB (with expiry)
+        const user = await User.findOne({ role: "admin" }).select("accessToken tokenExpiry");
+
+        if (
+            user &&
+            user.accessToken &&
+            user.tokenExpiry &&
+            new Date(user.tokenExpiry).getTime() > Date.now()
+        ) {
+            shiprocketToken = user.accessToken;
+            tokenExpiry = new Date(user.tokenExpiry).getTime();
+            return shiprocketToken;
+        }
+
+        // ✅ 3. Fetch new token from Shiprocket
+        const loginRes = await axios.post("https://apiv2.shiprocket.in/v1/external/auth/login", {
+            email: process.env.SHIPROCKET_EMAIL,
+            password: process.env.SHIPROCKET_PASSWORD,
+        });
+
+        if (loginRes?.data?.token) {
+            shiprocketToken = loginRes.data.token;
+
+            // Set new expiry: 10 days from now
+            tokenExpiry = Date.now() + 10 * 24 * 60 * 60 * 1000;
+
+            // ✅ Save new token and expiry in DB
+            await User.updateOne(
+                { role: "admin" },
+                {
+                    accessToken: shiprocketToken,
+                    tokenExpiry: new Date(tokenExpiry),
+                }
+            );
+
+            return shiprocketToken;
+        } else {
+            throw new Error("Shiprocket token not received");
+        }
+    } catch (error) {
+        console.error("Error getting Shiprocket token:", error.message);
+        throw new Error("Unable to fetch Shiprocket token");
     }
-    let user = await User.findOne({ role: "admin" }).select('accessToken');
-
-    if (user && user.accessToken) {
-        shiprocketToken = user.accessToken;
-        return shiprocketToken;
-    }
-
-
-
-    const loginRes = await axios.post('https://apiv2.shiprocket.in/v1/external/auth/login', {
-        email: process.env.SHIPROCKET_EMAIL,
-        password: process.env.SHIPROCKET_PASSWORD
-    });
-    shiprocketToken = loginRes?.data?.token;
-    await User.updateOne({ role: "admin" }, { accessToken: shiprocketToken });
-    // 10 days expiry
-    tokenExpiry = Date.now() + 10 * 24 * 60 * 60 * 1000;
-    return shiprocketToken;
 }
+
+
+
 
 function getAxiosInstance() {
     const instance = axios.create({
@@ -64,7 +142,6 @@ exports.login = async (req, res) => {
         const token = await getShiprocketToken();
         res.status(200).json({ status: 'success', token });
     } catch (error) {
-        console.log("Ss", error)
         console.error('Shiprocket login error:', error.message);
         res.status(500).json({ status: 'error', message: error.message });
     }
