@@ -1,34 +1,114 @@
 const axios = require('axios');
 const User = require('../models/User');
 const ShiprocketOrder = require('../models/shiprocketOrder');
+const Order = require("../models/Order")
 require('dotenv').config();
 const { refundPayment } = require('../utils/razorpay');
 let shiprocketToken = null;
 let tokenExpiry = null;
 
+// async function getShiprocketToken() {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//     if (shiprocketToken && tokenExpiry && Date.now() < tokenExpiry) {
+//         return shiprocketToken;
+//     }
+//     let user = await User.findOne({ role: "admin" }).select('accessToken');
+//     if (user && user.accessToken) {
+//         shiprocketToken = user.accessToken;
+//         return shiprocketToken;
+//     }
+
+
+
+//     const loginRes = await axios.post('https://apiv2.shiprocket.in/v1/external/auth/login', {
+//         email: process.env.SHIPROCKET_EMAIL,
+//         password: process.env.SHIPROCKET_PASSWORD
+//     });
+//     console.log("ssssss", loginRes)
+//     shiprocketToken = loginRes?.data?.token;
+//     await User.updateOne({ role: "admin" }, { accessToken: shiprocketToken });
+//     // 10 days expiry
+//     tokenExpiry = Date.now() + 10 * 24 * 60 * 60 * 1000;
+//     return shiprocketToken;
+// }
+
+
+
+
+// Update path as needed
+
 async function getShiprocketToken() {
+    try {
+        // ✅ 1. In-memory cache check
+        if (shiprocketToken && tokenExpiry && Date.now() < tokenExpiry) {
+            return shiprocketToken;
+        }
 
-    if (shiprocketToken && tokenExpiry && Date.now() < tokenExpiry) {
-        return shiprocketToken;
+        // ✅ 2. Check token in DB (with expiry)
+        const user = await User.findOne({ role: "admin" }).select("accessToken tokenExpiry");
+
+        if (
+            user &&
+            user.accessToken &&
+            user.tokenExpiry &&
+            new Date(user.tokenExpiry).getTime() > Date.now()
+        ) {
+            shiprocketToken = user.accessToken;
+            tokenExpiry = new Date(user.tokenExpiry).getTime();
+            return shiprocketToken;
+        }
+
+        // ✅ 3. Fetch new token from Shiprocket
+        const loginRes = await axios.post("https://apiv2.shiprocket.in/v1/external/auth/login", {
+            email: process.env.SHIPROCKET_EMAIL,
+            password: process.env.SHIPROCKET_PASSWORD,
+        });
+
+        if (loginRes?.data?.token) {
+            shiprocketToken = loginRes.data.token;
+
+            // Set new expiry: 10 days from now
+            tokenExpiry = Date.now() + 10 * 24 * 60 * 60 * 1000;
+
+            // ✅ Save new token and expiry in DB
+            await User.updateOne(
+                { role: "admin" },
+                {
+                    accessToken: shiprocketToken,
+                    tokenExpiry: new Date(tokenExpiry),
+                }
+            );
+
+            return shiprocketToken;
+        } else {
+            throw new Error("Shiprocket token not received");
+        }
+    } catch (error) {
+        console.error("Error getting Shiprocket token:", error.message);
+        throw new Error("Unable to fetch Shiprocket token");
     }
-    let user = await User.findOne({ role: "admin" }).select('accessToken');
-
-    if (user && user.accessToken) {
-        shiprocketToken = user.accessToken;
-        return shiprocketToken;
-    }
-
-
-
-    const loginRes = await axios.post('https://apiv2.shiprocket.in/v1/external/auth/login', {
-        email: process.env.SHIPROCKET_EMAIL,
-        password: process.env.SHIPROCKET_PASSWORD
-    });
-    shiprocketToken = loginRes?.data?.token;
-    await User.updateOne({ role: "admin" }, { accessToken: shiprocketToken });// 10 days expiry
-    tokenExpiry = Date.now() + 10 * 24 * 60 * 60 * 1000;
-    return shiprocketToken;
 }
+
+
+
 
 function getAxiosInstance() {
     const instance = axios.create({
@@ -62,7 +142,6 @@ exports.login = async (req, res) => {
         const token = await getShiprocketToken();
         res.status(200).json({ status: 'success', token });
     } catch (error) {
-        console.log("Ss", error)
         console.error('Shiprocket login error:', error.message);
         res.status(500).json({ status: 'error', message: error.message });
     }
@@ -90,7 +169,7 @@ exports.getServiceability = async (req, res) => {
 exports.createOrder = async (req, res) => {
     try {
         const orderData = req.body;
-       
+
         const response = await shiprocket.post('/v1/external/orders/create/adhoc', orderData);
         const data = response.data;
         // Save to DB
@@ -218,36 +297,88 @@ exports.getOrders = async (req, res) => {
 
 exports.cancelShipment = async (req, res) => {
     try {
-        const { awbs } = req.body;
-        const response = await shiprocket.post('/v1/external/orders/cancel/shipment/awbs', { awbs });
-        res.status(200).json({ status: 'success', data: response.data });
+        const { orderId } = req.body;
+
+        // Step 1: Find Shiprocket Order
+        const shiprocketOrder = await ShiprocketOrder.findOne({ orderId });
+        if (!shiprocketOrder) {
+            return res.status(404).json({ status: 'error', message: 'Shiprocket Order not found' });
+        }
+
+        // Step 2: Find Local Order
+        const localOrder = await Order.findOne({ _id: shiprocketOrder.order_id });
+        if (!localOrder) {
+            return res.status(404).json({ status: 'error', message: 'Local Order not found' });
+        }
+
+        // Step 4: Cancel Shiprocket Order
+        const cancelResponse = await shiprocket.post('/v1/external/orders/cancel/shipment/awbs', {
+            ids: [Number(orderId)] // Ensure orderId is a number
+        });
+        if (cancelResponse.data.status_code != 200) {
+            return res.status(404).json({ status: 'error', message: 'Error in shiprocket', error: cancelResponse.data });
+        }
+
+        // Step 3: Refund via Razorpay
+        let refundResponse = await refundPayment(shiprocketOrder?.paymentInfo?.id, localOrder.totalPrice);
+
+        if (refundResponse?.error?.code === "BAD_REQUEST_ERROR") {
+            return res.status(400).json({ status: 'failed', message: refundResponse.error.description });
+        }
+
+
+
+        return res.status(200).json({ status: 'success', data: cancelResponse.data });
     } catch (error) {
-        console.error('Error in cancelShipment:', error.message);
-        res.status(error.response?.status || 500).json({ status: 'error', message: error.response?.data?.message || 'Internal Server Error' });
+        console.error('Error in cancelorder:', error.response?.data || error.message);
+        return res.status(error.response?.status || 500).json({
+            status: 'error',
+            message: error.response?.data?.message || error.message || 'Internal Server Error',
+        });
     }
 }
 
-// curl --location 'https://apiv2.shiprocket.in/v1/external/orders/cancel' \
-// --header 'Content-Type: application/json' \
-// --header 'Authorization: Bearer {{token}}' \
-// --data '{
-//   "ids": [16168898,16167171]
-// }'
+
 
 exports.cancelorder = async (req, res) => {
     try {
         const { orderId } = req.body;
-        console.log("ids", orderId)
-        const ShiprocketOrderFind = await ShiprocketOrder.findOne({ orderId: orderId })
-        console.log("ShiprocketOrderFind", ShiprocketOrderFind?.paymentInfo.id)
+
+        // Step 1: Find Shiprocket Order
+        const shiprocketOrder = await ShiprocketOrder.findOne({ orderId });
+        if (!shiprocketOrder) {
+            return res.status(404).json({ status: 'error', message: 'Shiprocket Order not found' });
+        }
+
+        // Step 2: Find Local Order
+        const localOrder = await Order.findOne({ _id: shiprocketOrder.order_id });
+        if (!localOrder) {
+            return res.status(404).json({ status: 'error', message: 'Local Order not found' });
+        }
+
+        // Step 4: Cancel Shiprocket Order
+        const cancelResponse = await shiprocket.post('/v1/external/orders/cancel', {
+            ids: [Number(orderId)] // Ensure orderId is a number
+        });
+        if (cancelResponse.data.status_code != 200) {
+            return res.status(404).json({ status: 'error', message: 'Error in shiprocket', error: cancelResponse.data });
+        }
+
+        // Step 3: Refund via Razorpay
+        let refundResponse = await refundPayment(shiprocketOrder?.paymentInfo?.id, localOrder.totalPrice);
+
+        if (refundResponse?.error?.code === "BAD_REQUEST_ERROR") {
+            return res.status(400).json({ status: 'failed', message: refundResponse.error.description });
+        }
 
 
-        await refundPayment(ShiprocketOrderFind?.paymentInfo.id, refundAmount, refundReason);
-        return
-        const response = await shiprocket.post('/v1/external/orders/cancel', { ids });
-        res.status(200).json({ status: 'success', data: response.data });
+
+        return res.status(200).json({ status: 'success', data: cancelResponse.data });
     } catch (error) {
-        console.error('Error in cancelorder:', error.message);
-        res.status(error.response?.status || 500).json({ status: 'error', message: error.response?.data?.message || 'Internal Server Error' });
+        console.error('Error in cancelorder:', error.response?.data || error.message);
+        return res.status(error.response?.status || 500).json({
+            status: 'error',
+            message: error.response?.data?.message || error.message || 'Internal Server Error',
+        });
     }
-}
+};

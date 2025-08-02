@@ -1,10 +1,10 @@
-import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingCart, Star, Sparkles } from 'lucide-react';
-import { Button } from './ui/button';
-import { getPrimaryProduct } from '../data/products';
-import { useCart } from '../contexts/CartContext';
-import { useState } from 'react';
-import AddToCartPopup from './AddToCartPopup';
+import { Link, useNavigate } from "react-router-dom";
+import { ShoppingCart, Star, Sparkles } from "lucide-react";
+import { Button } from "./ui/button";
+import { getPrimaryProduct } from "../data/products";
+import { useCart } from "../contexts/CartContext";
+import { useState } from "react";
+import AddToCartPopup from "./AddToCartPopup";
 
 const HeroSection = () => {
   const navigate = useNavigate();
@@ -14,7 +14,7 @@ const HeroSection = () => {
   const primaryProduct = getPrimaryProduct();
 
   const handleAddToCart = () => {
-   navigate('/checkout', { state: { product: primaryProduct, quantity: 1 } });
+    navigate("/checkout", { state: { product: primaryProduct, quantity: 1 } });
   };
 
   return (
@@ -25,8 +25,8 @@ const HeroSection = () => {
           {/* Product Image */}
           <div className="relative mb-8">
             <div className="aspect-square max-w-sm mx-auto overflow-hidden rounded-3xl bg-gradient-to-br from-accent/5 to-muted/5 relative group">
-              <img 
-                src={primaryProduct.images} 
+              <img
+                src={primaryProduct.images}
                 alt={primaryProduct.name}
                 className="w-full h-full object-contain transition-all duration-500 group-hover:scale-110"
               />
@@ -37,10 +37,19 @@ const HeroSection = () => {
           {/* Price and Buy Button */}
           <div className="text-center mb-8 space-y-4">
             <div className="flex items-center justify-center gap-4">
-              <span className="text-3xl font-bold text-foreground">₹{primaryProduct.price}</span>
-              <span className="text-xl text-muted-foreground line-through">₹{primaryProduct.originalPrice}</span>
+              <span className="text-3xl font-bold text-foreground">
+                ₹{primaryProduct.price}
+              </span>
+              <span className="text-xl text-muted-foreground line-through">
+                ₹{primaryProduct.originalPrice}
+              </span>
               <div className="bg-gradient-to-r from-primary to-accent text-white px-3 py-1 rounded-full text-sm font-bold">
-                {Math.round(((primaryProduct.originalPrice - primaryProduct.price) / primaryProduct.originalPrice) * 100)}% OFF
+                {Math.round(
+                  ((primaryProduct.originalPrice - primaryProduct.price) /
+                    primaryProduct.originalPrice) *
+                    100
+                )}
+                % OFF
               </div>
             </div>
 
@@ -50,12 +59,14 @@ const HeroSection = () => {
                   <Star key={i} className="w-4 h-4 fill-accent text-accent" />
                 ))}
               </div>
-              <span className="text-muted-foreground">({primaryProduct.reviews} reviews)</span>
+              <span className="text-muted-foreground">
+                ({primaryProduct.reviews} reviews)
+              </span>
             </div>
 
-            <Button 
-              variant="premium" 
-              size="lg" 
+            <Button
+              variant="premium"
+              size="lg"
               className="group w-full max-w-xs"
               onClick={handleAddToCart}
             >
@@ -70,38 +81,50 @@ const HeroSection = () => {
               <Sparkles className="w-4 h-4 mr-2" />
               Packed with 100 Benefits
             </div>
-            
+
             <div className="space-y-4">
               <h1 className="text-3xl md:text-4xl font-playfair font-bold text-foreground leading-tight">
-                Packed with{' '}
+                Packed with{" "}
                 <span className="bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent">
                   100 Benefits
-                </span>{' '}
+                </span>{" "}
                 in Every Drop.
               </h1>
-              
+
               <p className="text-lg text-muted-foreground">
-                WOC Herbal Hair Oil brings you the perfect blend of traditional Ayurveda and modern science. 
-                Each bottle contains 30+ carefully selected natural ingredients for complete hair transformation.
+                WOC Panchgavya Ayurvedic Herbal Hair Oil is a strong mix of 30
+                powerful herbs, each known to offer at least 5 unique benefits,
+                from hair growth to scalp health. This single bottle enriches
+                your hair with the goodness of indigenous cow milk, and it
+                brings you over 100+ natural solutions for stronger, shinier,
+                and healthier hair.
               </p>
             </div>
             {/* Product highlights */}
             <div className="grid grid-cols-2 gap-4 max-w-md mx-auto">
               <div className="flex items-center space-x-3">
                 <div className="w-3 h-3 bg-accent rounded-full"></div>
-                <span className="text-muted-foreground text-sm">Made in India</span>
+                <span className="text-muted-foreground text-sm">
+                  Made in India
+                </span>
               </div>
               <div className="flex items-center space-x-3">
                 <div className="w-3 h-3 bg-accent rounded-full"></div>
-                <span className="text-muted-foreground text-sm">100% Authentic Ingredients</span>
+                <span className="text-muted-foreground text-sm">
+                  100% Authentic Ingredients
+                </span>
               </div>
               <div className="flex items-center space-x-3">
                 <div className="w-3 h-3 bg-accent rounded-full"></div>
-                <span className="text-muted-foreground text-sm">Aromatic Therapy</span>
+                <span className="text-muted-foreground text-sm">
+                  Aromatic Therapy
+                </span>
               </div>
               <div className="flex items-center space-x-3">
                 <div className="w-3 h-3 bg-accent rounded-full"></div>
-                <span className="text-muted-foreground text-sm">Long-Lasting Results</span>
+                <span className="text-muted-foreground text-sm">
+                  Long-Lasting Results
+                </span>
               </div>
             </div>
 
@@ -121,21 +144,25 @@ const HeroSection = () => {
               <Sparkles className="w-4 h-4 mr-2" />
               Packed with 100 Benefits
             </div>
-            
+
             <div className="space-y-4">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-playfair font-bold text-foreground leading-tight">
-                Packed with{' '}
+                Packed with{" "}
                 <span className="bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent">
                   100 Benefits
-                </span>{' '}
+                </span>{" "}
                 in Every Drop.
               </h1>
-              
+
               <p className="text-lg md:text-xl text-muted-foreground max-w-2xl">
-                WOC Herbal Hair Oil brings you the perfect blend of traditional Ayurveda and modern science. 
-                Each bottle contains 30+ carefully selected natural ingredients for complete hair transformation.
+                WOC Panchgavya Ayurvedic Herbal Hair Oil is a strong mix of 30
+                powerful herbs, each known to offer at least 5 unique benefits,
+                from hair growth to scalp health. This single bottle enriches
+                your hair with the goodness of indigenous cow milk, and it
+                brings you over 100+ natural solutions for stronger, shinier,
+                and healthier hair.
               </p>
-            </div> 
+            </div>
 
             {/* Product highlights */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -145,7 +172,9 @@ const HeroSection = () => {
               </div>
               <div className="flex items-center space-x-3">
                 <div className="w-3 h-3 bg-accent rounded-full"></div>
-                <span className="text-muted-foreground">100% Authentic Ingredients</span>
+                <span className="text-muted-foreground">
+                  100% Authentic Ingredients
+                </span>
               </div>
               <div className="flex items-center space-x-3">
                 <div className="w-3 h-3 bg-accent rounded-full"></div>
@@ -153,17 +182,28 @@ const HeroSection = () => {
               </div>
               <div className="flex items-center space-x-3">
                 <div className="w-3 h-3 bg-accent rounded-full"></div>
-                <span className="text-muted-foreground">Long-Lasting Results</span>
+                <span className="text-muted-foreground">
+                  Long-Lasting Results
+                </span>
               </div>
             </div>
 
             {/* Pricing and CTA */}
             <div className="space-y-4">
               <div className="flex items-center gap-4">
-                <span className="text-3xl md:text-4xl font-bold text-foreground">₹{primaryProduct.price}</span>
-                <span className="text-xl text-muted-foreground line-through">₹{primaryProduct.originalPrice}</span>
+                <span className="text-3xl md:text-4xl font-bold text-foreground">
+                  ₹{primaryProduct.price}
+                </span>
+                <span className="text-xl text-muted-foreground line-through">
+                  ₹{primaryProduct.originalPrice}
+                </span>
                 <div className="bg-gradient-to-r from-primary to-accent text-white px-3 py-1 rounded-full text-sm font-bold">
-                  {Math.round(((primaryProduct.originalPrice - primaryProduct.price) / primaryProduct.originalPrice) * 100)}% OFF
+                  {Math.round(
+                    ((primaryProduct.originalPrice - primaryProduct.price) /
+                      primaryProduct.originalPrice) *
+                      100
+                  )}
+                  % OFF
                 </div>
               </div>
 
@@ -173,13 +213,15 @@ const HeroSection = () => {
                     <Star key={i} className="w-4 h-4 fill-accent text-accent" />
                   ))}
                 </div>
-                <span className="text-muted-foreground">({primaryProduct.reviews} reviews)</span>
+                <span className="text-muted-foreground">
+                  ({primaryProduct.reviews} reviews)
+                </span>
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button 
-                  variant="premium" 
-                  size="lg" 
+                <Button
+                  variant="premium"
+                  size="lg"
                   className="group"
                   onClick={handleAddToCart}
                 >
@@ -187,7 +229,11 @@ const HeroSection = () => {
                   Buy Now - ₹{primaryProduct.price}
                 </Button>
                 <Link to="/products">
-                  <Button variant="outline" size="lg" className="w-full sm:w-auto">
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="w-full sm:w-auto"
+                  >
                     Explore Products
                   </Button>
                 </Link>
@@ -198,31 +244,34 @@ const HeroSection = () => {
           {/* Right side - Product Image */}
           <div className="relative">
             <div className="aspect-square overflow-hidden rounded-3xl bg-gradient-to-br from-accent/5 to-muted/5 relative group">
-              <img 
-                src={primaryProduct.images} 
+              <img
+                src={primaryProduct.images}
                 alt={primaryProduct.name}
                 className="w-full h-full object-contain transition-all duration-500 group-hover:scale-110"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-transparent to-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </div>
-            
+
             {/* Floating elements for visual appeal */}
             <div className="absolute -top-4 -right-4 w-20 h-20 bg-accent/20 rounded-full blur-xl animate-pulse"></div>
-            <div className="absolute -bottom-4 -left-4 w-16 h-16 bg-primary/20 rounded-full blur-lg animate-pulse" style={{animationDelay: '1s'}}></div>
+            <div
+              className="absolute -bottom-4 -left-4 w-16 h-16 bg-primary/20 rounded-full blur-lg animate-pulse"
+              style={{ animationDelay: "1s" }}
+            ></div>
           </div>
         </div>
       </div>
 
       {/* Add to Cart Popup */}
-      <AddToCartPopup 
-        isOpen={showPopup} 
-        onClose={() => setShowPopup(false)} 
+      <AddToCartPopup
+        isOpen={showPopup}
+        onClose={() => setShowPopup(false)}
         product={{
           id: primaryProduct._id,
           name: primaryProduct.name,
           price: primaryProduct.price,
-          image: primaryProduct.images
-        }} 
+          image: primaryProduct.images,
+        }}
       />
     </section>
   );

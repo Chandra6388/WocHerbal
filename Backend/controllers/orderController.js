@@ -2,7 +2,7 @@ const axios = require('axios');
 const Order = require('../models/Order');
 const Product = require('../models/Product');
 const Cart = require('../models/Cart');
-const { createOrder: createRazorpayOrder, verifyPayment } = require('../utils/razorpay');
+const { createOrder: createRazorpayOrder, verifyPayment, CapturePayment } = require('../utils/razorpay');
 const ErrorHandler = require('../utils/errorHandler');
 const User = require("../models/User");
 const ShiprocketOrder = require('../models/shiprocketOrder');
@@ -22,7 +22,7 @@ async function getShiprocketToken() {
     shiprocketToken = user.accessToken;
     return shiprocketToken;
   }
- 
+
 
   const loginRes = await axios.post('https://apiv2.shiprocket.in/v1/external/auth/login', {
     email: process.env.SHIPROCKET_EMAIL,
@@ -71,8 +71,10 @@ exports.newOrder = async (req, res, next) => {
       taxPrice,
       shippingPrice,
       totalPrice,
-      paymentInfo
+      paymentInfo,
+      user
     } = req.body;
+
 
     // 1️⃣ Create order in DB
     const order = await Order.create({
@@ -84,8 +86,12 @@ exports.newOrder = async (req, res, next) => {
       totalPrice,
       paymentInfo,
       paidAt: Date.now(),
-      user: req.user?._id || null
+      user: user
     });
+
+
+    console.log("order", order)
+
 
     // 2️⃣ Map order items for Shiprocket
     const orderItemsReq = orderItems.map(item => ({
@@ -107,11 +113,16 @@ exports.newOrder = async (req, res, next) => {
     // 4️⃣ Get Shiprocket access token
     const admin = await User.findOne({ role: "admin" }).select("accessToken");
     const accessToken = admin?.accessToken;
+    console.log("sss", accessToken)
     if (!accessToken) {
       return res.status(500).json({ success: false, message: "Missing Shiprocket access token." });
     }
- 
- 
+
+    // console.log(paymentInfo.id, totalPrice)
+    // let captureRes = await CapturePayment(paymentInfo.id, totalPrice)
+    // console.log("captureRes", captureRes)
+
+
     const shipmentData = {
       order_id: order?._id?.toString(),
       order_date: new Date().toISOString().slice(0, 10),
@@ -137,11 +148,16 @@ exports.newOrder = async (req, res, next) => {
       weight: 0.27
     }
 
+    console.log("shipmentData", shipmentData)
+
 
     const shiprocketRes = await shiprocket.post('/v1/external/orders/create/adhoc', shipmentData);
     // const data = response.data;
 
 
+    console.log("shiprocketRes", shiprocketRes)
+    console.log("shiprocketRes.data", shiprocketRes.data)
+    console.log("shiprocketRes.data.shipment_id", shiprocketRes.shipment_id.data.data)
 
 
 
@@ -390,7 +406,7 @@ exports.createPayment = async (req, res, next) => {
 // };
 
 
-exports.verifyPayment = async(req, res) => {
+exports.verifyPayment = async (req, res) => {
   const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
 
   const secret = process.env.RAZORPAY_KEY_SECRET;
@@ -532,3 +548,18 @@ exports.getOverallRevenue = async (req, res) => {
     res.status(500).json({ success: false, message: 'Failed to fetch overall revenue', error: error.message });
   }
 };
+
+exports.captureOrder = async (req, res) => {
+  try {
+    const { paymentid, amount } = req.body;
+
+    let captureRes = await CapturePayment(paymentid, amount);
+    console.log(captureRes)
+
+    return res.json({ status: true, data: captureRes })
+
+
+  } catch (error) {
+    return res.json({ status: false, data: error })
+  }
+}

@@ -36,8 +36,8 @@ const schemas = {
   // Product validation
   createProduct: Joi.object({
     name: Joi.string().min(2).max(100).required(),
-    description: Joi.string().min(10).required(),
-    benefits: Joi.string().min(10).required(),
+    description: Joi.string().min(1).required(),
+    benefits: Joi.string().min(1).required(),
     price: Joi.number().positive().required(),
     soldCount: Joi.number().min(0).optional(),
     weight: Joi.string().optional(),
@@ -52,7 +52,7 @@ const schemas = {
     rating: Joi.number().min(0).max(5).optional(),
     reviews: Joi.array().items(
       Joi.object({
-        user: Joi.string().required(),       // should be a valid ObjectId format if needed
+        user: Joi.string().required(),
         name: Joi.string().required(),
         rating: Joi.number().min(0).max(5).required(),
         comment: Joi.string().required()
@@ -62,8 +62,8 @@ const schemas = {
 
   updateProduct: Joi.object({
     name: Joi.string().min(2).max(100).optional(),
-    description: Joi.string().min(10).optional(),
-    benefits: Joi.string().min(10).optional(),
+    description: Joi.string().min(1).optional(),
+    benefits: Joi.string().min(1).optional(),
     price: Joi.number().positive().optional(),
     soldCount: Joi.number().min(0).optional(),
     weight: Joi.string().optional(),

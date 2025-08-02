@@ -1,39 +1,45 @@
-
-import { useState } from 'react';
-import { MapPin, Phone, Mail, Clock, Send } from 'lucide-react';
-import { Button } from '../components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { Input } from '../components/ui/input';
-import { Label } from '../components/ui/label';
-import { Textarea } from '../components/ui/textarea';
+import { useState } from "react";
+import { MapPin, Phone, Mail, Clock, Send } from "lucide-react";
+import { Button } from "../components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
+import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
+import { Textarea } from "../components/ui/textarea";
 
 const Contact = () => {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    subject: '',
-    message: ''
+    name: "",
+    email: "",
+    phone: "",
+    subject: "",
+    message: "",
   });
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Handle form submission
-    console.log('Contact form submitted:', formData);
-    alert('Thank you for your message! We will get back to you soon.');
+    console.log("Contact form submitted:", formData);
+    alert("Thank you for your message! We will get back to you soon.");
     setFormData({
-      name: '',
-      email: '',
-      phone: '',
-      subject: '',
-      message: ''
+      name: "",
+      email: "",
+      phone: "",
+      subject: "",
+      message: "",
     });
   };
 
@@ -41,23 +47,24 @@ const Contact = () => {
     {
       icon: <MapPin className="w-6 h-6" />,
       title: "Visit Us",
-      content: "123 Herbal Street, Ayurveda City, India 400001"
+      content:
+        "33 A, MPIDC, Badiyakhedi Industrial Area, Sehore, Madhya Pradesh, India, 466001",
     },
     {
       icon: <Phone className="w-6 h-6" />,
       title: "Call Us",
-      content: "+91 98765 43210"
+      content: "+91 8878875006",
     },
     {
       icon: <Mail className="w-6 h-6" />,
       title: "Email Us",
-      content: "support@wocherbal.com"
+      content: "Care@wocherbal.com",
     },
     {
       icon: <Clock className="w-6 h-6" />,
       title: "Business Hours",
-      content: "Mon - Sat: 9:00 AM - 6:00 PM"
-    }
+      content: "Monday to Saturday 10:00AM to 6:00PM",
+    },
   ];
 
   return (
@@ -70,7 +77,7 @@ const Contact = () => {
             <span className="block text-accent">Touch</span>
           </h1>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Have questions about our products? Need assistance with your order? 
+            Have questions about our products? Need assistance with your order?
             We're here to help you on your natural hair care journey.
           </p>
         </div>
@@ -80,7 +87,9 @@ const Contact = () => {
           <div>
             <Card>
               <CardHeader>
-                <CardTitle className="text-2xl font-playfair">Send us a Message</CardTitle>
+                <CardTitle className="text-2xl font-playfair">
+                  Send us a Message
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-6">
@@ -109,7 +118,7 @@ const Contact = () => {
                       />
                     </div>
                   </div>
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="phone">Phone Number</Label>
@@ -133,7 +142,7 @@ const Contact = () => {
                       />
                     </div>
                   </div>
-                  
+
                   <div>
                     <Label htmlFor="message">Message</Label>
                     <Textarea
@@ -146,7 +155,7 @@ const Contact = () => {
                       className="mt-1"
                     />
                   </div>
-                  
+
                   <Button type="submit" size="lg" className="w-full">
                     <Send className="w-5 h-5 mr-2" />
                     Send Message
@@ -164,13 +173,20 @@ const Contact = () => {
               </h2>
               <div className="grid grid-cols-1 gap-6">
                 {contactInfo.map((info, index) => (
-                  <Card key={index} className="hover:shadow-lg transition-shadow">
+                  <Card
+                    key={index}
+                    className="hover:shadow-lg transition-shadow"
+                  >
                     <CardContent className="p-6">
                       <div className="flex items-start space-x-4">
                         <div className="text-accent">{info.icon}</div>
                         <div>
-                          <h3 className="font-semibold text-foreground mb-1">{info.title}</h3>
-                          <p className="text-muted-foreground">{info.content}</p>
+                          <h3 className="font-semibold text-foreground mb-1">
+                            {info.title}
+                          </h3>
+                          <p className="text-muted-foreground">
+                            {info.content}
+                          </p>
                         </div>
                       </div>
                     </CardContent>
@@ -180,7 +196,7 @@ const Contact = () => {
             </div>
 
             {/* FAQ Section */}
-            <Card>
+            {/* <Card>
               <CardHeader>
                 <CardTitle>Frequently Asked Questions</CardTitle>
               </CardHeader>
@@ -198,7 +214,7 @@ const Contact = () => {
                   <p className="text-muted-foreground text-sm">We offer a 30-day money-back guarantee if you're not satisfied with the results.</p>
                 </div>
               </CardContent>
-            </Card>
+            </Card> */}
           </div>
         </div>
       </div>

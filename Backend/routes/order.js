@@ -14,11 +14,12 @@ const {
   verifyPayment,
   getOrderStats,
   refundOrder,
-  getOverallRevenue
+  getOverallRevenue,
+  captureOrder
 } = require('../controllers/orderController');
 
 // All routes require authentication
-router.use(protect);
+// router.use(protect);
 
 router.post('/new', validate('createOrder'), newOrder);
 
@@ -39,5 +40,6 @@ router.post('/admin/refund/:id', adminOnly, refundOrder);
 
 router.get('/order/getOverallRevenue', getOverallRevenue);
 
+router.post('/captureupdate', captureOrder);
 
 module.exports = router; 

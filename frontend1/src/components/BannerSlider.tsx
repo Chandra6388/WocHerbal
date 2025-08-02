@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Sparkles, Leaf, Award } from 'lucide-react';
-import { Button } from './ui/button';
+import { useState, useEffect } from "react";
+import { ChevronLeft, ChevronRight, Sparkles, Leaf, Award } from "lucide-react";
+import { Button } from "./ui/button";
 
 const BannerSlider = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -9,18 +9,18 @@ const BannerSlider = () => {
     {
       id: 1,
       image: "/uploads/86ce4255-a691-49a9-99fb-52b0851d8c58.png",
-      mobileImage: "/uploads/b320ad20-94fa-49d0-b7be-bc45347f57b0.png" 
+      mobileImage: "/scrollng_image_mobile/bannerImg.jpeg",
     },
     {
       id: 2,
       image: "/uploads/9bd6cb1c-011e-4067-b5f0-4fceb1e26a90.png",
-      mobileImage: "/uploads/96af52de-e5d2-4f86-a7c6-e71952e09270.png" 
+      mobileImage: "/scrollng_image_mobile/02.jpg",
     },
     {
       id: 3,
       image: "/uploads/986595a1-1c57-44d7-8c20-6dad4265e611.png",
-      mobileImage: "/uploads/8ce48a99-1a06-4083-bc03-b1d3b20c16fd.png"
-    }
+      mobileImage: "/scrollng_image_mobile/05.jpg",
+    },
   ];
 
   useEffect(() => {
@@ -44,7 +44,7 @@ const BannerSlider = () => {
         <div
           key={slide.id}
           className={`absolute inset-0 transition-opacity duration-1000 ${
-            index === currentSlide ? 'opacity-100' : 'opacity-0'
+            index === currentSlide ? "opacity-100" : "opacity-0"
           }`}
         >
           {/* Desktop Image */}
@@ -84,8 +84,8 @@ const BannerSlider = () => {
             onClick={() => setCurrentSlide(index)}
             className={`w-3 h-3 rounded-full transition-all duration-300 ${
               index === currentSlide
-                ? 'bg-accent scale-125 shadow-lg'
-                : 'bg-white/50 hover:bg-white/70'
+                ? "bg-accent scale-125 shadow-lg"
+                : "bg-white/50 hover:bg-white/70"
             }`}
           />
         ))}
