@@ -89,6 +89,10 @@ exports.newOrder = async (req, res, next) => {
       user: user
     });
 
+
+    console.log("order", order)
+
+
     // 2️⃣ Map order items for Shiprocket
     const orderItemsReq = orderItems.map(item => ({
       name: item?.name || "Unnamed Item",
@@ -108,8 +112,8 @@ exports.newOrder = async (req, res, next) => {
 
     // 4️⃣ Get Shiprocket access token
     const admin = await User.findOne({ role: "admin" }).select("accessToken");
-    console.log("sss", admin)
     const accessToken = admin?.accessToken;
+    console.log("sss", accessToken)
     if (!accessToken) {
       return res.status(500).json({ success: false, message: "Missing Shiprocket access token." });
     }
@@ -144,11 +148,16 @@ exports.newOrder = async (req, res, next) => {
       weight: 0.27
     }
 
+    console.log("shipmentData", shipmentData)
+
 
     const shiprocketRes = await shiprocket.post('/v1/external/orders/create/adhoc', shipmentData);
     // const data = response.data;
 
 
+    console.log("shiprocketRes", shiprocketRes)
+    console.log("shiprocketRes.data", shiprocketRes.data)
+    console.log("shiprocketRes.data.shipment_id", shiprocketRes.shipment_id.data.data)
 
 
 
